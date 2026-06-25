@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { defineNuxtPlugin, useRuntimeConfig } from '#imports';
+import { getFirestore } from 'firebase/firestore';
+import { defineNuxtPlugin, useRuntimeConfig, useState } from '#imports';
 
 export default defineNuxtPlugin((nuxtApp) => {
   const config = useRuntimeConfig();
@@ -20,6 +21,18 @@ export default defineNuxtPlugin((nuxtApp) => {
   // Initialize Auth
   const auth = getAuth(app);
 
+  // Initialize Firestore
+  const db = getFirestore(app);
+
+  // Global state for user
+  const user = useState('firebaseUser', () => null as any);
+
+  // Listen to auth state
+  auth.onAuthStateChanged((u) => {
+    user.value = u;
+  });
+
   // Provide to the app
   nuxtApp.provide('auth', auth);
+  nuxtApp.provide('db', db);
 });

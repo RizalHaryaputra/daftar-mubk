@@ -10,10 +10,12 @@ export default defineNuxtRouteMiddleware((to: RouteLocationNormalized, from: Rou
     return;
   }
 
-  if (!isAuthenticated) {
-    // Arahkan ke halaman login
-    // NOTE: Uncomment ketika logic authentication sudah diimplementasi
-    // return navigateTo('/admin/login');
-    console.log('[Middleware] Admin-auth bypass (Mock Mode)');
+  // Gunakan state firebaseUser dari plugin
+  const user = useState('firebaseUser');
+
+  // Karena Firebase onAuthStateChanged async, ini mungkin terbaca null di load pertama (SSR).
+  // Di client side, kalau null kita paksa ke login.
+  if (import.meta.client && !user.value) {
+    return navigateTo('/admin/login');
   }
 });
