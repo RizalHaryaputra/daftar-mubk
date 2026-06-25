@@ -1,0 +1,18 @@
+<template>
+  <div class="space-y-6">
+    <div class="flex justify-between items-center">
+      <h1 class="font-display text-2xl text-brand-brown">Kelola Pendaftaran</h1>
+    </div>
+
+    <div class="bg-white rounded-xl border border-brand-border p-8 text-center text-brand-muted">
+      <p>Modul Pendaftaran (CRUD) akan diimplementasikan setelah skema Firestore aktif.</p>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+definePageMeta({
+  layout: 'admin',
+  middleware: ['admin-auth']
+});
+</script>
