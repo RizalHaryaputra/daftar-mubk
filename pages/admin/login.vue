@@ -17,8 +17,12 @@
           <input type="password" v-model="password" required placeholder="••••••••" class="px-4 py-2 text-sm rounded-lg border border-brand-border bg-white focus:outline-none focus:border-brand-orange transition-colors" />
         </div>
 
-        <AppButton type="submit" variant="primary" class="w-full mt-2">
-          Masuk
+        <div v-if="errorMsg" class="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4 border border-red-100">
+          {{ errorMsg }}
+        </div>
+
+        <AppButton type="submit" variant="primary" class="w-full mt-2" :disabled="isLoading">
+          {{ isLoading ? 'Memproses...' : 'Masuk' }}
         </AppButton>
       </form>
     </div>
@@ -28,18 +32,34 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useNuxtApp } from '#imports';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 definePageMeta({
   layout: false // Halaman login tidak butuh layout sidebar
 });
 
 const router = useRouter();
+const { $auth } = useNuxtApp();
 const email = ref('');
 const password = ref('');
+const errorMsg = ref('');
+const isLoading = ref(false);
 
-const login = () => {
-  // Simulasi sukses login
-  alert('Simulasi: Berhasil Login');
-  router.push('/admin/dashboard');
+const login = async () => {
+  errorMsg.value = '';
+  isLoading.value = true;
+  try {
+    // Authenticate with Firebase Client SDK
+    await signInWithEmailAndPassword($auth, email.value, password.value);
+    
+    // Redirect on success
+    router.push('/admin/dashboard');
+  } catch (error: any) {
+    console.error('Login error:', error);
+    errorMsg.value = 'Email atau password salah. Silakan coba lagi.';
+  } finally {
+    isLoading.value = false;
+  }
 };
 </script>

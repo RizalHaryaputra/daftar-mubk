@@ -1,4 +1,7 @@
-export default defineNuxtRouteMiddleware((to, from) => {
+import type { RouteLocationNormalized } from 'vue-router';
+import { defineNuxtRouteMiddleware } from '#imports';
+
+export default defineNuxtRouteMiddleware((to: RouteLocationNormalized, from: RouteLocationNormalized) => {
   // Simulasi cek login
   const isAuthenticated = false; // Ubah ini saat implementasi Firebase Auth asli
 

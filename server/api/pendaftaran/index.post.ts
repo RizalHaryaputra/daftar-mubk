@@ -1,6 +1,6 @@
 import { getFirestoreDb } from '../../utils/firebase';
 import { createSnapTransaction } from '../../utils/midtrans';
-import { generateInvoiceCode } from '#imports';
+import { generateInvoiceCode } from '../../../utils/generateInvoiceCode';
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);

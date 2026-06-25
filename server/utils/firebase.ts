@@ -1,24 +1,23 @@
-// Mock Firebase Admin setup
-// import * as admin from 'firebase-admin';
+import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
 
-let dbMock: any = null;
+// Initialize Firebase Admin
+if (!getApps().length) {
+  try {
+    initializeApp({
+      credential: cert({
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        // private key string usually has literal \n that needs to be replaced
+        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+      }),
+    });
+    console.log('Firebase Admin initialized successfully');
+  } catch (error) {
+    console.error('Firebase Admin initialization error', error);
+  }
+}
 
 export const getFirestoreDb = () => {
-  // If we had real credentials, we would initialize here.
-  // For now, we mock it.
-  if (!dbMock) {
-    dbMock = {
-      collection: (col: string) => ({
-        doc: (id: string) => ({
-          set: async (data: any) => { console.log(`Mock Firestore SET ${col}/${id}`, data); return true; },
-          get: async () => ({ exists: true, data: () => ({ statusPembayaran: 'pending', rincianBiaya: { total: 250000 } }) }),
-          update: async (data: any) => { console.log(`Mock Firestore UPDATE ${col}/${id}`, data); return true; }
-        }),
-        where: (field: string, op: string, val: any) => ({
-          get: async () => ({ empty: true, docs: [] })
-        })
-      })
-    };
-  }
-  return dbMock;
+  return getFirestore();
 };
