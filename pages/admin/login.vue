@@ -33,7 +33,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useNuxtApp } from '#imports';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, type Auth } from 'firebase/auth';
 
 definePageMeta({
   layout: false // Halaman login tidak butuh layout sidebar
@@ -41,6 +41,7 @@ definePageMeta({
 
 const router = useRouter();
 const { $auth } = useNuxtApp();
+const auth = $auth as Auth;
 const email = ref('');
 const password = ref('');
 const errorMsg = ref('');
@@ -51,7 +52,7 @@ const login = async () => {
   isLoading.value = true;
   try {
     // Authenticate with Firebase Client SDK
-    await signInWithEmailAndPassword($auth, email.value, password.value);
+    await signInWithEmailAndPassword(auth, email.value, password.value);
     
     // Redirect on success
     router.push('/admin/dashboard');
