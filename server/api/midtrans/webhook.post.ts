@@ -1,36 +1,63 @@
 import { getFirestoreDb } from '../../utils/firebase';
+import { sendConfirmationEmail } from '../../utils/mailer';
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   const db = getFirestoreDb();
-  
-  // Notifikasi Midtrans: order_id, transaction_status, dll
-  const orderId = body.order_id;
-  const status = body.transaction_status;
-  
-  // Extract kodeInvoice (if orderId was manipulated like MUBK-XXXX-timestamp)
-  const kodeInvoice = orderId.split('-').slice(0, 3).join('-'); 
-  
+
+  const orderId: string = body.order_id;
+  const status: string = body.transaction_status;
+
+  if (!orderId || !status) {
+    throw createError({ statusCode: 400, message: 'Invalid webhook payload' });
+  }
+
+  // Ambil kode invoice dari orderId (format MUBK-YYYYMMDD-XXXX)
+  // orderId di Midtrans bisa berupa kodeInvoice itu sendiri
+  const kodeInvoice = orderId;
+
   let dbStatus = 'pending';
   if (status === 'capture' || status === 'settlement') {
     dbStatus = 'success';
   } else if (status === 'deny' || status === 'cancel' || status === 'expire') {
-    dbStatus = 'failed';
+    dbStatus = status === 'expire' ? 'expire' : 'failed';
   }
-  
+
   const docRef = db.collection('pendaftaran').doc(kodeInvoice);
+  const docSnap = await docRef.get();
+
+  if (!docSnap.exists) {
+    // Bisa jadi format orderId berbeda, coba query
+    console.warn(`Pendaftaran tidak ditemukan untuk orderId: ${orderId}`);
+    return { success: false, message: 'Pendaftaran not found' };
+  }
+
   await docRef.update({
     statusPembayaran: dbStatus,
-    'midtrans.transactionId': body.transaction_id,
-    'midtrans.paymentType': body.payment_type,
+    'midtrans.transactionId': body.transaction_id ?? null,
+    'midtrans.paymentType': body.payment_type ?? null,
     'midtrans.statusRaw': status,
     updatedAt: new Date()
   });
-  
-  // Trigger email jika status success (Mock)
+
+  // Kirim email konfirmasi jika sukses
   if (dbStatus === 'success') {
-    console.log(`Mock Email: Pendaftaran berhasil untuk invoice ${kodeInvoice}`);
+    const data = docSnap.data();
+    if (data?.dataPeserta?.email) {
+      try {
+        await sendConfirmationEmail({
+          to: data.dataPeserta.email,
+          namaLengkap: data.dataPeserta.namaLengkap,
+          kodeInvoice: data.kodeInvoice,
+          programNama: data.programNama,
+          total: data.rincianBiaya?.total
+        });
+      } catch (mailError) {
+        // Jangan gagalkan webhook karena email gagal
+        console.error('Email failed to send:', mailError);
+      }
+    }
   }
-  
+
   return { success: true };
 });
