@@ -1,6 +1,3 @@
-import { getFirestoreDb } from '../../utils/firebase';
-import { sendConfirmationEmail } from '../../utils/mailer';
-
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   const db = getFirestoreDb();

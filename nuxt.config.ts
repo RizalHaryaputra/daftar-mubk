@@ -12,6 +12,8 @@ export default defineNuxtConfig({
       firebaseStorageBucket: process.env.FIREBASE_STORAGE_BUCKET,
       firebaseMessagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
       firebaseAppId: process.env.FIREBASE_APP_ID,
+      midtransClientKey: process.env.MIDTRANS_CLIENT_KEY,
+      midtransIsProduction: process.env.MIDTRANS_IS_PRODUCTION === 'true',
     }
   },
   app: {
