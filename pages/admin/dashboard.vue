@@ -84,6 +84,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
+import type { Firestore } from 'firebase/firestore';
 import { useNuxtApp } from '#imports';
 
 definePageMeta({
@@ -92,6 +93,7 @@ definePageMeta({
 });
 
 const { $db } = useNuxtApp();
+const db = $db as Firestore;
 
 const isLoading = ref(true);
 const stats = ref({
@@ -105,7 +107,7 @@ const fetchDashboardData = async () => {
   try {
     // Note: In a real large-scale app, we should use aggregation queries (count()) 
     // to avoid downloading all documents. For simplicity here, we fetch all.
-    const pendaftaranSnap = await getDocs(collection($db, 'pendaftaran'));
+    const pendaftaranSnap = await getDocs(collection(db, 'pendaftaran'));
     
     let pendingCount = 0;
     let toShipCount = 0;
@@ -123,7 +125,7 @@ const fetchDashboardData = async () => {
     };
 
     // Fetch top 5 recent
-    const qRecent = query(collection($db, 'pendaftaran'), orderBy('createdAt', 'desc'), limit(5));
+    const qRecent = query(collection(db, 'pendaftaran'), orderBy('createdAt', 'desc'), limit(5));
     const recentSnap = await getDocs(qRecent);
     recent.value = recentSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
