@@ -1,123 +1,103 @@
 <template>
-  <div class="space-y-6">
-    <div class="flex justify-between items-center">
-      <h1 class="font-display text-2xl text-brand-brown">Kelola Pendaftaran</h1>
+  <div class="space-y-8">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <h1 class="font-display text-4xl text-brand-brown tracking-tight">Kelola Pendaftaran</h1>
+        <p class="text-brand-muted mt-2">Daftar transaksi pendaftaran program dari para calon santri.</p>
+      </div>
+      <!-- Pendaftaran tidak punya tombol Tambah karena dibuat oleh user di frontend -->
     </div>
 
-    <div class="bg-white rounded-xl border border-brand-border overflow-hidden">
+    <!-- Table & Filters Container -->
+    <div class="bg-white rounded-[30px] border border-brand-border/50 shadow-sm overflow-hidden relative">
+      
+      <!-- Toolbar: Pencarian & Filter -->
+      <div class="p-6 border-b border-brand-border/50 bg-gray-50/50 flex flex-col sm:flex-row gap-4 justify-between items-center">
+        <div class="relative w-full sm:w-72">
+          <svg class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-brand-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+          <input 
+            type="text" 
+            v-model="searchQuery" 
+            placeholder="Cari nama atau invoice..." 
+            class="w-full pl-11 pr-4 py-3 rounded-full border-2 border-brand-border/50 bg-white focus:outline-none focus:border-brand-orange transition-colors text-brand-brown font-medium text-sm"
+          />
+        </div>
+        
+        <div class="flex gap-2 w-full sm:w-auto">
+          <select v-model="filterStatus" class="w-full sm:w-auto px-6 py-3 rounded-full border-2 border-brand-border/50 bg-white focus:outline-none focus:border-brand-orange text-brand-brown font-medium cursor-pointer text-sm appearance-none">
+            <option value="">Semua Status</option>
+            <option value="pending">Pending</option>
+            <option value="success">Success</option>
+            <option value="expire">Expire</option>
+            <option value="failed">Failed</option>
+          </select>
+        </div>
+      </div>
+
+      <div v-if="isLoading" class="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
+        <div class="w-10 h-10 rounded-full border-4 border-brand-cream border-t-brand-orange animate-spin mb-4"></div>
+        <span class="text-sm font-bold text-brand-brown tracking-widest uppercase animate-pulse">Memuat Data...</span>
+      </div>
+
       <div class="overflow-x-auto">
         <table class="w-full text-left text-sm whitespace-nowrap">
-          <thead class="bg-gray-50 border-b border-brand-border text-brand-muted">
+          <thead class="bg-gray-50/50 border-b border-brand-border/50 text-brand-muted font-bold tracking-widest uppercase text-xs">
             <tr>
-              <th class="p-4 font-medium">Invoice & Waktu</th>
-              <th class="p-4 font-medium">Peserta</th>
-              <th class="p-4 font-medium">Total</th>
-              <th class="p-4 font-medium">Pembayaran</th>
-              <th class="p-4 font-medium">Pengiriman</th>
-              <th class="p-4 font-medium text-right">Aksi</th>
+              <th class="p-6">Invoice & Waktu</th>
+              <th class="p-6">Peserta</th>
+              <th class="p-6">Total Biaya</th>
+              <th class="p-6">Pembayaran</th>
+              <th class="p-6">Pengiriman</th>
+              <th class="p-6 text-right">Aksi</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-brand-border">
-            <tr v-for="item in pendaftaranList" :key="item.id" class="hover:bg-gray-50 transition-colors">
-              <td class="p-4">
-                <p class="font-medium text-brand-brown">{{ item.id }}</p>
-                <p class="text-xs text-brand-muted">{{ formatDate(item.createdAt) }}</p>
-              </td>
-              <td class="p-4">
-                <p class="font-medium text-brand-brown">{{ item.dataPeserta?.namaLengkap || '-' }}</p>
-                <p class="text-xs text-brand-muted">{{ item.dataPeserta?.noWa || '-' }}</p>
-              </td>
-              <td class="p-4 text-brand-orange">Rp {{ (item.rincianBiaya?.total || 0).toLocaleString('id-ID') }}</td>
-              <td class="p-4">
-                <StatusBadge :status="item.statusPembayaran" />
-              </td>
-              <td class="p-4">
-                <span v-if="item.statusPengiriman === '-'" class="text-xs text-brand-muted">Tidak pesan kitab</span>
-                <span v-else-if="item.statusPengiriman === 'dikirim'" class="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">Dikirim</span>
-                <span v-else class="text-xs text-amber-600 bg-amber-100 px-2 py-1 rounded-full">Belum dikirim</span>
-              </td>
-              <td class="p-4 text-right">
-                <button @click="openDetail(item)" class="text-brand-brown hover:text-brand-orange text-sm">Lihat Detail</button>
+          <tbody class="divide-y divide-brand-border/50">
+            <tr v-if="paginatedData.length === 0 && !isLoading">
+              <td colspan="6" class="p-16 text-center text-brand-muted">
+                Tidak ada pendaftaran yang cocok dengan kriteria pencarian Anda.
               </td>
             </tr>
-            <tr v-if="pendaftaranList.length === 0">
-              <td colspan="6" class="p-8 text-center text-brand-muted">Belum ada data pendaftaran.</td>
+            <tr v-for="item in paginatedData" :key="item.id" class="hover:bg-brand-cream/20 transition-colors">
+              <td class="p-6">
+                <p class="font-bold text-brand-brown text-base uppercase">#{{ item.id }}</p>
+                <p class="text-xs text-brand-muted mt-1">{{ formatDate(item.createdAt) }}</p>
+              </td>
+              <td class="p-6">
+                <p class="font-bold text-brand-brown">{{ item.dataPeserta?.namaLengkap || '-' }}</p>
+                <p class="text-xs text-brand-muted mt-1">{{ item.dataPeserta?.noWa || '-' }}</p>
+              </td>
+              <td class="p-6 font-bold text-brand-orange">
+                Rp {{ (item.rincianBiaya?.total || 0).toLocaleString('id-ID') }}
+              </td>
+              <td class="p-6">
+                <StatusBadge :status="item.statusPembayaran" />
+              </td>
+              <td class="p-6">
+                <span v-if="item.statusPengiriman === '-'" class="text-[10px] font-bold px-3 py-1.5 rounded-full border border-gray-200 bg-gray-100 text-gray-500 uppercase tracking-wider">Tidak Beli Kitab</span>
+                <span v-else-if="item.statusPengiriman === 'dikirim'" class="text-[10px] font-bold px-3 py-1.5 rounded-full border border-green-200 bg-green-100 text-green-700 uppercase tracking-wider">Dikirim</span>
+                <span v-else class="text-[10px] font-bold px-3 py-1.5 rounded-full border border-amber-200 bg-amber-100 text-amber-700 uppercase tracking-wider">Belum Dikirim</span>
+              </td>
+              <td class="p-6 text-right space-x-2">
+                <NuxtLink :to="`/admin/pendaftaran/${item.id}`" class="inline-block px-4 py-2 bg-brand-cream text-brand-orange hover:bg-brand-orange hover:text-white transition-colors rounded-full font-bold text-xs uppercase tracking-wider">
+                  Detail
+                </NuxtLink>
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
-    </div>
-
-    <!-- Modal Detail -->
-    <div v-if="isModalOpen && selectedItem" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div class="bg-white rounded-xl w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="font-display text-xl text-brand-brown">Detail Pendaftaran</h2>
-          <button @click="closeDetail" class="text-brand-muted hover:text-brand-brown">Tutup</button>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="space-y-4">
-            <div>
-              <p class="text-xs text-brand-muted mb-1">Kode Invoice</p>
-              <p class="font-medium">{{ selectedItem.id }}</p>
-            </div>
-            <div>
-              <p class="text-xs text-brand-muted mb-1">Data Peserta</p>
-              <p class="font-medium">{{ selectedItem.dataPeserta?.namaLengkap }}</p>
-              <p class="text-sm">{{ selectedItem.dataPeserta?.email }}</p>
-              <p class="text-sm">{{ selectedItem.dataPeserta?.noWa }}</p>
-              <p class="text-sm capitalize">{{ selectedItem.dataPeserta?.jenisKelamin }}</p>
-            </div>
-            <div v-if="selectedItem.beliKitab">
-              <p class="text-xs text-brand-muted mb-1">Alamat Pengiriman</p>
-              <p class="text-sm whitespace-pre-wrap">{{ selectedItem.dataPeserta?.alamatPengiriman }}</p>
-            </div>
-          </div>
-          
-          <div class="space-y-4">
-            <div class="bg-gray-50 p-4 rounded-lg border border-brand-border">
-              <p class="text-sm font-medium mb-2 border-b border-brand-border pb-2">Rincian Biaya</p>
-              <div class="flex justify-between text-sm mb-1">
-                <span class="text-brand-muted">Program</span>
-                <span>Rp {{ (selectedItem.rincianBiaya?.program || 0).toLocaleString('id-ID') }}</span>
-              </div>
-              <div class="flex justify-between text-sm mb-1">
-                <span class="text-brand-muted">Kitab</span>
-                <span>Rp {{ (selectedItem.rincianBiaya?.kitab || 0).toLocaleString('id-ID') }}</span>
-              </div>
-              <div class="flex justify-between text-sm mb-2">
-                <span class="text-brand-muted">Ongkir</span>
-                <span>Rp {{ (selectedItem.rincianBiaya?.ongkir || 0).toLocaleString('id-ID') }}</span>
-              </div>
-              <div class="flex justify-between font-medium pt-2 border-t border-brand-border text-brand-orange">
-                <span>Total</span>
-                <span>Rp {{ (selectedItem.rincianBiaya?.total || 0).toLocaleString('id-ID') }}</span>
-              </div>
-            </div>
-
-            <!-- Update Status Actions -->
-            <div class="space-y-3 pt-4 border-t border-brand-border">
-              <div class="flex items-center justify-between">
-                <span class="text-sm text-brand-muted">Ubah Status Pembayaran</span>
-                <select v-model="selectedItem.statusPembayaran" @change="updateStatus('statusPembayaran', selectedItem.statusPembayaran)" class="text-sm border rounded p-1">
-                  <option value="pending">Pending</option>
-                  <option value="success">Success</option>
-                  <option value="expire">Expire</option>
-                  <option value="failed">Failed</option>
-                </select>
-              </div>
-              
-              <div v-if="selectedItem.beliKitab" class="flex items-center justify-between">
-                <span class="text-sm text-brand-muted">Ubah Status Pengiriman</span>
-                <select v-model="selectedItem.statusPengiriman" @change="updateStatus('statusPengiriman', selectedItem.statusPengiriman)" class="text-sm border rounded p-1">
-                  <option value="belum_dikirim">Belum Dikirim</option>
-                  <option value="dikirim">Dikirim</option>
-                </select>
-              </div>
-            </div>
-
-          </div>
+      
+      <!-- Pagination Controls -->
+      <div v-if="totalPages > 1 && !isLoading && pendaftaranList.length > 0" class="p-6 border-t border-brand-border/50 bg-white flex justify-between items-center">
+        <p class="text-sm text-brand-muted font-medium">Halaman <span class="text-brand-brown font-bold">{{ currentPage }}</span> dari <span class="text-brand-brown font-bold">{{ totalPages }}</span></p>
+        <div class="flex gap-2">
+          <button @click="currentPage--" :disabled="currentPage === 1" class="px-4 py-2 rounded-full border-2 border-brand-border text-brand-brown font-bold text-xs tracking-wider uppercase hover:bg-brand-cream hover:border-brand-orange transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            Sebelumnya
+          </button>
+          <button @click="currentPage++" :disabled="currentPage === totalPages" class="px-4 py-2 rounded-full border-2 border-brand-border text-brand-brown font-bold text-xs tracking-wider uppercase hover:bg-brand-cream hover:border-brand-orange transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            Selanjutnya
+          </button>
         </div>
       </div>
     </div>
@@ -125,29 +105,39 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { collection, getDocs, doc, updateDoc, orderBy, query } from 'firebase/firestore';
+import { ref, computed, onMounted, watch } from 'vue';
+import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import type { Firestore } from 'firebase/firestore';
 import { useNuxtApp } from '#imports';
 
-definePageMeta({
-  layout: 'admin',
-  middleware: ['admin-auth']
-});
+definePageMeta({ layout: 'admin', middleware: ['admin-auth'] });
 
 const { $db } = useNuxtApp();
+const db = $db as Firestore;
+
 const pendaftaranList = ref<any[]>([]);
-const isModalOpen = ref(false);
-const selectedItem = ref<any>(null);
+const isLoading = ref(true);
+
+// States for Filter & Pagination
+const searchQuery = ref('');
+const filterStatus = ref('');
+const currentPage = ref(1);
+const itemsPerPage = 10;
 
 const fetchPendaftaran = async () => {
-  const q = query(collection($db, 'pendaftaran'), orderBy('createdAt', 'desc'));
-  const querySnapshot = await getDocs(q);
-  pendaftaranList.value = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  isLoading.value = true;
+  try {
+    const q = query(collection(db, 'pendaftaran'), orderBy('createdAt', 'desc'));
+    const snap = await getDocs(q);
+    pendaftaranList.value = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (error) {
+    console.error("Error fetching pendaftaran", error);
+  } finally {
+    isLoading.value = false;
+  }
 };
 
-onMounted(() => {
-  fetchPendaftaran();
-});
+onMounted(fetchPendaftaran);
 
 const formatDate = (timestamp: any) => {
   if (!timestamp) return '-';
@@ -155,28 +145,37 @@ const formatDate = (timestamp: any) => {
   return new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium', timeStyle: 'short' }).format(date);
 };
 
-const openDetail = (item: any) => {
-  selectedItem.value = JSON.parse(JSON.stringify(item)); // clone
-  isModalOpen.value = true;
-};
-
-const closeDetail = () => {
-  isModalOpen.value = false;
-  selectedItem.value = null;
-  fetchPendaftaran(); // refresh
-};
-
-const updateStatus = async (field: string, value: string) => {
-  try {
-    const docRef = doc($db, 'pendaftaran', selectedItem.value.id);
-    await updateDoc(docRef, {
-      [field]: value,
-      updatedAt: new Date()
-    });
-    alert(`Status berhasil diubah menjadi ${value}`);
-  } catch (error) {
-    console.error('Failed to update status', error);
-    alert('Gagal mengubah status');
+// Computed properties for processing data
+const filteredData = computed(() => {
+  let result = pendaftaranList.value;
+  
+  if (searchQuery.value) {
+    const lowerQuery = searchQuery.value.toLowerCase();
+    result = result.filter(p => 
+      p.id?.toLowerCase().includes(lowerQuery) || 
+      p.dataPeserta?.namaLengkap?.toLowerCase().includes(lowerQuery)
+    );
   }
-};
+
+  if (filterStatus.value) {
+    result = result.filter(p => p.statusPembayaran === filterStatus.value);
+  }
+
+  return result;
+});
+
+// Reset page when filter changes
+watch([searchQuery, filterStatus], () => {
+  currentPage.value = 1;
+});
+
+const totalPages = computed(() => {
+  return Math.max(1, Math.ceil(filteredData.value.length / itemsPerPage));
+});
+
+const paginatedData = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  return filteredData.value.slice(start, end);
+});
 </script>
