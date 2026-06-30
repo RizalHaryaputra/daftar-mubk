@@ -1,121 +1,139 @@
 <template>
-  <div class="space-y-6">
-    <div class="flex justify-between items-center">
-      <h1 class="font-display text-2xl text-brand-brown">Kelola Kitab</h1>
-      <AppButton variant="primary" @click="openModal()">+ Tambah Kitab</AppButton>
+  <div class="space-y-8">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <h1 class="font-display text-4xl text-brand-brown tracking-tight">Kelola Kitab</h1>
+        <p class="text-brand-muted mt-2">Daftar buku dan kitab rujukan yang ditawarkan oleh Ma'had Umar bin Khattab.</p>
+      </div>
+      <NuxtLink to="/admin/kitab/create" class="bg-brand-orange text-white font-bold tracking-widest uppercase px-6 py-3 rounded-full hover:bg-orange-600 transition-all hover:shadow-xl hover:-translate-y-1 text-sm flex items-center justify-center gap-2 shrink-0">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+        Tambah Kitab
+      </NuxtLink>
     </div>
 
-    <!-- Tabel -->
-    <div class="bg-white rounded-xl border border-brand-border overflow-hidden">
-      <div v-if="isLoading" class="p-8 text-center text-brand-muted animate-pulse">Memuat data...</div>
-      <div v-else-if="kitabs.length === 0" class="p-8 text-center text-brand-muted">Belum ada data kitab.</div>
-      <table v-else class="w-full text-left text-sm">
-        <thead class="bg-gray-50 border-b border-brand-border text-brand-muted">
-          <tr>
-            <th class="p-4 font-medium">Judul Kitab</th>
-            <th class="p-4 font-medium">Penulis</th>
-            <th class="p-4 font-medium">Harga</th>
-            <th class="p-4 font-medium">Standalone</th>
-            <th class="p-4 font-medium">Status</th>
-            <th class="p-4 font-medium text-right">Aksi</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-brand-border">
-          <tr v-for="item in kitabs" :key="item.id" class="hover:bg-gray-50 transition-colors">
-            <td class="p-4">
-              <p class="font-medium text-brand-brown">{{ item.judul }}</p>
-              <p class="text-xs text-brand-muted">{{ item.kategori }}</p>
-            </td>
-            <td class="p-4 text-brand-muted">{{ item.penulis }}</td>
-            <td class="p-4 text-brand-orange font-medium">Rp {{ item.harga?.toLocaleString('id-ID') }}</td>
-            <td class="p-4">
-              <span :class="item.bisaStandalone ? 'text-blue-700 bg-blue-100' : 'text-gray-500 bg-gray-100'" class="text-xs font-medium px-2 py-1 rounded-full">
-                {{ item.bisaStandalone ? 'Ya' : 'Tidak' }}
-              </span>
-            </td>
-            <td class="p-4">
-              <span :class="item.status === 'aktif' ? 'text-green-700 bg-green-100' : 'text-gray-500 bg-gray-100'" class="text-xs font-medium px-2 py-1 rounded-full">
-                {{ item.status }}
-              </span>
-            </td>
-            <td class="p-4 text-right space-x-3">
-              <button @click="openModal(item)" class="text-sm text-brand-brown hover:text-brand-orange">Edit</button>
-              <button @click="deleteKitab(item.id)" class="text-sm text-red-500 hover:text-red-700">Hapus</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Modal Form -->
-    <div v-if="isModalOpen" class="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4 overflow-y-auto">
-      <div class="bg-white rounded-xl w-full max-w-xl p-6 space-y-5 my-8">
-        <div class="flex justify-between items-center">
-          <h2 class="font-display text-xl text-brand-brown">{{ isEditing ? 'Edit' : 'Tambah' }} Kitab</h2>
-          <button @click="closeModal" class="text-brand-muted hover:text-brand-brown text-lg">✕</button>
+    <!-- Table & Filters Container -->
+    <div class="bg-white rounded-[30px] border border-brand-border/50 shadow-sm overflow-hidden relative">
+      
+      <!-- Toolbar: Pencarian & Filter -->
+      <div class="p-6 border-b border-brand-border/50 bg-gray-50/50 flex flex-col sm:flex-row gap-4 justify-between items-center">
+        <div class="relative w-full sm:w-72">
+          <svg class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-brand-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+          <input 
+            type="text" 
+            v-model="searchQuery" 
+            placeholder="Cari judul atau penulis kitab..." 
+            class="w-full pl-11 pr-4 py-3 rounded-full border-2 border-brand-border/50 bg-white focus:outline-none focus:border-brand-orange transition-colors text-brand-brown font-medium text-sm"
+          />
         </div>
+        
+        <div class="flex gap-2 w-full sm:w-auto">
+          <select v-model="filterStatus" class="w-full md:w-auto px-6 py-3 rounded-full border-2 border-brand-border/50 bg-white focus:outline-none focus:border-brand-orange text-brand-brown font-medium cursor-pointer text-sm appearance-none">
+            <option value="">Semua Status</option>
+            <option value="aktif">Aktif</option>
+            <option value="nonaktif">Nonaktif</option>
+          </select>
+          <select v-model="filterStandalone" class="w-full md:w-auto px-6 py-3 rounded-full border-2 border-brand-border/50 bg-white focus:outline-none focus:border-brand-orange text-brand-brown font-medium cursor-pointer text-sm appearance-none">
+            <option value="">Semua Tipe</option>
+            <option value="true">Standalone</option>
+            <option value="false">Tidak Standalone</option>
+          </select>
+        </div>
+      </div>
+      <div v-if="isLoading" class="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
+        <div class="w-10 h-10 rounded-full border-4 border-brand-cream border-t-brand-orange animate-spin mb-4"></div>
+        <span class="text-sm font-bold text-brand-brown tracking-widest uppercase animate-pulse">Memuat Data...</span>
+      </div>
 
-        <form @submit.prevent="saveKitab" class="space-y-4">
-          <div class="flex flex-col gap-1.5">
-            <label class="label">Judul Kitab <span class="text-brand-orange">*</span></label>
-            <input v-model="form.judul" required class="input-field" placeholder="Al-Ajurrumiyyah" />
-          </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm whitespace-nowrap">
+          <thead class="bg-gray-50/50 border-b border-brand-border/50 text-brand-muted font-bold tracking-widest uppercase text-xs">
+            <tr>
+              <th class="p-6">Judul Kitab</th>
+              <th class="p-6">Penulis</th>
+              <th class="p-6">Harga</th>
+              <th class="p-6">Status</th>
+              <th class="p-6 text-right">Aksi</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-brand-border/50">
+            <tr v-if="paginatedData.length === 0 && !isLoading">
+              <td colspan="5" class="p-16 text-center text-brand-muted">
+                Tidak ada kitab yang cocok dengan kriteria pencarian Anda.
+              </td>
+            </tr>
+            <tr v-for="item in paginatedData" :key="item.id" class="hover:bg-brand-cream/20 transition-colors">
+              <td class="p-6">
+                <div class="flex items-center gap-4">
+                  <div class="w-12 h-16 rounded-lg overflow-hidden bg-brand-cream/30 border border-brand-border/30 flex-shrink-0 flex items-center justify-center">
+                    <img v-if="item.gambarUrl" :src="item.gambarUrl" alt="Cover" class="w-full h-full object-cover" />
+                    <svg v-else class="w-6 h-6 text-brand-muted/50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                  </div>
+                  <div>
+                    <p class="font-bold text-brand-brown text-base">{{ item.judul }}</p>
+                    <p class="text-xs text-brand-muted mt-1 uppercase tracking-wider">{{ item.kategori || 'Tanpa Kategori' }}</p>
+                  </div>
+                </div>
+              </td>
+              <td class="p-6">
+                <span class="text-brand-muted">{{ item.penulis }}</span>
+              </td>
+              <td class="p-6 font-medium text-brand-brown">
+                Rp {{ item.harga?.toLocaleString('id-ID') }}
+              </td>
+              <td class="p-6">
+                <div class="flex flex-col gap-2 items-start">
+                  <span :class="item.status === 'aktif' ? 'text-green-700 bg-green-100 border-green-200' : 'text-gray-500 bg-gray-100 border-gray-200'" class="text-[10px] font-bold px-3 py-1.5 rounded-full border uppercase tracking-wider">
+                    {{ item.status }}
+                  </span>
+                  <span v-if="item.bisaStandalone" class="text-[10px] font-bold uppercase tracking-wider bg-brand-orange text-white px-3 py-1.5 rounded-full">
+                    Standalone
+                  </span>
+                </div>
+              </td>
+              <td class="p-6 text-right space-x-2">
+                <NuxtLink :to="`/admin/kitab/${item.id}`" class="inline-block px-4 py-2 bg-brand-cream text-brand-orange hover:bg-brand-orange hover:text-white transition-colors rounded-full font-bold text-xs uppercase tracking-wider">
+                  Edit
+                </NuxtLink>
+                <button @click="confirmDelete(item)" class="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-colors rounded-full font-bold text-xs uppercase tracking-wider">
+                  Hapus
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-          <div class="grid grid-cols-2 gap-4">
-            <div class="flex flex-col gap-1.5">
-              <label class="label">Penulis <span class="text-brand-orange">*</span></label>
-              <input v-model="form.penulis" required class="input-field" placeholder="Ibnu Ajurrum" />
-            </div>
-            <div class="flex flex-col gap-1.5">
-              <label class="label">Kategori</label>
-              <input v-model="form.kategori" class="input-field" placeholder="Nahwu, Sharaf, dll." />
-            </div>
-          </div>
-
-          <div class="flex flex-col gap-1.5">
-            <label class="label">Deskripsi <span class="text-brand-orange">*</span></label>
-            <textarea v-model="form.deskripsi" required rows="3" class="input-field resize-none" placeholder="Deskripsi singkat kitab..."></textarea>
-          </div>
-
-          <div class="grid grid-cols-2 gap-4">
-            <div class="flex flex-col gap-1.5">
-              <label class="label">Harga (Rp) <span class="text-brand-orange">*</span></label>
-              <input type="number" v-model="form.harga" required class="input-field" />
-            </div>
-            <div class="flex flex-col gap-1.5">
-              <label class="label">Status <span class="text-brand-orange">*</span></label>
-              <select v-model="form.status" required class="input-field">
-                <option value="aktif">Aktif</option>
-                <option value="nonaktif">Nonaktif</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="flex flex-col gap-1.5">
-            <label class="label">URL Gambar (Cloudinary)</label>
-            <input v-model="form.gambarUrl" class="input-field" placeholder="https://res.cloudinary.com/..." />
-          </div>
-
-          <label class="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" v-model="form.bisaStandalone" class="rounded text-brand-orange focus:ring-brand-orange" />
-            <span class="text-sm font-medium text-brand-brown">Bisa dibeli tanpa daftar program (standalone)</span>
-          </label>
-
-          <div class="flex justify-end gap-2 pt-4 border-t border-brand-border">
-            <AppButton type="button" variant="ghost" @click="closeModal">Batal</AppButton>
-            <AppButton type="submit" variant="primary" :disabled="isSaving">
-              {{ isSaving ? 'Menyimpan...' : (isEditing ? 'Simpan Perubahan' : 'Tambah Kitab') }}
-            </AppButton>
-          </div>
-        </form>
+      <!-- Pagination Controls -->
+      <div v-if="totalPages > 1 && !isLoading && kitabs.length > 0" class="p-6 border-t border-brand-border/50 bg-white flex justify-between items-center">
+        <p class="text-sm text-brand-muted font-medium">Halaman <span class="text-brand-brown font-bold">{{ currentPage }}</span> dari <span class="text-brand-brown font-bold">{{ totalPages }}</span></p>
+        <div class="flex gap-2">
+          <button @click="currentPage--" :disabled="currentPage === 1" class="px-4 py-2 rounded-full border-2 border-brand-border text-brand-brown font-bold text-xs tracking-wider uppercase hover:bg-brand-cream hover:border-brand-orange transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            Sebelumnya
+          </button>
+          <button @click="currentPage++" :disabled="currentPage === totalPages" class="px-4 py-2 rounded-full border-2 border-brand-border text-brand-brown font-bold text-xs tracking-wider uppercase hover:bg-brand-cream hover:border-brand-orange transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            Selanjutnya
+          </button>
+        </div>
       </div>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+    <ModalConfirm 
+      :is-open="isDeleteModalOpen"
+      title="Hapus Kitab?"
+      :message="`Apakah Anda yakin ingin menghapus kitab '${itemToDelete?.judul}'? Data ini tidak dapat dikembalikan.`"
+      confirm-text="Ya, Hapus"
+      variant="danger"
+      @confirm="executeDelete"
+      @cancel="isDeleteModalOpen = false"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, orderBy, query } from 'firebase/firestore';
+import { ref, computed, onMounted, watch } from 'vue';
+import { collection, getDocs, deleteDoc, doc, orderBy, query } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
 import { useNuxtApp } from '#imports';
 
@@ -123,80 +141,81 @@ definePageMeta({ layout: 'admin', middleware: ['admin-auth'] });
 
 const { $db } = useNuxtApp();
 const db = $db as Firestore;
+
 const kitabs = ref<any[]>([]);
 const isLoading = ref(true);
-const isModalOpen = ref(false);
-const isEditing = ref(false);
-const isSaving = ref(false);
-const currentId = ref('');
 
-const defaultForm = () => ({
-  judul: '', penulis: '', kategori: '', deskripsi: '',
-  harga: 0, status: 'aktif', gambarUrl: '', bisaStandalone: true
-});
-const form = ref(defaultForm());
+const searchQuery = ref('');
+const filterStatus = ref('');
+const filterStandalone = ref('');
+
+const currentPage = ref(1);
+const itemsPerPage = 7;
+
+const isDeleteModalOpen = ref(false);
+const itemToDelete = ref<any>(null);
 
 const fetchKitabs = async () => {
   isLoading.value = true;
-  const q = query(collection(db, 'kitabs'), orderBy('createdAt', 'desc'));
-  const snap = await getDocs(q);
-  kitabs.value = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  isLoading.value = false;
+  try {
+    const q = query(collection(db, 'kitabs'), orderBy('createdAt', 'desc'));
+    const snap = await getDocs(q);
+    kitabs.value = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (error) {
+    console.error('Error fetching kitabs:', error);
+  } finally {
+    isLoading.value = false;
+  }
 };
 
 onMounted(fetchKitabs);
 
-const openModal = (item?: any) => {
-  if (item) {
-    isEditing.value = true;
-    currentId.value = item.id;
-    form.value = {
-      judul: item.judul ?? '', penulis: item.penulis ?? '',
-      kategori: item.kategori ?? '', deskripsi: item.deskripsi ?? '',
-      harga: item.harga ?? 0, status: item.status ?? 'aktif',
-      gambarUrl: item.gambarUrl ?? '', bisaStandalone: item.bisaStandalone ?? true
-    };
-  } else {
-    isEditing.value = false;
-    currentId.value = '';
-    form.value = defaultForm();
-  }
-  isModalOpen.value = true;
+// Filtering & Search Logic
+const filteredData = computed(() => {
+  return kitabs.value.filter(item => {
+    const matchSearch = item.judul?.toLowerCase().includes(searchQuery.value.toLowerCase()) || 
+                        item.penulis?.toLowerCase().includes(searchQuery.value.toLowerCase());
+    const matchStatus = filterStatus.value ? item.status === filterStatus.value : true;
+    
+    // Standalone filter logic
+    let matchStandalone = true;
+    if (filterStandalone.value === 'true') matchStandalone = item.bisaStandalone === true;
+    if (filterStandalone.value === 'false') matchStandalone = item.bisaStandalone === false;
+
+    return matchSearch && matchStatus && matchStandalone;
+  });
+});
+
+// Reset page when filter changes
+watch([searchQuery, filterStatus, filterStandalone], () => {
+  currentPage.value = 1;
+});
+
+// Pagination Logic
+const totalPages = computed(() => Math.ceil(filteredData.value.length / itemsPerPage));
+const paginatedData = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  return filteredData.value.slice(start, end);
+});
+
+// Delete Logic
+const confirmDelete = (item: any) => {
+  itemToDelete.value = item;
+  isDeleteModalOpen.value = true;
 };
 
-const closeModal = () => { isModalOpen.value = false; };
-
-const saveKitab = async () => {
-  isSaving.value = true;
+const executeDelete = async () => {
+  if (!itemToDelete.value) return;
+  
   try {
-    const data = {
-      judul: form.value.judul, penulis: form.value.penulis,
-      kategori: form.value.kategori, deskripsi: form.value.deskripsi,
-      harga: Number(form.value.harga), status: form.value.status,
-      gambarUrl: form.value.gambarUrl || null, bisaStandalone: form.value.bisaStandalone,
-      updatedAt: new Date()
-    };
-    if (isEditing.value) {
-      await updateDoc(doc(db, 'kitabs', currentId.value), data);
-    } else {
-      await addDoc(collection(db, 'kitabs'), { ...data, createdAt: new Date() });
-    }
-    closeModal();
+    await deleteDoc(doc(db, 'kitabs', itemToDelete.value.id));
+    isDeleteModalOpen.value = false;
+    itemToDelete.value = null;
     fetchKitabs();
-  } finally {
-    isSaving.value = false;
-  }
-};
-
-const deleteKitab = async (id: string) => {
-  if (confirm('Yakin ingin menghapus kitab ini?')) {
-    await deleteDoc(doc(db, 'kitabs', id));
-    fetchKitabs();
+  } catch (error) {
+    console.error('Error deleting kitab:', error);
+    alert('Gagal menghapus kitab.');
   }
 };
 </script>
-
-<style scoped>
-.input-field { @apply px-4 py-2 text-sm rounded-lg border border-brand-border bg-white focus:outline-none focus:border-brand-orange w-full transition-colors; }
-.label { @apply text-sm font-medium text-brand-brown; }
-</style>
