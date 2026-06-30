@@ -1,37 +1,52 @@
 <template>
-  <div class="bg-white border border-brand-border rounded-xl overflow-hidden hover:shadow-sm transition-shadow flex flex-col h-full">
-    <!-- Area visual atas -->
-    <div class="bg-brand-brown h-28 relative flex items-center justify-center overflow-hidden">
-      <span v-if="!program.gambarUrl" class="font-serif text-5xl text-brand-orange/25 select-none z-0">ن</span>
-      <img v-else :src="program.gambarUrl" :alt="program.nama" class="w-full h-full object-cover z-0 opacity-80" />
+  <NuxtLink :to="`/program/${program.id}`" class="group bg-white border border-brand-border rounded-[30px] overflow-hidden hover:shadow-2xl hover:shadow-brand-deeper/10 transition-all duration-300 flex flex-col h-full relative hover:-translate-y-2">
+    <!-- Gambar Cover -->
+    <div class="relative h-56 bg-brand-deeper overflow-hidden">
+      <img v-if="program.gambarUrl" :src="program.gambarUrl" :alt="program.nama" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500" />
+      <div v-else class="w-full h-full flex items-center justify-center bg-brand-brown">
+        <svg class="w-16 h-16 text-brand-orange/30" viewBox="0 0 100 100" fill="currentColor">
+          <path d="M50 0 L55 45 L100 50 L55 55 L50 100 L45 55 L0 50 L45 45 Z" />
+        </svg>
+      </div>
       
-      <!-- Badge status -->
-      <span v-if="program.status === 'aktif'" class="absolute top-2.5 right-2.5 z-10 bg-brand-orange text-white text-[10px] font-medium px-2 py-0.5 rounded">
-        Buka
-      </span>
-      <span v-else class="absolute top-2.5 right-2.5 z-10 bg-gray-100 text-gray-500 text-[10px] font-medium px-2 py-0.5 rounded">
-        Tutup
-      </span>
+      <!-- Gradient overlay bottom -->
+      <div class="absolute inset-0 bg-gradient-to-t from-brand-deeper/80 via-transparent to-transparent opacity-80"></div>
+      
+      <!-- Badge Status -->
+      <div class="absolute top-4 right-4 z-10">
+        <span v-if="program.status === 'aktif'" class="bg-brand-orange text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg">
+          Buka
+        </span>
+        <span v-else class="bg-white/90 text-brand-deeper text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg">
+          Tutup
+        </span>
+      </div>
+      
+      <!-- Level Tag overlay on image -->
+      <div v-if="program.level" class="absolute bottom-4 left-4 z-10">
+        <span class="text-brand-orange font-bold uppercase tracking-widest text-xs drop-shadow-md">{{ program.level }}</span>
+      </div>
     </div>
 
     <!-- Body -->
-    <div class="p-4 flex-1 flex flex-col">
-      <p v-if="program.level" class="text-brand-orange text-[10px] font-medium uppercase tracking-wide mb-1">{{ program.level }}</p>
-      <h3 class="text-sm font-medium text-brand-brown leading-snug mb-1">{{ program.nama }}</h3>
-      <p class="text-xs text-brand-muted mb-3 flex-1">{{ program.jadwal }}</p>
+    <div class="p-6 md:p-8 flex-1 flex flex-col">
+      <h3 class="font-display text-2xl text-brand-brown leading-tight mb-3 group-hover:text-brand-orange transition-colors">{{ program.nama }}</h3>
+      <p class="text-sm text-brand-muted mb-6 flex-1 line-clamp-3">
+        {{ program.deskripsi || 'Program intensif dengan jadwal ' + program.jadwal + '. Sangat cocok untuk Anda yang ingin belajar secara terstruktur.' }}
+      </p>
 
-      <!-- Footer -->
-      <div class="flex items-center justify-between pt-3 border-t border-brand-border mt-auto">
+      <!-- Footer / Price -->
+      <div class="flex items-center justify-between pt-6 border-t border-brand-border border-dashed mt-auto">
         <div>
-          <p class="text-sm font-medium text-brand-brown">Rp {{ program.harga.toLocaleString('id-ID') }}</p>
-          <p class="text-[10px] text-brand-muted">per program</p>
+          <p class="text-[10px] text-brand-muted uppercase tracking-widest mb-1">Investasi</p>
+          <p class="text-lg font-bold text-brand-brown">Rp {{ program.harga.toLocaleString('id-ID') }}</p>
         </div>
-        <NuxtLink :to="`/program/${program.id}`" class="bg-brand-brown text-white text-[10px] font-medium px-3 py-1.5 rounded-md hover:bg-brand-deeper transition-colors">
-          Detail
-        </NuxtLink>
+        <div class="w-10 h-10 rounded-full bg-brand-cream text-brand-orange flex items-center justify-center group-hover:bg-brand-orange group-hover:text-white transition-colors">
+          &rarr;
+        </div>
       </div>
     </div>
-  </div>
+  </NuxtLink>
 </template>
 
 <script setup lang="ts">

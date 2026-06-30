@@ -1,7 +1,7 @@
 <template>
   <div class="bg-brand-cream min-h-screen font-sans flex flex-col">
     <AppNavbar />
-    <main class="max-w-5xl mx-auto px-4 py-6 space-y-3 flex-grow w-full">
+    <main class="flex-grow">
       <slot />
     </main>
     <AppFooter />
