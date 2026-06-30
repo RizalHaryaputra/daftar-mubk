@@ -55,7 +55,7 @@
             </div>
             <div>
               <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Program yang Diikuti</p>
-              <p class="font-medium text-brand-brown">{{ item.dataProgram?.nama || 'Nama Program Tidak Tersedia' }}</p>
+              <p class="font-medium text-brand-brown">{{ item.programNama || item.dataProgram?.nama || 'Nama Program Tidak Tersedia' }}</p>
             </div>
             <div>
               <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Tanggal Daftar</p>
@@ -65,7 +65,7 @@
         </div>
 
         <!-- Card Alamat Pengiriman (Hanya jika beli kitab) -->
-        <div v-if="item.beliKitab" class="bg-white rounded-[30px] border border-brand-border/50 p-8 shadow-sm relative overflow-hidden">
+        <div v-if="item.kitabDibeli && item.kitabDibeli.length > 0" class="bg-white rounded-[30px] border border-brand-border/50 p-8 shadow-sm relative overflow-hidden">
           <div class="absolute top-0 right-0 w-32 h-32 bg-brand-cream/30 rounded-bl-full -z-10"></div>
           <h2 class="font-display text-xl text-brand-brown mb-6 flex items-center gap-2">
             <svg class="w-5 h-5 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
@@ -91,11 +91,11 @@
           <div class="space-y-3 mb-6">
             <div class="flex justify-between items-center text-white/80 text-sm">
               <span>Biaya Program</span>
-              <span class="font-medium">Rp {{ (item.rincianBiaya?.program || 0).toLocaleString('id-ID') }}</span>
+              <span class="font-medium">Rp {{ (item.rincianBiaya?.biayaProgram ?? item.rincianBiaya?.program ?? 0).toLocaleString('id-ID') }}</span>
             </div>
             <div class="flex justify-between items-center text-white/80 text-sm">
               <span>Pembelian Kitab</span>
-              <span class="font-medium">Rp {{ (item.rincianBiaya?.kitab || 0).toLocaleString('id-ID') }}</span>
+              <span class="font-medium">Rp {{ (item.rincianBiaya?.totalHargaKitab ?? item.rincianBiaya?.kitab ?? 0).toLocaleString('id-ID') }}</span>
             </div>
             <div class="flex justify-between items-center text-white/80 text-sm">
               <span>Ongkos Kirim</span>
@@ -138,7 +138,7 @@
             </div>
 
             <!-- Status Pengiriman -->
-            <div v-if="item.beliKitab">
+            <div v-if="item.kitabDibeli && item.kitabDibeli.length > 0">
               <label class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-2 block">Status Pengiriman Kitab</label>
               <div class="relative">
                 <select 

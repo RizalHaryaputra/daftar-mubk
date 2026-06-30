@@ -124,7 +124,7 @@
               </td>
               <td class="p-6">
                 <p class="font-bold text-brand-brown text-base">{{ item.dataPeserta?.namaLengkap || 'Tanpa Nama' }}</p>
-                <p class="text-xs text-brand-muted mt-1">{{ item.dataProgram?.nama || 'Program tidak diketahui' }}</p>
+                <p class="text-xs text-brand-muted mt-1">{{ item.programNama || item.dataProgram?.nama || 'Program tidak diketahui' }}</p>
               </td>
               <td class="p-6 font-bold text-brand-orange">Rp {{ (item.rincianBiaya?.total || 0).toLocaleString('id-ID') }}</td>
               <td class="p-6 text-right">
@@ -264,8 +264,8 @@ const fetchDashboardData = async () => {
       }
       
       // Program Processing (Doughnut Chart)
-      if (data.dataProgram?.nama) {
-        const pName = data.dataProgram.nama;
+      const pName = data.programNama || data.dataProgram?.nama;
+      if (pName) {
         programCounts[pName] = (programCounts[pName] || 0) + 1;
       }
     });
