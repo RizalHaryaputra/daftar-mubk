@@ -1,143 +1,118 @@
 <template>
-  <div class="space-y-6">
-    <div class="flex justify-between items-center">
-      <h1 class="font-display text-2xl text-brand-brown">Kelola Program</h1>
-      <AppButton variant="primary" @click="openModal()">+ Tambah Program</AppButton>
+  <div class="space-y-8">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <h1 class="font-display text-4xl text-brand-brown tracking-tight">Kelola Program</h1>
+        <p class="text-brand-muted mt-2">Daftar program belajar yang ditawarkan oleh Ma'had Umar bin Khattab.</p>
+      </div>
+      <NuxtLink to="/admin/program/create" class="bg-brand-orange text-white font-bold tracking-widest uppercase px-6 py-3 rounded-full hover:bg-orange-600 transition-all hover:shadow-xl hover:-translate-y-1 text-sm flex items-center justify-center gap-2 shrink-0">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+        Tambah Program
+      </NuxtLink>
     </div>
 
-    <!-- Tabel -->
-    <div class="bg-white rounded-xl border border-brand-border overflow-hidden">
-      <div v-if="isLoading" class="p-8 text-center text-brand-muted animate-pulse">Memuat data...</div>
-      <div v-else-if="programs.length === 0" class="p-8 text-center text-brand-muted">Belum ada data program. Tambahkan program pertama Anda!</div>
-      <table v-else class="w-full text-left text-sm">
-        <thead class="bg-gray-50 border-b border-brand-border text-brand-muted">
-          <tr>
-            <th class="p-4 font-medium">Nama Program</th>
-            <th class="p-4 font-medium">Jadwal</th>
-            <th class="p-4 font-medium">Harga</th>
-            <th class="p-4 font-medium">Status</th>
-            <th class="p-4 font-medium text-right">Aksi</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-brand-border">
-          <tr v-for="item in programs" :key="item.id" class="hover:bg-gray-50 transition-colors">
-            <td class="p-4">
-              <p class="font-medium text-brand-brown">{{ item.nama }}</p>
-              <p class="text-xs text-brand-muted">{{ item.durasi }}</p>
-            </td>
-            <td class="p-4 text-brand-muted text-xs">{{ item.jadwal }}</td>
-            <td class="p-4 text-brand-orange font-medium">Rp {{ item.harga?.toLocaleString('id-ID') }}</td>
-            <td class="p-4">
-              <span :class="item.status === 'aktif' ? 'text-green-700 bg-green-100' : 'text-gray-500 bg-gray-100'" class="text-xs font-medium px-2 py-1 rounded-full">
-                {{ item.status }}
-              </span>
-            </td>
-            <td class="p-4 text-right space-x-3">
-              <button @click="openModal(item)" class="text-sm text-brand-brown hover:text-brand-orange">Edit</button>
-              <button @click="deleteProgram(item.id)" class="text-sm text-red-500 hover:text-red-700">Hapus</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Modal Form -->
-    <div v-if="isModalOpen" class="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4 overflow-y-auto">
-      <div class="bg-white rounded-xl w-full max-w-2xl p-6 space-y-5 my-8">
-        <div class="flex justify-between items-center">
-          <h2 class="font-display text-xl text-brand-brown">{{ isEditing ? 'Edit' : 'Tambah' }} Program</h2>
-          <button @click="closeModal" class="text-brand-muted hover:text-brand-brown text-lg">✕</button>
+    <!-- Tabel & Kontrol -->
+    <div class="bg-white rounded-[30px] border border-brand-border/50 shadow-sm overflow-hidden">
+      
+      <!-- Toolbar: Pencarian & Filter -->
+      <div class="p-6 border-b border-brand-border/50 bg-gray-50/50 flex flex-col sm:flex-row gap-4 justify-between items-center">
+        <div class="relative w-full sm:w-72">
+          <svg class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-brand-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+          <input v-model="searchQuery" class="w-full pl-11 pr-4 py-3 border-2 border-brand-border/50 rounded-full text-sm focus:outline-none focus:border-brand-orange transition-colors font-medium text-brand-brown" placeholder="Cari nama program..." />
         </div>
+        <select v-model="statusFilter" class="w-full sm:w-auto px-6 py-3 border-2 border-brand-border/50 rounded-full text-sm focus:outline-none focus:border-brand-orange transition-colors font-medium text-brand-brown bg-white appearance-none cursor-pointer">
+          <option value="semua">Semua Status</option>
+          <option value="aktif">Aktif Saja</option>
+          <option value="nonaktif">Nonaktif Saja</option>
+        </select>
+      </div>
 
-        <form @submit.prevent="saveProgram" class="space-y-4">
-          <!-- Nama -->
-          <div class="flex flex-col gap-1.5">
-            <label class="label">Nama Program <span class="text-brand-orange">*</span></label>
-            <input v-model="form.nama" required class="input-field" placeholder="Nahwu Dasar Intensif" />
-          </div>
+      <div v-if="isLoading" class="p-10 text-center text-brand-muted">
+        <div class="animate-pulse flex flex-col items-center gap-3">
+          <div class="w-10 h-10 rounded-full border-2 border-brand-orange border-t-transparent animate-spin"></div>
+          <span class="font-medium">Memuat data program...</span>
+        </div>
+      </div>
+      
+      <div v-else-if="programs.length === 0" class="p-16 text-center">
+        <div class="w-20 h-20 bg-brand-orange/10 rounded-full flex items-center justify-center mx-auto mb-6 text-brand-orange">
+          <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+        </div>
+        <h3 class="font-display text-2xl text-brand-brown mb-2">Belum ada Program</h3>
+        <p class="text-brand-muted">Silakan klik tombol "Tambah Program" di atas untuk membuat program pertama Anda.</p>
+      </div>
 
-          <!-- Deskripsi -->
-          <div class="flex flex-col gap-1.5">
-            <label class="label">Deskripsi <span class="text-brand-orange">*</span></label>
-            <textarea v-model="form.deskripsi" required rows="3" class="input-field resize-none" placeholder="Deskripsi singkat program..."></textarea>
-          </div>
+      <div v-else-if="paginatedPrograms.length === 0" class="p-16 text-center text-brand-muted">
+        <p>Tidak ada program yang cocok dengan kriteria pencarian Anda.</p>
+      </div>
 
-          <div class="grid grid-cols-2 gap-4">
-            <!-- Jadwal -->
-            <div class="flex flex-col gap-1.5">
-              <label class="label">Jadwal <span class="text-brand-orange">*</span></label>
-              <input v-model="form.jadwal" required class="input-field" placeholder="Senin & Rabu, 19.30-21.00 WIB" />
-            </div>
-            <!-- Durasi -->
-            <div class="flex flex-col gap-1.5">
-              <label class="label">Durasi <span class="text-brand-orange">*</span></label>
-              <input v-model="form.durasi" required class="input-field" placeholder="3 bulan" />
-            </div>
-          </div>
-
-          <div class="grid grid-cols-2 gap-4">
-            <!-- Harga -->
-            <div class="flex flex-col gap-1.5">
-              <label class="label">Harga (Rp) <span class="text-brand-orange">*</span></label>
-              <input type="number" v-model="form.harga" required class="input-field" />
-            </div>
-            <!-- Status -->
-            <div class="flex flex-col gap-1.5">
-              <label class="label">Status <span class="text-brand-orange">*</span></label>
-              <select v-model="form.status" required class="input-field">
-                <option value="aktif">Aktif</option>
-                <option value="nonaktif">Nonaktif</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-2 gap-4">
-            <!-- Tanggal Mulai -->
-            <div class="flex flex-col gap-1.5">
-              <label class="label">Tanggal Mulai</label>
-              <input type="date" v-model="form.tanggalMulaiStr" class="input-field" />
-            </div>
-            <!-- Deadline Daftar -->
-            <div class="flex flex-col gap-1.5">
-              <label class="label">Deadline Pendaftaran</label>
-              <input type="date" v-model="form.deadlineDaftarStr" class="input-field" />
-            </div>
-          </div>
-
-          <!-- Gambar URL -->
-          <div class="flex flex-col gap-1.5">
-            <label class="label">URL Gambar (Cloudinary)</label>
-            <input v-model="form.gambarUrl" class="input-field" placeholder="https://res.cloudinary.com/..." />
-          </div>
-
-          <!-- Wajib Beli Kitab -->
-          <div class="p-4 border border-brand-border rounded-lg space-y-3">
-            <label class="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" v-model="form.wajibBeliKitab" class="rounded text-brand-orange focus:ring-brand-orange" />
-              <span class="text-sm font-medium text-brand-brown">Program ini mewajibkan pembelian kitab</span>
-            </label>
-            <div v-if="form.wajibBeliKitab" class="flex flex-col gap-1.5">
-              <label class="label">ID Kitab Wajib (pisahkan dengan koma)</label>
-              <input v-model="form.kitabWajibIdsStr" class="input-field" placeholder="kitabId1, kitabId2" />
-              <p class="text-xs text-brand-muted">Masukkan ID dokumen kitab dari koleksi <code>kitabs</code>.</p>
-            </div>
-          </div>
-
-          <div class="flex justify-end gap-2 pt-4 border-t border-brand-border">
-            <AppButton type="button" variant="ghost" @click="closeModal">Batal</AppButton>
-            <AppButton type="submit" variant="primary" :disabled="isSaving">
-              {{ isSaving ? 'Menyimpan...' : (isEditing ? 'Simpan Perubahan' : 'Tambah Program') }}
-            </AppButton>
-          </div>
-        </form>
+      <div v-else class="overflow-x-auto">
+        <table class="w-full text-left text-sm whitespace-nowrap">
+          <thead class="bg-gray-50/50 border-b border-brand-border/50 text-brand-muted font-bold tracking-widest uppercase text-xs">
+            <tr>
+              <th class="p-6">Nama Program</th>
+              <th class="p-6">Jadwal</th>
+              <th class="p-6">Harga</th>
+              <th class="p-6">Status</th>
+              <th class="p-6 text-right">Aksi</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-brand-border/50">
+            <tr v-for="item in paginatedPrograms" :key="item.id" class="hover:bg-brand-cream/20 transition-colors">
+              <td class="p-6">
+                <p class="font-bold text-brand-brown text-base">{{ item.nama }}</p>
+                <p class="text-xs text-brand-muted mt-1">{{ item.durasi }}</p>
+              </td>
+              <td class="p-6 text-brand-muted">{{ item.jadwal }}</td>
+              <td class="p-6 text-brand-brown font-medium">Rp {{ item.harga?.toLocaleString('id-ID') }}</td>
+              <td class="p-6">
+                <span :class="item.status === 'aktif' ? 'text-green-700 bg-green-100 border-green-200' : 'text-gray-500 bg-gray-100 border-gray-200'" class="text-xs font-bold px-3 py-1.5 rounded-full border uppercase tracking-wider">
+                  {{ item.status }}
+                </span>
+              </td>
+              <td class="p-6 text-right space-x-2">
+                <NuxtLink :to="`/admin/program/${item.id}`" class="inline-block px-4 py-2 bg-brand-cream text-brand-orange hover:bg-brand-orange hover:text-white transition-colors rounded-full font-bold text-xs uppercase tracking-wider">
+                  Edit
+                </NuxtLink>
+                <button @click="deleteProgram(item.id)" class="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-colors rounded-full font-bold text-xs uppercase tracking-wider">
+                  Hapus
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Pagination Controls -->
+      <div v-if="totalPages > 1 && !isLoading && programs.length > 0" class="p-6 border-t border-brand-border/50 bg-white flex justify-between items-center">
+        <p class="text-sm text-brand-muted font-medium">Halaman <span class="text-brand-brown font-bold">{{ currentPage }}</span> dari <span class="text-brand-brown font-bold">{{ totalPages }}</span></p>
+        <div class="flex gap-2">
+          <button @click="currentPage--" :disabled="currentPage === 1" class="px-4 py-2 rounded-full border-2 border-brand-border text-brand-brown font-bold text-xs tracking-wider uppercase hover:bg-brand-cream hover:border-brand-orange transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            Sebelumnnya
+          </button>
+          <button @click="currentPage++" :disabled="currentPage === totalPages" class="px-4 py-2 rounded-full border-2 border-brand-border text-brand-brown font-bold text-xs tracking-wider uppercase hover:bg-brand-cream hover:border-brand-orange transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            Selanjutnya
+          </button>
+        </div>
       </div>
     </div>
+
+    <!-- Modal Konfirmasi Hapus -->
+    <ModalConfirm
+      :is-open="isConfirmOpen"
+      title="Hapus Program?"
+      message="Apakah Anda yakin ingin menghapus program ini? Semua data terkait program ini akan hilang dan tindakan ini tidak dapat dibatalkan."
+      confirm-text="Ya, Hapus"
+      variant="danger"
+      @confirm="executeDelete"
+      @cancel="cancelDelete"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, Timestamp, orderBy, query } from 'firebase/firestore';
+import { ref, computed, onMounted } from 'vue';
+import { collection, getDocs, doc, deleteDoc, orderBy, query } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
 import { useNuxtApp } from '#imports';
 
@@ -147,101 +122,86 @@ const { $db } = useNuxtApp();
 const db = $db as Firestore;
 const programs = ref<any[]>([]);
 const isLoading = ref(true);
-const isModalOpen = ref(false);
-const isEditing = ref(false);
-const isSaving = ref(false);
-const currentId = ref('');
 
-const defaultForm = () => ({
-  nama: '', deskripsi: '', jadwal: '', durasi: '',
-  harga: 0, status: 'aktif', gambarUrl: '',
-  tanggalMulaiStr: '', deadlineDaftarStr: '',
-  wajibBeliKitab: false, kitabWajibIdsStr: ''
-});
+// States for Filter & Pagination
+const searchQuery = ref('');
+const statusFilter = ref('semua');
+const currentPage = ref(1);
+const itemsPerPage = 10;
 
-const form = ref(defaultForm());
+// States for Delete Confirmation
+const isConfirmOpen = ref(false);
+const itemToDelete = ref<string | null>(null);
 
 const fetchPrograms = async () => {
   isLoading.value = true;
-  const q = query(collection(db, 'programs'), orderBy('createdAt', 'desc'));
-  const snap = await getDocs(q);
-  programs.value = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  isLoading.value = false;
+  try {
+    const q = query(collection(db, 'programs'), orderBy('createdAt', 'desc'));
+    const snap = await getDocs(q);
+    programs.value = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (error) {
+    console.error("Error fetching programs", error);
+  } finally {
+    isLoading.value = false;
+  }
 };
 
 onMounted(fetchPrograms);
 
-const openModal = (item?: any) => {
-  if (item) {
-    isEditing.value = true;
-    currentId.value = item.id;
-    form.value = {
-      nama: item.nama ?? '',
-      deskripsi: item.deskripsi ?? '',
-      jadwal: item.jadwal ?? '',
-      durasi: item.durasi ?? '',
-      harga: item.harga ?? 0,
-      status: item.status ?? 'aktif',
-      gambarUrl: item.gambarUrl ?? '',
-      tanggalMulaiStr: item.tanggalMulai?.toDate?.()?.toISOString().split('T')[0] ?? '',
-      deadlineDaftarStr: item.deadlineDaftar?.toDate?.()?.toISOString().split('T')[0] ?? '',
-      wajibBeliKitab: item.wajibBeliKitab ?? false,
-      kitabWajibIdsStr: (item.kitabWajibIds ?? []).join(', ')
-    };
-  } else {
-    isEditing.value = false;
-    currentId.value = '';
-    form.value = defaultForm();
-  }
-  isModalOpen.value = true;
+const deleteProgram = (id: string) => {
+  itemToDelete.value = id;
+  isConfirmOpen.value = true;
 };
 
-const closeModal = () => { isModalOpen.value = false; };
+const cancelDelete = () => {
+  isConfirmOpen.value = false;
+  itemToDelete.value = null;
+};
 
-const saveProgram = async () => {
-  isSaving.value = true;
+const executeDelete = async () => {
+  if (!itemToDelete.value) return;
+  
   try {
-    const kitabWajibIds = form.value.kitabWajibIdsStr
-      ? form.value.kitabWajibIdsStr.split(',').map(s => s.trim()).filter(Boolean)
-      : [];
-
-    const data: any = {
-      nama: form.value.nama,
-      deskripsi: form.value.deskripsi,
-      jadwal: form.value.jadwal,
-      durasi: form.value.durasi,
-      harga: Number(form.value.harga),
-      status: form.value.status,
-      gambarUrl: form.value.gambarUrl || null,
-      wajibBeliKitab: form.value.wajibBeliKitab,
-      kitabWajibIds,
-      updatedAt: new Date()
-    };
-
-    if (form.value.tanggalMulaiStr) data.tanggalMulai = Timestamp.fromDate(new Date(form.value.tanggalMulaiStr));
-    if (form.value.deadlineDaftarStr) data.deadlineDaftar = Timestamp.fromDate(new Date(form.value.deadlineDaftarStr));
-
-    if (isEditing.value) {
-      await updateDoc(doc(db, 'programs', currentId.value), data);
-    } else {
-      await addDoc(collection(db, 'programs'), { ...data, createdAt: new Date() });
-    }
-    closeModal();
-    fetchPrograms();
+    await deleteDoc(doc(db, 'programs', itemToDelete.value));
+    fetchPrograms(); // Refresh the list
+  } catch (error) {
+    console.error("Error deleting program", error);
+    alert('Gagal menghapus program.');
   } finally {
-    isSaving.value = false;
+    isConfirmOpen.value = false;
+    itemToDelete.value = null;
   }
 };
 
-const deleteProgram = async (id: string) => {
-  if (confirm('Yakin ingin menghapus program ini?')) {
-    await deleteDoc(doc(db, 'programs', id));
-    fetchPrograms();
+// Computed properties for processing data
+const filteredPrograms = computed(() => {
+  let result = programs.value;
+  
+  // Reset pagination if filter changes
+  currentPage.value = 1;
+
+  if (searchQuery.value) {
+    const lowerQuery = searchQuery.value.toLowerCase();
+    result = result.filter(p => 
+      p.nama?.toLowerCase().includes(lowerQuery) || 
+      p.deskripsi?.toLowerCase().includes(lowerQuery)
+    );
   }
-};
+
+  if (statusFilter.value !== 'semua') {
+    result = result.filter(p => p.status === statusFilter.value);
+  }
+
+  return result;
+});
+
+const totalPages = computed(() => {
+  return Math.max(1, Math.ceil(filteredPrograms.value.length / itemsPerPage));
+});
+
+const paginatedPrograms = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  return filteredPrograms.value.slice(start, end);
+});
 </script>
-
-<style scoped>
-.input-field { @apply px-4 py-2 text-sm rounded-lg border border-brand-border bg-white focus:outline-none focus:border-brand-orange w-full transition-colors; }
-.label { @apply text-sm font-medium text-brand-brown; }
-</style>

@@ -14,6 +14,8 @@ export default defineNuxtConfig({
       firebaseAppId: process.env.FIREBASE_APP_ID,
       midtransClientKey: process.env.MIDTRANS_CLIENT_KEY,
       midtransIsProduction: process.env.MIDTRANS_IS_PRODUCTION === 'true',
+      cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
+      cloudinaryUploadPreset: process.env.CLOUDINARY_UPLOAD_PRESET,
     }
   },
   app: {
