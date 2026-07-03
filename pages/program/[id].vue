@@ -126,7 +126,7 @@
               <span class="px-3 py-1 bg-brand-orange/10 text-brand-orange text-xs font-bold uppercase tracking-widest rounded-full">Wajib</span>
             </div>
             
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 gap-4">
               <NuxtLink v-for="k in kitabWajib" :key="k.id" :to="`/kitab/${k.id}`" class="group flex items-start gap-4 p-4 rounded-[20px] border border-brand-border/50 hover:border-brand-orange hover:shadow-lg transition-all bg-white">
                 <div class="w-20 h-24 bg-brand-cream/30 rounded-xl overflow-hidden shrink-0 border border-brand-border/30">
                   <img v-if="k.gambarUrl" :src="k.gambarUrl" :alt="k.judul" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
