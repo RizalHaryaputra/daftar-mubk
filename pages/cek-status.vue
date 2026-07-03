@@ -1,9 +1,9 @@
 <template>
-  <div class="max-w-2xl mx-auto py-12 md:py-20 px-4 space-y-8">
+  <div class="max-w-2xl mx-auto pb-20 pt-8 px-4 space-y-8">
     
     <div class="text-center mb-12">
-      <h1 class="font-display text-4xl md:text-5xl text-brand-brown mb-4">Cek Status Pendaftaran</h1>
-      <p class="text-brand-muted max-w-md mx-auto">Masukkan kode invoice Anda (contoh: MUBK-YYYYMMDD-XXXX) untuk melacak status pendaftaran dan pembayaran Anda.</p>
+      <h1 class="font-display text-4xl md:text-5xl text-brand-brown mb-4 font-bold tracking-tight">Cek Status <span class="text-brand-orange italic">Pendaftaran</span></h1>
+      <p class="text-brand-muted md:text-lg leading-relaxed max-w-md mx-auto">Masukkan kode invoice Anda (contoh: MUBK-YYYYMMDD-XXXX) untuk melacak status pendaftaran dan pembayaran Anda.</p>
     </div>
 
     <!-- Form Cari -->
