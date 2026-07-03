@@ -12,7 +12,7 @@
     </div>
 
     <!-- State Loading -->
-    <div v-if="isLoading" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8 px-4 max-w-6xl mx-auto">
+    <div v-if="isLoading" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 px-4 max-w-6xl mx-auto">
       <div v-for="n in 8" :key="n" class="bg-white/50 border border-brand-border/50 rounded-[30px] h-[350px] animate-pulse"></div>
     </div>
 
@@ -23,7 +23,7 @@
     </div>
 
     <!-- State Data -->
-    <div v-else-if="kitabs.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8 px-4 max-w-6xl mx-auto">
+    <div v-else-if="kitabs.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 px-4 max-w-6xl mx-auto">
       <CardKitab v-for="kitab in kitabs" :key="kitab.id" :kitab="kitab" />
     </div>
 

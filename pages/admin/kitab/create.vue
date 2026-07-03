@@ -1,12 +1,12 @@
 <template>
-  <div class="space-y-6 max-w-4xl mx-auto">
+  <div class="space-y-8">
     <!-- Header -->
     <div>
       <NuxtLink to="/admin/kitab" class="inline-flex items-center gap-2 text-sm text-brand-muted hover:text-brand-orange transition-colors mb-4">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
         Kembali ke Daftar Kitab
       </NuxtLink>
-      <h1 class="font-display text-3xl text-brand-brown">Tambah Kitab Baru</h1>
+      <h1 class="font-display text-4xl text-brand-brown tracking-tight">Tambah Kitab Baru</h1>
       <p class="text-brand-muted mt-2">Lengkapi form di bawah ini untuk menambahkan kitab baru ke sistem.</p>
     </div>
 

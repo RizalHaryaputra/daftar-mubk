@@ -41,25 +41,29 @@
     <div class="bg-brand-deeper pb-20">
       <!-- 2. STATS SECTION (Dark) -->
       <section class="px-6 py-16 md:py-24 max-w-6xl mx-auto">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center md:text-left divide-x-0 md:divide-x divide-white/10">
-        <div class="px-4">
-          <p class="font-display text-4xl md:text-5xl text-brand-orange mb-2">12<span class="text-white">+</span></p>
-          <p class="text-white/60 text-sm font-medium uppercase tracking-wider">Program Pilihan</p>
+        <div class="bg-white/5 border border-white/10 rounded-[40px] p-8 md:p-14 shadow-2xl relative overflow-hidden backdrop-blur-md">
+          <div class="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none"></div>
+          
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center md:text-left divide-x-0 md:divide-x divide-white/10 relative z-10">
+            <div class="px-4">
+              <p class="font-display text-4xl md:text-5xl text-brand-orange mb-2">12<span class="text-white">+</span></p>
+              <p class="text-white/60 text-sm font-medium uppercase tracking-wider">Program Pilihan</p>
+            </div>
+            <div class="px-4">
+              <p class="font-display text-4xl md:text-5xl text-brand-orange mb-2">8<span class="text-white">+</span></p>
+              <p class="text-white/60 text-sm font-medium uppercase tracking-wider">Tahun Pengalaman</p>
+            </div>
+            <div class="px-4">
+              <p class="font-display text-4xl md:text-5xl text-brand-orange mb-2">500<span class="text-white">+</span></p>
+              <p class="text-white/60 text-sm font-medium uppercase tracking-wider">Alumni Sukses</p>
+            </div>
+            <div class="px-4">
+              <p class="font-display text-4xl md:text-5xl text-brand-orange mb-2">24<span class="text-white">/7</span></p>
+              <p class="text-white/60 text-sm font-medium uppercase tracking-wider">Akses & Bimbingan</p>
+            </div>
+          </div>
         </div>
-        <div class="px-4">
-          <p class="font-display text-4xl md:text-5xl text-brand-orange mb-2">8<span class="text-white">+</span></p>
-          <p class="text-white/60 text-sm font-medium uppercase tracking-wider">Tahun Pengalaman</p>
-        </div>
-        <div class="px-4">
-          <p class="font-display text-4xl md:text-5xl text-brand-orange mb-2">500<span class="text-white">+</span></p>
-          <p class="text-white/60 text-sm font-medium uppercase tracking-wider">Alumni Sukses</p>
-        </div>
-        <div class="px-4">
-          <p class="font-display text-4xl md:text-5xl text-brand-orange mb-2">24<span class="text-white">/7</span></p>
-          <p class="text-white/60 text-sm font-medium uppercase tracking-wider">Akses & Bimbingan</p>
-        </div>
-      </div>
-    </section>
+      </section>
 
     <!-- 3. ABOUT / METHODOLOGY SECTION -->
     <section class="px-6 py-12 max-w-6xl mx-auto">
@@ -102,32 +106,39 @@
 
           <!-- Interactive List -->
           <div class="space-y-4">
-            <div 
-              v-for="(prog, idx) in mockPrograms" 
-              :key="prog.id"
-              @mouseenter="hoveredProgram = prog"
-              class="group flex items-center justify-between p-5 rounded-xl border transition-all cursor-pointer"
-              :class="hoveredProgram.id === prog.id ? 'border-brand-orange bg-white/5' : 'border-white/10 hover:border-white/30'"
-            >
-              <div class="flex items-center gap-4">
-                <span class="text-white/40 font-mono text-sm">0{{ idx + 1 }}</span>
-                <span class="text-white font-medium group-hover:text-brand-orange transition-colors">{{ prog.nama }}</span>
-              </div>
-              <span class="text-white/40 group-hover:text-brand-orange transition-transform group-hover:translate-x-2">&rarr;</span>
+            <div v-if="isLoading" class="animate-pulse space-y-4">
+              <div v-for="n in 3" :key="n" class="h-[68px] bg-white/5 rounded-xl border border-white/10"></div>
             </div>
+            <div v-else-if="programs.length === 0" class="text-white/50 text-sm py-4">Belum ada program unggulan.</div>
+            <template v-else>
+              <div 
+                v-for="(prog, idx) in programs" 
+                :key="prog.id"
+                @mouseenter="hoveredProgram = prog"
+                class="group flex items-center justify-between p-5 rounded-xl border transition-all cursor-pointer"
+                :class="hoveredProgram?.id === prog.id ? 'border-brand-orange bg-white/5' : 'border-white/10 hover:border-white/30'"
+              >
+                <div class="flex items-center gap-4">
+                  <span class="text-white/40 font-mono text-sm">0{{ idx + 1 }}</span>
+                  <span class="text-white font-medium group-hover:text-brand-orange transition-colors">{{ prog.nama }}</span>
+                </div>
+                <span class="text-white/40 group-hover:text-brand-orange transition-transform group-hover:translate-x-2">&rarr;</span>
+              </div>
+            </template>
           </div>
         </div>
 
         <div class="md:w-6/12 relative hidden md:block">
           <!-- Dynamic Image Panel -->
-          <div class="aspect-[4/5] rounded-[30px] overflow-hidden relative shadow-2xl shadow-black/50">
+          <div v-if="isLoading" class="aspect-[4/5] rounded-[30px] overflow-hidden relative bg-white/5 animate-pulse border border-white/10"></div>
+          <div v-else-if="hoveredProgram" class="aspect-[4/5] rounded-[30px] overflow-hidden relative shadow-2xl shadow-black/50">
             <img :src="hoveredProgram.gambarUrl || 'https://images.unsplash.com/photo-1522881451255-f59ad836fdfb?w=800&q=80'" class="w-full h-full object-cover transition-opacity duration-300" :key="hoveredProgram.id" />
             <div class="absolute inset-0 bg-gradient-to-t from-brand-deeper via-brand-deeper/50 to-transparent opacity-90"></div>
             
             <div class="absolute bottom-8 left-8 right-8">
-              <p class="text-brand-orange text-xs font-bold uppercase tracking-widest mb-2">{{ hoveredProgram.level }}</p>
+              <p class="text-brand-orange text-xs font-bold uppercase tracking-widest mb-2">{{ hoveredProgram.level || 'Umum' }}</p>
               <h3 class="font-display text-2xl text-white mb-2">{{ hoveredProgram.nama }}</h3>
-              <p class="text-white/70 text-sm line-clamp-2 mb-4">{{ hoveredProgram.jadwal }} · Rp {{ hoveredProgram.harga.toLocaleString('id-ID') }}</p>
+              <p class="text-white/70 text-sm line-clamp-2 mb-4">{{ hoveredProgram.jadwal }} · Rp {{ (hoveredProgram.harga || 0).toLocaleString('id-ID') }}</p>
               
               <NuxtLink :to="`/program/${hoveredProgram.id}`" class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white text-brand-deeper hover:bg-brand-orange hover:text-white transition-colors">
                 <span class="rotate-45 block transform -translate-y-px">&uarr;</span>
@@ -212,21 +223,25 @@
         <NuxtLink to="/kitab" class="text-white/50 hover:text-white transition-colors text-sm bg-white/5 border border-white/10 px-5 py-2.5 rounded-full hover:bg-white/10">Lihat Semua</NuxtLink>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div v-for="kitab in mockKitab" :key="kitab.id" class="bg-white rounded-[24px] p-6 text-center border-4 border-transparent hover:border-brand-orange/20 flex flex-col items-center group relative hover:-translate-y-2 transition-all duration-300 shadow-xl">
+      <div v-if="isLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div v-for="n in 4" :key="n" class="bg-white/5 rounded-[24px] h-[260px] animate-pulse border border-white/10"></div>
+      </div>
+      <div v-else-if="kitabs.length === 0" class="text-white/50 text-center py-10">Belum ada kitab pilihan.</div>
+      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <NuxtLink :to="`/kitab/${kitab.id}`" v-for="kitab in kitabs" :key="kitab.id" class="bg-white rounded-[24px] p-6 text-center border-4 border-transparent hover:border-brand-orange/20 flex flex-col items-center group relative hover:-translate-y-2 transition-all duration-300 shadow-xl">
           <div class="w-16 h-16 rounded-full bg-brand-cream flex items-center justify-center mb-5 text-brand-orange border-2 border-brand-orange/20 relative group-hover:scale-110 transition-transform">
             <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
             <div class="absolute -top-1 -right-1 w-4 h-4 bg-brand-orange rounded-full border-2 border-white"></div>
           </div>
           <h4 class="text-brand-brown font-semibold mb-1 text-sm md:text-base">{{ kitab.judul }}</h4>
-          <p class="text-brand-muted text-xs md:text-sm mb-4">{{ kitab.penulis }}</p>
+          <p class="text-brand-muted text-xs md:text-sm mb-4">{{ kitab.penulis || 'Penulis Unknown' }}</p>
           <div class="mt-auto pt-4 border-t border-brand-border w-full flex items-center justify-between">
-            <p class="text-brand-orange font-bold text-sm">Rp {{ kitab.harga.toLocaleString('id-ID') }}</p>
+            <p class="text-brand-orange font-bold text-sm">Rp {{ (kitab.harga || 0).toLocaleString('id-ID') }}</p>
             <div class="w-6 h-6 rounded-full bg-brand-cream text-brand-orange flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">
               &rarr;
             </div>
           </div>
-        </div>
+        </NuxtLink>
       </div>
     </section>
 
@@ -257,78 +272,51 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { useNuxtApp } from '#imports';
+import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
+import type { Firestore } from 'firebase/firestore';
 
 definePageMeta({
   layout: 'landing'
 });
 
-const mockPrograms = [
-  {
-    id: 'prog-1',
-    nama: 'Nahwu Dasar Intensif',
-    level: 'Pemula',
-    jadwal: 'Senin & Rabu · 19.30 WIB',
-    harga: 250000,
-    status: 'aktif',
-    gambarUrl: 'https://images.unsplash.com/photo-1744957280344-77fa163d2e22?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nzl8fGtpdGFifGVufDB8fDB8fHww'
-  },
-  {
-    id: 'prog-2',
-    nama: 'Sharaf Menengah',
-    level: 'Menengah',
-    jadwal: 'Selasa & Kamis · 16.00 WIB',
-    harga: 300000,
-    status: 'aktif',
-    gambarUrl: 'https://images.unsplash.com/photo-1732584044835-6efdfd8df087?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjN8fGtpdGFifGVufDB8fDB8fHww'
-  },
-  {
-    id: 'prog-3',
-    nama: 'Baca Kitab Lanjutan',
-    level: 'Mahir',
-    jadwal: 'Sabtu · 08.00 WIB',
-    harga: 400000,
-    status: 'tutup',
-    gambarUrl: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&q=80'
-  }
-];
+const { $db } = useNuxtApp();
+const db = $db as Firestore;
 
-const hoveredProgram = ref(mockPrograms[0]!);
+const programs = ref<any[]>([]);
+const hoveredProgram = ref<any>(null);
+const kitabs = ref<any[]>([]);
+const isLoading = ref(true);
 
-const mockKitab = [
-  {
-    id: 'kitab-1',
-    judul: 'Al-Ajurrumiyyah',
-    penulis: 'Ibnu Ajurrum',
-    harga: 45000,
-    bisaStandalone: true,
-    gambarUrl: null
-  },
-  {
-    id: 'kitab-2',
-    judul: 'Al-Amtsilah At-Tashrifiyyah',
-    penulis: 'KH. Ma\'shum Ali',
-    harga: 35000,
-    bisaStandalone: true,
-    gambarUrl: null
-  },
-  {
-    id: 'kitab-3',
-    judul: 'Mutammimah Al-Ajurrumiyyah',
-    penulis: 'Ar-Ru\'aini',
-    harga: 65000,
-    bisaStandalone: true,
-    gambarUrl: null
-  },
-  {
-    id: 'kitab-4',
-    judul: 'Mukhtarot',
-    penulis: 'Ustadz Aunur Rofiq',
-    harga: 50000,
-    bisaStandalone: true,
-    gambarUrl: null
+onMounted(async () => {
+  try {
+    const qPrograms = query(
+      collection(db, 'programs'),
+      where('status', '==', 'aktif'),
+      orderBy('createdAt', 'desc'),
+      limit(4)
+    );
+    const snapPrograms = await getDocs(qPrograms);
+    programs.value = snapPrograms.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    if (programs.value.length > 0) {
+      hoveredProgram.value = programs.value[0];
+    }
+
+    const qKitabs = query(
+      collection(db, 'kitabs'),
+      where('status', '==', 'aktif'),
+      orderBy('createdAt', 'desc'),
+      limit(4)
+    );
+    const snapKitabs = await getDocs(qKitabs);
+    kitabs.value = snapKitabs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (error) {
+    console.error('Error fetching data for landing page:', error);
+  } finally {
+    isLoading.value = false;
   }
-];
+});
 </script>
 
 <style scoped>

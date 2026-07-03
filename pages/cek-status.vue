@@ -1,69 +1,89 @@
 <template>
-  <div class="max-w-lg mx-auto space-y-6 mt-10">
-    <div class="text-center mb-8">
-      <h1 class="font-display text-3xl text-brand-brown mb-2">Cek Status Pendaftaran</h1>
-      <p class="text-sm text-brand-muted">Masukkan kode invoice untuk melihat status pendaftaran Anda.</p>
+  <div class="max-w-2xl mx-auto py-12 md:py-20 px-4 space-y-8">
+    
+    <div class="text-center mb-12">
+      <h1 class="font-display text-4xl md:text-5xl text-brand-brown mb-4">Cek Status Pendaftaran</h1>
+      <p class="text-brand-muted max-w-md mx-auto">Masukkan kode invoice Anda (contoh: MUBK-YYYYMMDD-XXXX) untuk melacak status pendaftaran dan pembayaran Anda.</p>
     </div>
 
     <!-- Form Cari -->
-    <div class="bg-white border border-brand-border rounded-xl p-6 md:p-8">
-      <form @submit.prevent="checkStatus" class="space-y-4">
-        <div class="flex flex-col gap-1.5">
-          <label class="text-sm font-medium text-brand-brown text-center">Kode Invoice</label>
+    <div class="bg-white border border-brand-border/50 shadow-xl rounded-[40px] p-8 md:p-12 relative overflow-hidden group">
+      <!-- Decorative element -->
+      <div class="absolute -right-20 -top-20 w-48 h-48 bg-brand-orange/5 rounded-full blur-3xl pointer-events-none"></div>
+
+      <form @submit.prevent="checkStatus" class="space-y-6 relative z-10">
+        <div class="flex flex-col gap-3">
+          <label class="text-xs font-bold uppercase tracking-widest text-brand-muted text-center">Kode Invoice</label>
           <input
             type="text"
             v-model="invoiceCode"
             required
             placeholder="MUBK-YYYYMMDD-XXXX"
-            class="px-4 py-3 text-center tracking-widest text-sm rounded-lg border border-brand-border bg-white focus:outline-none focus:border-brand-orange transition-colors uppercase"
+            class="px-6 py-4 text-center tracking-widest text-base md:text-lg rounded-2xl border-2 border-brand-border/50 bg-brand-cream/30 focus:outline-none focus:border-brand-orange focus:bg-white transition-all uppercase font-medium text-brand-brown w-full shadow-inner"
             @input="invoiceCode = (invoiceCode as string).toUpperCase()"
           />
         </div>
-        <AppButton type="submit" variant="primary" class="w-full" :disabled="isLoading">
-          {{ isLoading ? 'Mencari...' : 'Cari Pendaftaran' }}
+        <AppButton type="submit" variant="primary" class="w-full !rounded-full !py-4 text-sm font-bold uppercase tracking-widest shadow-lg hover:shadow-brand-orange/30 hover:-translate-y-0.5 transition-all" :disabled="isLoading">
+          {{ isLoading ? 'Mencari...' : 'Lacak Status' }}
         </AppButton>
       </form>
 
       <!-- Error -->
-      <div v-if="error" class="mt-4 bg-red-50 text-red-600 p-3 rounded-lg text-sm border border-red-100">
+      <div v-if="error" class="mt-6 bg-red-50 text-red-600 p-4 rounded-2xl text-sm border border-red-100 flex items-center gap-3 relative z-10">
+        <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
         {{ error }}
       </div>
     </div>
 
     <!-- Hasil Pencarian -->
-    <div v-if="result" class="bg-white border border-brand-border rounded-xl p-6 md:p-8 space-y-5">
+    <div v-if="result" class="bg-white border border-brand-border/50 shadow-xl rounded-[40px] p-8 md:p-12 space-y-8 animate-fade-in relative overflow-hidden">
+      <!-- Decorative element -->
+      <div class="absolute -left-20 -bottom-20 w-64 h-64 bg-brand-brown/5 rounded-full blur-3xl pointer-events-none"></div>
 
-      <!-- Status Utama -->
-      <div class="text-center pb-4 border-b border-brand-border">
-        <p class="text-xs text-brand-muted mb-2">Status Pembayaran</p>
-        <StatusBadge :status="result.statusPembayaran" />
+      <!-- Header & Status Utama -->
+      <div class="text-center pb-8 border-b border-brand-border/50 relative z-10">
+        <div class="inline-block p-4 rounded-full bg-brand-cream/50 mb-4 border border-brand-border/30">
+          <svg class="w-8 h-8 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        </div>
+        <h2 class="font-display text-2xl text-brand-brown mb-2">Detail Pendaftaran</h2>
+        <p class="text-xs font-bold uppercase tracking-widest text-brand-muted mb-4">Status Pembayaran</p>
+        <div class="flex justify-center">
+          <StatusBadge :status="result.statusPembayaran" class="scale-110" />
+        </div>
       </div>
 
       <!-- Rincian Pendaftaran -->
-      <div class="space-y-2 text-sm">
-        <div class="flex justify-between">
+      <div class="space-y-4 text-sm relative z-10">
+        <div class="flex justify-between items-center py-2 border-b border-brand-border/30 border-dashed">
           <span class="text-brand-muted">Kode Invoice</span>
-          <span class="font-medium text-brand-brown">{{ result.kodeInvoice }}</span>
+          <span class="font-bold text-brand-brown bg-brand-cream px-3 py-1 rounded-md tracking-wider">{{ result.kodeInvoice }}</span>
         </div>
-        <div v-if="result.programNama" class="flex justify-between">
+        
+        <div class="flex justify-between items-center py-2 border-b border-brand-border/30 border-dashed">
+          <span class="text-brand-muted">Nama Pendaftar</span>
+          <span class="font-bold text-brand-brown">{{ result.dataPeserta?.namaLengkap }}</span>
+        </div>
+
+        <div v-if="result.programNama" class="flex justify-between items-center py-2 border-b border-brand-border/30 border-dashed">
           <span class="text-brand-muted">Program</span>
-          <span class="font-medium text-brand-brown">{{ result.programNama }}</span>
+          <span class="font-medium text-brand-brown text-right max-w-[200px]">{{ result.programNama }}</span>
         </div>
-        <div class="flex justify-between">
-          <span class="text-brand-muted">Nama</span>
-          <span class="font-medium text-brand-brown">{{ result.dataPeserta?.namaLengkap }}</span>
+        
+        <div v-if="result.kitabDibeli?.length > 0" class="flex justify-between items-start py-2 border-b border-brand-border/30 border-dashed">
+          <span class="text-brand-muted pt-1">Kitab Dipesan</span>
+          <div class="flex flex-col items-end gap-1 text-right max-w-[200px]">
+            <span v-for="(k, i) in result.kitabDibeli" :key="i" class="font-medium text-brand-brown bg-brand-cream/30 px-2 py-1 rounded text-xs">
+              {{ k.judul }}
+            </span>
+          </div>
         </div>
-        <div v-if="result.kitabDibeli?.length > 0" class="flex justify-between">
-          <span class="text-brand-muted">Kitab Dipesan</span>
-          <span class="font-medium text-brand-brown text-right max-w-[200px]">
-            {{ result.kitabDibeli.map((k: any) => k.judul).join(', ') }}
-          </span>
-        </div>
-        <div v-if="result.kitabDibeli?.length > 0" class="flex justify-between">
+        
+        <div v-if="result.kitabDibeli?.length > 0" class="flex justify-between items-center py-2 border-b border-brand-border/30 border-dashed">
           <span class="text-brand-muted">Status Pengiriman</span>
           <span
-            :class="result.statusPengiriman === 'dikirim' ? 'text-green-600' : 'text-amber-600'"
-            class="font-medium capitalize"
+            :class="result.statusPengiriman === 'dikirim' ? 'text-green-600 bg-green-50' : 'text-amber-600 bg-amber-50'"
+            class="font-bold text-xs uppercase tracking-widest px-3 py-1 rounded-full border"
+            :style="result.statusPengiriman === 'dikirim' ? 'border-color: #bbf7d0' : 'border-color: #fde68a'"
           >
             {{ result.statusPengiriman === 'belum_dikirim' ? 'Belum Dikirim' : result.statusPengiriman === 'dikirim' ? 'Sudah Dikirim' : '-' }}
           </span>
@@ -71,30 +91,45 @@
       </div>
 
       <!-- Total -->
-      <div class="pt-4 border-t border-brand-border flex justify-between font-semibold">
-        <span class="text-brand-brown">Total Pembayaran</span>
-        <span class="text-brand-orange">Rp {{ result.rincianBiaya?.total?.toLocaleString('id-ID') }}</span>
+      <div class="pt-6 flex justify-between items-end relative z-10">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-widest text-brand-muted">Total Pembayaran</span>
+        </div>
+        <div class="text-3xl font-display text-brand-orange">
+          Rp {{ result.rincianBiaya?.total?.toLocaleString('id-ID') }}
+        </div>
       </div>
 
       <!-- CTA sesuai status -->
-      <div v-if="result.statusPembayaran === 'pending'" class="pt-2 space-y-3">
-        <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-700">
-          Pembayaran Anda belum selesai. Klik tombol di bawah untuk melanjutkan.
+      <div v-if="result.statusPembayaran === 'pending'" class="pt-6 border-t border-brand-border/50 space-y-4 relative z-10">
+        <div class="p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-3">
+          <svg class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <p class="text-sm text-amber-800 leading-relaxed">
+            Pembayaran Anda belum selesai atau sedang menunggu konfirmasi sistem. Klik tombol di bawah untuk melanjutkan pembayaran via Midtrans.
+          </p>
         </div>
-        <AppButton variant="secondary" class="w-full" @click="resumePembayaran" :disabled="isResuming">
+        <AppButton variant="secondary" class="w-full !rounded-full !py-4 text-sm font-bold uppercase tracking-widest hover:-translate-y-0.5 transition-all" @click="resumePembayaran" :disabled="isResuming">
           {{ isResuming ? 'Memproses...' : 'Lanjutkan Pembayaran' }}
         </AppButton>
       </div>
 
-      <div v-else-if="result.statusPembayaran === 'success'" class="pt-2">
-        <div class="p-3 bg-green-50 border border-green-200 rounded-lg text-xs text-green-700">
-          ✅ Pembayaran berhasil dikonfirmasi. Email konfirmasi telah dikirim ke {{ result.dataPeserta?.email }}.
+      <div v-else-if="result.statusPembayaran === 'success'" class="pt-6 border-t border-brand-border/50 relative z-10">
+        <div class="p-4 bg-green-50 border border-green-200 rounded-2xl flex items-start gap-3">
+          <div class="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+            <svg class="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+          </div>
+          <p class="text-sm text-green-800 leading-relaxed">
+            Pembayaran berhasil dikonfirmasi! Tanda terima dan instruksi selanjutnya telah dikirimkan ke email <span class="font-bold">{{ result.dataPeserta?.email }}</span>.
+          </p>
         </div>
       </div>
 
-      <div v-else-if="result.statusPembayaran === 'expire' || result.statusPembayaran === 'failed'" class="pt-2">
-        <div class="p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700">
-          Pembayaran Anda telah kadaluarsa atau gagal. Silakan hubungi admin untuk informasi lebih lanjut.
+      <div v-else-if="result.statusPembayaran === 'expire' || result.statusPembayaran === 'failed'" class="pt-6 border-t border-brand-border/50 relative z-10">
+        <div class="p-4 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-3">
+          <svg class="w-5 h-5 text-red-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <p class="text-sm text-red-800 leading-relaxed">
+            Sesi pembayaran Anda telah kadaluarsa atau dibatalkan. Silakan lakukan pendaftaran ulang atau hubungi admin untuk bantuan.
+          </p>
         </div>
       </div>
 

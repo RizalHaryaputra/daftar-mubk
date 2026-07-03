@@ -2,7 +2,7 @@ import { getFirestoreDb } from '../../../utils/firebase';
 import { createSnapTransaction } from '../../../utils/midtrans';
 
 export default defineEventHandler(async (event) => {
-  const kodeInvoice = getRouterParam(event, 'kodeInvoice');
+  const kodeInvoice = getRouterParam(event, 'kodeInvoice') as string;
   const db = getFirestoreDb();
   
   const docRef = db.collection('pendaftaran').doc(kodeInvoice);
@@ -13,6 +13,9 @@ export default defineEventHandler(async (event) => {
   }
   
   const data = doc.data();
+  if (!data) {
+    throw createError({ statusCode: 404, statusMessage: 'Data tidak ditemukan' });
+  }
   if (data.statusPembayaran !== 'pending') {
     throw createError({ statusCode: 400, statusMessage: 'Hanya transaksi pending yang dapat dilanjutkan' });
   }

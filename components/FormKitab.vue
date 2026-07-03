@@ -130,6 +130,6 @@ const onSubmit = () => {
 
 <style scoped lang="postcss">
 .input-field {
-  @apply px-5 py-4 text-sm rounded-[20px] border-2 border-brand-border/50 bg-white focus:outline-none focus:border-brand-orange transition-all w-full text-brand-brown font-medium;
+  @apply px-5 py-3.5 text-sm rounded-xl border-2 border-brand-border/50 bg-brand-cream/30 focus:outline-none focus:border-brand-orange focus:bg-white transition-all w-full text-brand-brown font-medium;
 }
 </style>
