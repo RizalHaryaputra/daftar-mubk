@@ -63,7 +63,17 @@
                 <p class="font-bold text-brand-brown text-base">{{ item.nama }}</p>
                 <p class="text-xs text-brand-muted mt-1">{{ item.durasi }}</p>
               </td>
-              <td class="p-6 text-brand-muted">{{ item.jadwal }}</td>
+              <td class="p-6 text-brand-muted">
+                <template v-if="Array.isArray(item.jadwal)">
+                  <div class="flex flex-wrap gap-2 mt-1">
+                    <span v-for="(j, idx) in item.jadwal" :key="idx" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-brand-cream/40 border border-brand-border/50 text-xs text-brand-brown font-medium">
+                      <span class="w-1.5 h-1.5 rounded-full bg-brand-orange"></span>
+                      {{ j }}
+                    </span>
+                  </div>
+                </template>
+                <template v-else>{{ item.jadwal }}</template>
+              </td>
               <td class="p-6 text-brand-brown font-medium">Rp {{ item.harga?.toLocaleString('id-ID') }}</td>
               <td class="p-6">
                 <span :class="item.status === 'aktif' ? 'text-green-700 bg-green-100 border-green-200' : 'text-gray-500 bg-gray-100 border-gray-200'" class="text-xs font-bold px-3 py-1.5 rounded-full border uppercase tracking-wider">

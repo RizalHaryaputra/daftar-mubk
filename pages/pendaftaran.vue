@@ -31,53 +31,56 @@
 
     <template v-else>
       <!-- Wizard Progress Bar (Premium Pill Design) -->
-      <div class="mb-10 bg-white border border-brand-border/50 rounded-full p-2 flex justify-between relative shadow-sm max-w-3xl mx-auto">
-        
-        <!-- Sliding active indicator -->
-        <div class="absolute top-2 bottom-2 bg-brand-orange rounded-full transition-all duration-500 shadow-md"
-             :style="{ width: 'calc(25% - 4px)', left: `calc(${ (currentStep - 1) * 25 }% + 4px)` }"></div>
-        
-        <!-- Step 1 -->
-        <div class="relative z-10 flex-1 text-center py-3 flex items-center justify-center gap-2 transition-colors duration-500"
-             :class="currentStep === 1 ? 'text-white' : (currentStep > 1 ? 'text-brand-orange' : 'text-brand-muted')">
-          <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors duration-500" 
-               :class="currentStep === 1 ? 'bg-white/20' : (currentStep > 1 ? 'bg-brand-orange/10' : 'bg-brand-cream text-brand-brown')">
-            <svg v-if="currentStep > 1" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
-            <span v-else>1</span>
+      <div class="mb-10 bg-white border border-brand-border/50 rounded-full p-2 flex max-w-3xl mx-auto shadow-sm">
+        <div class="relative flex w-full">
+          
+          <!-- Sliding active indicator -->
+          <div class="absolute top-0 bottom-0 bg-brand-orange rounded-full transition-all duration-500 shadow-md"
+               :style="{ width: '25%', left: `${(currentStep - 1) * 25}%` }"></div>
+          
+          <!-- Step 1 -->
+          <div class="relative z-10 flex-1 text-center py-3.5 md:py-4 flex items-center justify-center gap-3 transition-colors duration-500"
+               :class="currentStep === 1 ? 'text-white' : (currentStep > 1 ? 'text-brand-orange' : 'text-brand-muted')">
+            <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors duration-500" 
+                 :class="currentStep === 1 ? 'bg-white/20' : (currentStep > 1 ? 'bg-brand-orange/10' : 'bg-brand-cream text-brand-brown')">
+              <svg v-if="currentStep > 1" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+              <span v-else>1</span>
+            </div>
+            <span class="text-[11px] uppercase tracking-widest font-bold hidden sm:block">Data Diri</span>
           </div>
-          <span class="text-[11px] uppercase tracking-widest font-bold hidden sm:block">Data Diri</span>
-        </div>
-        
-        <!-- Step 2 -->
-        <div class="relative z-10 flex-1 text-center py-3 flex items-center justify-center gap-2 transition-colors duration-500"
-             :class="currentStep === 2 ? 'text-white' : (currentStep > 2 ? 'text-brand-orange' : 'text-brand-muted')">
-          <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors duration-500" 
-               :class="currentStep === 2 ? 'bg-white/20' : (currentStep > 2 ? 'bg-brand-orange/10' : 'bg-brand-cream text-brand-brown')">
-            <svg v-if="currentStep > 2" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
-            <span v-else>2</span>
+          
+          <!-- Step 2 -->
+          <div class="relative z-10 flex-1 text-center py-3.5 md:py-4 flex items-center justify-center gap-3 transition-colors duration-500"
+               :class="currentStep === 2 ? 'text-white' : (currentStep > 2 ? 'text-brand-orange' : 'text-brand-muted')">
+            <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors duration-500" 
+                 :class="currentStep === 2 ? 'bg-white/20' : (currentStep > 2 ? 'bg-brand-orange/10' : 'bg-brand-cream text-brand-brown')">
+              <svg v-if="currentStep > 2" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+              <span v-else>2</span>
+            </div>
+            <span class="text-[11px] uppercase tracking-widest font-bold hidden sm:block">Tambahan</span>
           </div>
-          <span class="text-[11px] uppercase tracking-widest font-bold hidden sm:block">Tambahan</span>
-        </div>
-        
-        <!-- Step 3 -->
-        <div class="relative z-10 flex-1 text-center py-3 flex items-center justify-center gap-2 transition-colors duration-500"
-             :class="currentStep === 3 ? 'text-white' : (currentStep > 3 ? 'text-brand-orange' : 'text-brand-muted')">
-          <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors duration-500" 
-               :class="currentStep === 3 ? 'bg-white/20' : (currentStep > 3 ? 'bg-brand-orange/10' : 'bg-brand-cream text-brand-brown')">
-            <svg v-if="currentStep > 3" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
-            <span v-else>3</span>
+          
+          <!-- Step 3 -->
+          <div class="relative z-10 flex-1 text-center py-3.5 md:py-4 flex items-center justify-center gap-3 transition-colors duration-500"
+               :class="currentStep === 3 ? 'text-white' : (currentStep > 3 ? 'text-brand-orange' : 'text-brand-muted')">
+            <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors duration-500" 
+                 :class="currentStep === 3 ? 'bg-white/20' : (currentStep > 3 ? 'bg-brand-orange/10' : 'bg-brand-cream text-brand-brown')">
+              <svg v-if="currentStep > 3" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+              <span v-else>3</span>
+            </div>
+            <span class="text-[11px] uppercase tracking-widest font-bold hidden sm:block">Kitab</span>
           </div>
-          <span class="text-[11px] uppercase tracking-widest font-bold hidden sm:block">Kitab</span>
-        </div>
-        
-        <!-- Step 4 -->
-        <div class="relative z-10 flex-1 text-center py-3 flex items-center justify-center gap-2 transition-colors duration-500"
-             :class="currentStep === 4 ? 'text-white' : 'text-brand-muted'">
-          <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors duration-500" 
-               :class="currentStep === 4 ? 'bg-white/20' : 'bg-brand-cream text-brand-brown'">
-            4
+          
+          <!-- Step 4 -->
+          <div class="relative z-10 flex-1 text-center py-3.5 md:py-4 flex items-center justify-center gap-3 transition-colors duration-500"
+               :class="currentStep === 4 ? 'text-white' : 'text-brand-muted'">
+            <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors duration-500" 
+                 :class="currentStep === 4 ? 'bg-white/20' : 'bg-brand-cream text-brand-brown'">
+              4
+            </div>
+            <span class="text-[11px] uppercase tracking-widest font-bold hidden sm:block">Selesai</span>
           </div>
-          <span class="text-[11px] uppercase tracking-widest font-bold hidden sm:block">Selesai</span>
+          
         </div>
       </div>
 
@@ -86,7 +89,9 @@
         <div>
           <p class="text-xs text-brand-orange uppercase tracking-widest font-bold mb-1">Program Pilihan</p>
           <p class="font-display text-2xl mb-1">{{ selectedProgram.nama }}</p>
-          <p class="text-sm text-white/70">{{ selectedProgram.jadwal }} · Rp {{ selectedProgram.harga?.toLocaleString('id-ID') }}</p>
+          <p class="text-sm text-white/70">
+            {{ Array.isArray(selectedProgram.jadwal) ? (selectedProgram.jadwal.length + ' Pilihan Jadwal') : selectedProgram.jadwal }} · Rp {{ selectedProgram.harga?.toLocaleString('id-ID') }}
+          </p>
         </div>
         <NuxtLink :to="`/program/${selectedProgram.id}`" class="bg-brand-orange text-white text-sm font-bold uppercase tracking-widest px-6 py-3 rounded-full hover:bg-orange-600 transition-colors text-center self-start md:self-center shrink-0">Ganti Program</NuxtLink>
       </div>
@@ -102,6 +107,17 @@
             <h2 class="font-display text-2xl text-brand-brown border-b border-brand-border/50 pb-4 mb-8">Data Diri</h2>
 
             <div class="space-y-6">
+              <!-- Pilihan Jadwal (Dynamic based on program) -->
+              <div v-if="selectedProgram && Array.isArray(selectedProgram.jadwal) && selectedProgram.jadwal.length > 1" class="flex flex-col gap-3 pb-6 border-b border-brand-border/30">
+                <label class="text-sm font-bold text-brand-brown uppercase tracking-wider">Pilih Jadwal Pembelajaran <span class="text-brand-orange">*</span></label>
+                <div class="flex flex-col gap-3">
+                  <label v-for="(jadwalOpsi, idx) in selectedProgram.jadwal" :key="idx" class="flex items-center gap-3 text-sm cursor-pointer group bg-brand-cream/30 p-4 rounded-xl border border-brand-border/50 hover:border-brand-orange transition-colors">
+                    <input type="radio" v-model="form.jadwalPilihan" :value="jadwalOpsi" class="w-5 h-5 text-brand-orange focus:ring-brand-orange border-brand-border" />
+                    <span class="group-hover:text-brand-orange transition-colors font-medium text-brand-brown">{{ jadwalOpsi }}</span>
+                  </label>
+                </div>
+              </div>
+
               <div class="flex flex-col gap-2">
                 <label class="text-sm font-bold text-brand-brown uppercase tracking-wider">Nama Lengkap <span class="text-brand-orange">*</span></label>
                 <input type="text" v-model="form.dataPeserta.namaLengkap" :required="currentStep === 1" placeholder="Fulan bin Fulan" class="input-field" />
@@ -252,16 +268,20 @@
         <!-- STEP 4: RINGKASAN BIAYA        -->
         <!-- ============================== -->
         <div v-show="currentStep === 4">
-          <div class="bg-brand-cream border border-brand-orange/30 rounded-[30px] p-8 md:p-10">
-            <h2 class="font-display text-2xl text-brand-brown border-b border-brand-border/50 pb-4 mb-6">Ringkasan Biaya</h2>
+          <div class="bg-white shadow-xl border border-brand-border/50 rounded-[30px] p-8 md:p-10 relative overflow-hidden">
+            <!-- Decorative accent -->
+            <div class="absolute -right-10 -top-10 w-32 h-32 bg-brand-orange/5 rounded-full blur-2xl pointer-events-none"></div>
+            
+            <h2 class="font-display text-2xl text-brand-brown border-b border-brand-border/50 pb-4 mb-6 relative z-10">Ringkasan Biaya</h2>
 
             <div class="space-y-4">
-              <div v-if="selectedProgram" class="flex justify-between items-center text-sm md:text-base pb-4 border-b border-brand-border/50 border-dashed">
+              <div v-if="selectedProgram" class="flex justify-between items-start text-sm md:text-base pb-4 border-b border-brand-border/50 border-dashed">
                 <div>
                   <p class="font-bold text-brand-brown">Program</p>
                   <p class="text-brand-muted text-sm">{{ selectedProgram.nama }}</p>
+                  <p v-if="form.jadwalPilihan" class="text-brand-orange text-xs mt-1">Jadwal: {{ form.jadwalPilihan }}</p>
                 </div>
-                <span class="font-bold text-brand-brown">Rp {{ selectedProgram.harga?.toLocaleString('id-ID') }}</span>
+                <span class="font-bold text-brand-brown whitespace-nowrap">Rp {{ selectedProgram.harga?.toLocaleString('id-ID') }}</span>
               </div>
               
               <div v-if="semuaKitabDibeli.length > 0" class="pb-4 border-b border-brand-border/50 border-dashed space-y-3">
@@ -299,7 +319,7 @@
             type="button" 
             v-if="currentStep > 1" 
             @click="prevStep" 
-            class="w-full sm:w-1/3 bg-brand-cream text-brand-brown font-bold tracking-widest uppercase text-sm py-5 rounded-full hover:bg-orange-50 transition-all border border-brand-border">
+            class="w-full sm:w-1/3 bg-white text-brand-brown font-bold tracking-widest uppercase text-sm py-5 rounded-full hover:bg-orange-50 transition-all border border-brand-border shadow-sm">
             Kembali
           </button>
           
@@ -375,6 +395,7 @@ const form = ref({
     pernahIkutProgramMubk: false,
     alamatPengiriman: null as string | null
   },
+  jadwalPilihan: '',
   ongkir: {
     zona: '',
     nominal: 0
@@ -419,6 +440,15 @@ onMounted(async () => {
         return;
       }
       selectedProgram.value = { id: progSnap.id, ...progSnap.data() };
+
+      // Auto-select jadwal jika hanya ada 1 opsi atau masih string
+      if (Array.isArray(selectedProgram.value.jadwal)) {
+        if (selectedProgram.value.jadwal.length === 1) {
+          form.value.jadwalPilihan = selectedProgram.value.jadwal[0];
+        }
+      } else if (typeof selectedProgram.value.jadwal === 'string') {
+        form.value.jadwalPilihan = selectedProgram.value.jadwal;
+      }
 
       // Fetch kitab wajib program
       if (selectedProgram.value.wajibBeliKitab && selectedProgram.value.kitabWajibIds?.length > 0) {
@@ -476,8 +506,12 @@ const nextStep = () => {
       validationError.value = 'Mohon lengkapi semua isian wajib (*) di Data Diri.';
       return;
     }
+    if (selectedProgram.value && !form.value.jadwalPilihan) {
+      validationError.value = 'Mohon pilih Jadwal Pembelajaran yang tersedia.';
+      return;
+    }
     // Basic email validation
-    if (!/^\\S+@\\S+\\.\\S+$/.test(email)) {
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
       validationError.value = 'Format email tidak valid.';
       return;
     }

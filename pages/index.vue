@@ -138,7 +138,7 @@
             <div class="absolute bottom-8 left-8 right-8">
               <p class="text-brand-orange text-xs font-bold uppercase tracking-widest mb-2">{{ hoveredProgram.level || 'Umum' }}</p>
               <h3 class="font-display text-2xl text-white mb-2">{{ hoveredProgram.nama }}</h3>
-              <p class="text-white/70 text-sm line-clamp-2 mb-4">{{ hoveredProgram.jadwal }} · Rp {{ (hoveredProgram.harga || 0).toLocaleString('id-ID') }}</p>
+              <p class="text-white/70 text-sm line-clamp-2 mb-4">{{ Array.isArray(hoveredProgram.jadwal) ? (hoveredProgram.jadwal.length + ' Pilihan Jadwal') : hoveredProgram.jadwal }} · Rp {{ (hoveredProgram.harga || 0).toLocaleString('id-ID') }}</p>
               
               <NuxtLink :to="`/program/${hoveredProgram.id}`" class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white text-brand-deeper hover:bg-brand-orange hover:text-white transition-colors">
                 <span class="rotate-45 block transform -translate-y-px">&uarr;</span>

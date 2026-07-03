@@ -1,9 +1,9 @@
 <template>
-  <div class="max-w-2xl mx-auto py-12 md:py-20 px-4 space-y-8">
+  <div class="max-w-2xl mx-auto pb-20 pt-8 px-4 space-y-8">
     
     <div class="text-center mb-12">
-      <h1 class="font-display text-4xl md:text-5xl text-brand-brown mb-4">Cek Status Pendaftaran</h1>
-      <p class="text-brand-muted max-w-md mx-auto">Masukkan kode invoice Anda (contoh: MUBK-YYYYMMDD-XXXX) untuk melacak status pendaftaran dan pembayaran Anda.</p>
+      <h1 class="font-display text-4xl md:text-5xl text-brand-brown mb-4 font-bold tracking-tight">Cek Status <span class="text-brand-orange italic">Pendaftaran</span></h1>
+      <p class="text-brand-muted md:text-lg leading-relaxed max-w-md mx-auto">Masukkan kode invoice Anda (contoh: MUBK-YYYYMMDD-XXXX) untuk melacak status pendaftaran dan pembayaran Anda.</p>
     </div>
 
     <!-- Form Cari -->
@@ -67,6 +67,11 @@
         <div v-if="result.programNama" class="flex justify-between items-center py-2 border-b border-brand-border/30 border-dashed">
           <span class="text-brand-muted">Program</span>
           <span class="font-medium text-brand-brown text-right max-w-[200px]">{{ result.programNama }}</span>
+        </div>
+        
+        <div v-if="result.jadwalPilihan" class="flex justify-between items-center py-2 border-b border-brand-border/30 border-dashed">
+          <span class="text-brand-muted">Jadwal</span>
+          <span class="font-medium text-brand-orange text-right max-w-[200px] text-xs md:text-sm">{{ result.jadwalPilihan }}</span>
         </div>
         
         <div v-if="result.kitabDibeli?.length > 0" class="flex justify-between items-start py-2 border-b border-brand-border/30 border-dashed">

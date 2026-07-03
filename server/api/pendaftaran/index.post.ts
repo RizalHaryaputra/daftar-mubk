@@ -3,7 +3,7 @@ import { generateInvoiceCode } from '../../../utils/generateInvoiceCode';
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
 
-  const { programId, programNama, dataPeserta, kitabDibeli, ongkir, rincianBiaya } = body;
+  const { programId, programNama, jadwalPilihan, dataPeserta, kitabDibeli, ongkir, rincianBiaya } = body;
 
   const db = getFirestoreDb();
 
@@ -46,6 +46,7 @@ export default defineEventHandler(async (event) => {
     kodeInvoice,
     programId: programId ?? null,
     programNama: programNama ?? null,
+    jadwalPilihan: jadwalPilihan ?? null,
     dataPeserta: {
       ...dataPeserta,
       alamatPengiriman: kitabDibeli?.length > 0 ? (dataPeserta.alamatPengiriman ?? null) : null
