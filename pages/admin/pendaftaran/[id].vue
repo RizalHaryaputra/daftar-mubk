@@ -58,6 +58,10 @@
               <p class="font-medium text-brand-brown">{{ item.programNama || item.dataProgram?.nama || 'Nama Program Tidak Tersedia' }}</p>
             </div>
             <div>
+              <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Pilihan Jadwal</p>
+              <p class="font-medium text-brand-orange">{{ item.jadwalPilihan || '-' }}</p>
+            </div>
+            <div>
               <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Tanggal Daftar</p>
               <p class="font-medium text-brand-brown">{{ formatDate(item.createdAt) }}</p>
             </div>

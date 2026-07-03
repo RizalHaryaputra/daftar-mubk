@@ -71,15 +71,7 @@
             <h1 class="font-display text-4xl md:text-5xl lg:text-6xl text-brand-brown mb-6 leading-tight">{{ program.nama }}</h1>
             
             <!-- Quick Stats -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 md:gap-6 py-6 border-y border-brand-border/50">
-              <div class="flex flex-col gap-1">
-                <span class="text-xs text-brand-muted uppercase tracking-widest font-bold flex items-center gap-1.5">
-                  <svg class="w-4 h-4 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                  Jadwal
-                </span>
-                <span class="text-base font-medium text-brand-brown">{{ program.jadwal }}</span>
-              </div>
-              
+            <div class="grid grid-cols-2 gap-4 md:gap-6 py-6 border-y border-brand-border/50">
               <div class="flex flex-col gap-1">
                 <span class="text-xs text-brand-muted uppercase tracking-widest font-bold flex items-center gap-1.5">
                   <svg class="w-4 h-4 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -88,12 +80,30 @@
                 <span class="text-base font-medium text-brand-brown">{{ program.durasi }}</span>
               </div>
               
-              <div class="flex flex-col gap-1 col-span-2 sm:col-span-1">
+              <div class="flex flex-col gap-1">
                 <span class="text-xs text-brand-muted uppercase tracking-widest font-bold flex items-center gap-1.5">
                   <svg class="w-4 h-4 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                   Biaya
                 </span>
                 <span class="text-base font-bold text-brand-orange">Rp {{ program.harga?.toLocaleString('id-ID') }}</span>
+              </div>
+
+              <div class="flex flex-col gap-1 col-span-2 mt-2 pt-4 border-t border-brand-border/30 border-dashed">
+                <span class="text-xs text-brand-muted uppercase tracking-widest font-bold flex items-center gap-1.5 mb-1">
+                  <svg class="w-4 h-4 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                  Pilihan Jadwal
+                </span>
+                <span class="text-base font-medium text-brand-brown">
+                  <template v-if="Array.isArray(program.jadwal)">
+                    <div class="flex flex-wrap gap-2 mt-1">
+                      <span v-for="(j, idx) in program.jadwal" :key="idx" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-brand-cream/50 border border-brand-orange/20 text-sm font-medium text-brand-brown">
+                        <svg class="w-4 h-4 text-brand-orange shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <span class="leading-tight">{{ j }}</span>
+                      </span>
+                    </div>
+                  </template>
+                  <template v-else>{{ program.jadwal }}</template>
+                </span>
               </div>
             </div>
           </div>

@@ -89,7 +89,9 @@
         <div>
           <p class="text-xs text-brand-orange uppercase tracking-widest font-bold mb-1">Program Pilihan</p>
           <p class="font-display text-2xl mb-1">{{ selectedProgram.nama }}</p>
-          <p class="text-sm text-white/70">{{ selectedProgram.jadwal }} · Rp {{ selectedProgram.harga?.toLocaleString('id-ID') }}</p>
+          <p class="text-sm text-white/70">
+            {{ Array.isArray(selectedProgram.jadwal) ? (selectedProgram.jadwal.length + ' Pilihan Jadwal') : selectedProgram.jadwal }} · Rp {{ selectedProgram.harga?.toLocaleString('id-ID') }}
+          </p>
         </div>
         <NuxtLink :to="`/program/${selectedProgram.id}`" class="bg-brand-orange text-white text-sm font-bold uppercase tracking-widest px-6 py-3 rounded-full hover:bg-orange-600 transition-colors text-center self-start md:self-center shrink-0">Ganti Program</NuxtLink>
       </div>
@@ -105,6 +107,17 @@
             <h2 class="font-display text-2xl text-brand-brown border-b border-brand-border/50 pb-4 mb-8">Data Diri</h2>
 
             <div class="space-y-6">
+              <!-- Pilihan Jadwal (Dynamic based on program) -->
+              <div v-if="selectedProgram && Array.isArray(selectedProgram.jadwal) && selectedProgram.jadwal.length > 1" class="flex flex-col gap-3 pb-6 border-b border-brand-border/30">
+                <label class="text-sm font-bold text-brand-brown uppercase tracking-wider">Pilih Jadwal Pembelajaran <span class="text-brand-orange">*</span></label>
+                <div class="flex flex-col gap-3">
+                  <label v-for="(jadwalOpsi, idx) in selectedProgram.jadwal" :key="idx" class="flex items-center gap-3 text-sm cursor-pointer group bg-brand-cream/30 p-4 rounded-xl border border-brand-border/50 hover:border-brand-orange transition-colors">
+                    <input type="radio" v-model="form.jadwalPilihan" :value="jadwalOpsi" class="w-5 h-5 text-brand-orange focus:ring-brand-orange border-brand-border" />
+                    <span class="group-hover:text-brand-orange transition-colors font-medium text-brand-brown">{{ jadwalOpsi }}</span>
+                  </label>
+                </div>
+              </div>
+
               <div class="flex flex-col gap-2">
                 <label class="text-sm font-bold text-brand-brown uppercase tracking-wider">Nama Lengkap <span class="text-brand-orange">*</span></label>
                 <input type="text" v-model="form.dataPeserta.namaLengkap" :required="currentStep === 1" placeholder="Fulan bin Fulan" class="input-field" />
@@ -262,12 +275,13 @@
             <h2 class="font-display text-2xl text-brand-brown border-b border-brand-border/50 pb-4 mb-6 relative z-10">Ringkasan Biaya</h2>
 
             <div class="space-y-4">
-              <div v-if="selectedProgram" class="flex justify-between items-center text-sm md:text-base pb-4 border-b border-brand-border/50 border-dashed">
+              <div v-if="selectedProgram" class="flex justify-between items-start text-sm md:text-base pb-4 border-b border-brand-border/50 border-dashed">
                 <div>
                   <p class="font-bold text-brand-brown">Program</p>
                   <p class="text-brand-muted text-sm">{{ selectedProgram.nama }}</p>
+                  <p v-if="form.jadwalPilihan" class="text-brand-orange text-xs mt-1">Jadwal: {{ form.jadwalPilihan }}</p>
                 </div>
-                <span class="font-bold text-brand-brown">Rp {{ selectedProgram.harga?.toLocaleString('id-ID') }}</span>
+                <span class="font-bold text-brand-brown whitespace-nowrap">Rp {{ selectedProgram.harga?.toLocaleString('id-ID') }}</span>
               </div>
               
               <div v-if="semuaKitabDibeli.length > 0" class="pb-4 border-b border-brand-border/50 border-dashed space-y-3">
@@ -381,6 +395,7 @@ const form = ref({
     pernahIkutProgramMubk: false,
     alamatPengiriman: null as string | null
   },
+  jadwalPilihan: '',
   ongkir: {
     zona: '',
     nominal: 0
@@ -425,6 +440,15 @@ onMounted(async () => {
         return;
       }
       selectedProgram.value = { id: progSnap.id, ...progSnap.data() };
+
+      // Auto-select jadwal jika hanya ada 1 opsi atau masih string
+      if (Array.isArray(selectedProgram.value.jadwal)) {
+        if (selectedProgram.value.jadwal.length === 1) {
+          form.value.jadwalPilihan = selectedProgram.value.jadwal[0];
+        }
+      } else if (typeof selectedProgram.value.jadwal === 'string') {
+        form.value.jadwalPilihan = selectedProgram.value.jadwal;
+      }
 
       // Fetch kitab wajib program
       if (selectedProgram.value.wajibBeliKitab && selectedProgram.value.kitabWajibIds?.length > 0) {
@@ -480,6 +504,10 @@ const nextStep = () => {
     const { namaLengkap, email, noWa, jenisKelamin, tempatLahir, tanggalLahir, domisili, pekerjaan } = form.value.dataPeserta;
     if (!namaLengkap || !email || !noWa || !jenisKelamin || !tempatLahir || !tanggalLahir || !domisili || !pekerjaan) {
       validationError.value = 'Mohon lengkapi semua isian wajib (*) di Data Diri.';
+      return;
+    }
+    if (selectedProgram.value && !form.value.jadwalPilihan) {
+      validationError.value = 'Mohon pilih Jadwal Pembelajaran yang tersedia.';
       return;
     }
     // Basic email validation

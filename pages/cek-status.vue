@@ -69,6 +69,11 @@
           <span class="font-medium text-brand-brown text-right max-w-[200px]">{{ result.programNama }}</span>
         </div>
         
+        <div v-if="result.jadwalPilihan" class="flex justify-between items-center py-2 border-b border-brand-border/30 border-dashed">
+          <span class="text-brand-muted">Jadwal</span>
+          <span class="font-medium text-brand-orange text-right max-w-[200px] text-xs md:text-sm">{{ result.jadwalPilihan }}</span>
+        </div>
+        
         <div v-if="result.kitabDibeli?.length > 0" class="flex justify-between items-start py-2 border-b border-brand-border/30 border-dashed">
           <span class="text-brand-muted pt-1">Kitab Dipesan</span>
           <div class="flex flex-col items-end gap-1 text-right max-w-[200px]">

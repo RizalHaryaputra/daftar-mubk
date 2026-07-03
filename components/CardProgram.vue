@@ -32,7 +32,7 @@
     <div class="p-6 md:p-8 flex-1 flex flex-col">
       <h3 class="font-display text-2xl text-brand-brown leading-tight mb-3 group-hover:text-brand-orange transition-colors">{{ program.nama }}</h3>
       <p class="text-sm text-brand-muted mb-6 line-clamp-3">
-        {{ program.deskripsi || 'Program intensif dengan jadwal ' + program.jadwal + '. Sangat cocok untuk Anda yang ingin belajar secara terstruktur.' }}
+        {{ program.deskripsi || 'Program intensif dengan ' + (Array.isArray(program.jadwal) ? program.jadwal.length + ' pilihan jadwal' : 'jadwal ' + program.jadwal) + '. Sangat cocok untuk Anda yang ingin belajar secara terstruktur.' }}
       </p>
 
       <!-- Footer / Price -->
