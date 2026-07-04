@@ -8,7 +8,7 @@
     </div>
 
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       <!-- Total Pendaftar -->
       <div class="bg-white p-8 rounded-[30px] border border-brand-border/50 shadow-sm relative overflow-hidden group hover:shadow-xl hover:border-brand-orange transition-all">
         <div class="absolute -right-6 -top-6 text-brand-orange/5 group-hover:text-brand-orange/10 transition-colors">
@@ -18,6 +18,18 @@
         <p class="text-5xl font-display text-brand-brown relative z-10">
           <span v-if="isLoading" class="animate-pulse opacity-50">...</span>
           <span v-else>{{ stats.total }}</span>
+        </p>
+      </div>
+      
+      <!-- Total Pembelian Kitab -->
+      <div class="bg-white p-8 rounded-[30px] border border-brand-border/50 shadow-sm relative overflow-hidden group hover:shadow-xl hover:border-brand-orange transition-all">
+        <div class="absolute -right-6 -top-6 text-brand-orange/5 group-hover:text-brand-orange/10 transition-colors">
+          <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" /><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" /></svg>
+        </div>
+        <p class="text-xs text-brand-muted uppercase tracking-widest font-bold mb-2 relative z-10">Total Pembelian Kitab</p>
+        <p class="text-5xl font-display text-brand-brown relative z-10">
+          <span v-if="isLoading" class="animate-pulse opacity-50">...</span>
+          <span v-else>{{ stats.totalKitab }}</span>
         </p>
       </div>
       
@@ -177,26 +189,36 @@ const { $db } = useNuxtApp();
 const db = $db as Firestore;
 
 const isLoading = ref(true);
-const stats = ref({ total: 0, pending: 0, toShip: 0 });
+const stats = ref({ total: 0, totalKitab: 0, pending: 0, toShip: 0 });
 const recent = ref<any[]>([]);
 
 // Chart States
 const lineChartData = ref<any>({
   labels: [],
-  datasets: [{
-    label: 'Pendaftaran',
-    data: [],
-    borderColor: '#c68436', // brand-orange
-    backgroundColor: 'rgba(198, 132, 54, 0.1)',
-    tension: 0.4,
-    fill: true,
-  }]
+  datasets: [
+    {
+      label: 'Pendaftaran Program',
+      data: [],
+      borderColor: '#c68436', // brand-orange
+      backgroundColor: 'rgba(198, 132, 54, 0.1)',
+      tension: 0.4,
+      fill: true,
+    },
+    {
+      label: 'Pembelian Kitab',
+      data: [],
+      borderColor: '#493626', // brand-brown
+      backgroundColor: 'rgba(73, 54, 38, 0.05)',
+      tension: 0.4,
+      fill: true,
+    }
+  ]
 });
 
 const lineChartOptions = {
   responsive: true,
   maintainAspectRatio: false,
-  plugins: { legend: { display: false } },
+  plugins: { legend: { display: true, position: 'bottom' as const, labels: { boxWidth: 12, usePointStyle: true, padding: 20, font: { family: "'Inter', sans-serif" } } } },
   scales: {
     y: {
       beginAtZero: true,
@@ -234,65 +256,82 @@ const fetchDashboardData = async () => {
     let pendingCount = 0;
     let toShipCount = 0;
     
-    // Arrays for processing charts
-    const dateCounts: Record<string, number> = {};
-    const programCounts: Record<string, number> = {};
-    
-    // Get last 30 days dates
-    const today = new Date();
-    for (let i = 29; i >= 0; i--) {
-      const d = new Date(today);
-      d.setDate(d.getDate() - i);
-      const dateStr = d.toISOString().substring(0, 10); // YYYY-MM-DD
-      dateCounts[dateStr] = 0;
-    }
-
-    pendaftaranSnap.forEach((doc) => {
-      const data = doc.data();
+      // Arrays for processing charts
+      const dateCountsProgram: Record<string, number> = {};
+      const dateCountsKitab: Record<string, number> = {};
+      const programCounts: Record<string, number> = {};
       
-      // Filter out standalone book purchases (Pembelian Kitab)
-      if (data.programId === null) return;
-      
-      // Basic Stats
-      if (data.statusPembayaran === 'pending') pendingCount++;
-      if (data.statusPembayaran === 'success' && data.statusPengiriman === 'belum_dikirim') toShipCount++;
-      
-      // Date Processing (Line Chart)
-      if (data.createdAt) {
-        const d = data.createdAt.toDate ? data.createdAt.toDate() : new Date(data.createdAt);
-        const dateStr = d.toISOString().substring(0, 10);
-        if (dateCounts[dateStr] !== undefined) {
-          dateCounts[dateStr]++;
+      // Get last 30 days dates
+      const today = new Date();
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        const dateStr = d.toISOString().substring(0, 10); // YYYY-MM-DD
+        dateCountsProgram[dateStr] = 0;
+        dateCountsKitab[dateStr] = 0;
+      }
+  
+      pendaftaranSnap.forEach((doc) => {
+        const data = doc.data();
+        
+        const isKitabOnly = data.programId === null;
+        
+        // Basic Stats (Count for both)
+        if (data.statusPembayaran === 'pending') pendingCount++;
+        if (data.statusPembayaran === 'success' && data.statusPengiriman === 'belum_dikirim') toShipCount++;
+        
+        // Date Processing (Line Chart)
+        if (data.createdAt) {
+          const d = data.createdAt.toDate ? data.createdAt.toDate() : new Date(data.createdAt);
+          const dateStr = d.toISOString().substring(0, 10);
+          
+          if (isKitabOnly) {
+            if (dateCountsKitab[dateStr] !== undefined) dateCountsKitab[dateStr]++;
+          } else {
+            if (dateCountsProgram[dateStr] !== undefined) dateCountsProgram[dateStr]++;
+          }
         }
-      }
-      
-      // Program Processing (Doughnut Chart)
-      const pName = data.programNama || data.dataProgram?.nama;
-      if (pName) {
-        programCounts[pName] = (programCounts[pName] || 0) + 1;
-      }
-    });
+        
+        // Program Processing (Doughnut Chart)
+        if (!isKitabOnly) {
+          const pName = data.programNama || data.dataProgram?.nama;
+          if (pName) {
+            programCounts[pName] = (programCounts[pName] || 0) + 1;
+          }
+        }
+      });
 
     stats.value = {
       total: pendaftaranSnap.docs.filter(d => d.data().programId !== null).length,
+      totalKitab: pendaftaranSnap.docs.filter(d => d.data().programId === null).length,
       pending: pendingCount,
       toShip: toShipCount
     };
 
     // Construct Line Chart Data
     lineChartData.value = {
-      labels: Object.keys(dateCounts).map(d => {
+      labels: Object.keys(dateCountsProgram).map(d => {
         const [, month, day] = d.split('-');
         return `${day}/${month}`;
       }),
-      datasets: [{
-        label: 'Pendaftaran',
-        data: Object.values(dateCounts),
-        borderColor: '#c68436',
-        backgroundColor: 'rgba(198, 132, 54, 0.1)',
-        tension: 0.4,
-        fill: true,
-      }]
+      datasets: [
+        {
+          label: 'Pendaftaran Program',
+          data: Object.values(dateCountsProgram),
+          borderColor: '#c68436',
+          backgroundColor: 'rgba(198, 132, 54, 0.1)',
+          tension: 0.4,
+          fill: true,
+        },
+        {
+          label: 'Pembelian Kitab',
+          data: Object.values(dateCountsKitab),
+          borderColor: '#493626',
+          backgroundColor: 'rgba(73, 54, 38, 0.05)',
+          tension: 0.4,
+          fill: true,
+        }
+      ]
     };
 
     // Construct Doughnut Chart Data

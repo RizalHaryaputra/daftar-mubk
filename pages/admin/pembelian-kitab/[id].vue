@@ -19,7 +19,7 @@
       <p class="text-red-500 font-medium">Data pendaftaran tidak ditemukan!</p>
     </div>
 
-    <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
       
       <!-- Kolom Kiri: Data Peserta & Alamat -->
       <div class="lg:col-span-2 space-y-6">
@@ -70,7 +70,7 @@
       </div>
 
       <!-- Kolom Kanan: Tagihan & Status -->
-      <div class="space-y-6">
+      <div class="space-y-6 sticky top-24">
         
         <!-- Card Rincian Tagihan -->
         <div class="bg-brand-brown text-white rounded-[30px] p-8 shadow-xl relative overflow-hidden">

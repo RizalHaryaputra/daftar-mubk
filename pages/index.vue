@@ -298,26 +298,37 @@ const isLoading = ref(true);
 
 onMounted(async () => {
   try {
+    // Ambil program aktif, lalu urutkan di client untuk menghindari error Composite Index Firestore
     const qPrograms = query(
       collection(db, 'programs'),
-      where('status', '==', 'aktif'),
-      orderBy('createdAt', 'desc'),
-      limit(4)
+      where('status', '==', 'aktif')
     );
     const snapPrograms = await getDocs(qPrograms);
-    programs.value = snapPrograms.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    let allPrograms = snapPrograms.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    allPrograms.sort((a, b) => {
+      const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+      const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+      return dateB.getTime() - dateA.getTime();
+    });
+    programs.value = allPrograms.slice(0, 4);
+    
     if (programs.value.length > 0) {
       hoveredProgram.value = programs.value[0];
     }
 
+    // Ambil kitab aktif, urutkan di client
     const qKitabs = query(
       collection(db, 'kitabs'),
-      where('status', '==', 'aktif'),
-      orderBy('createdAt', 'desc'),
-      limit(4)
+      where('status', '==', 'aktif')
     );
     const snapKitabs = await getDocs(qKitabs);
-    kitabs.value = snapKitabs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    let allKitabs = snapKitabs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    allKitabs.sort((a, b) => {
+      const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+      const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+      return dateB.getTime() - dateA.getTime();
+    });
+    kitabs.value = allKitabs.slice(0, 4);
   } catch (error) {
     console.error('Error fetching data for landing page:', error);
   } finally {

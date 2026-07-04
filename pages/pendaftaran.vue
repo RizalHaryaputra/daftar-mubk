@@ -207,6 +207,29 @@
         <!-- ============================== -->
         <div v-show="currentStep === 3">
           <div class="space-y-10">
+            <!-- KITAB WAJIB PROGRAM -->
+            <div v-if="kitabWajibProgram.length > 0" class="bg-white border border-brand-border rounded-[30px] p-8 md:p-10 shadow-sm relative overflow-hidden">
+              <div class="absolute -top-10 -right-10 w-32 h-32 bg-brand-orange/10 rounded-full blur-2xl pointer-events-none"></div>
+              <h2 class="font-display text-2xl text-brand-brown border-b border-brand-border/50 pb-4 mb-4 flex items-center gap-2">
+                <svg class="w-6 h-6 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                Kitab Wajib <span class="text-brand-orange text-lg font-sans normal-case italic">(Otomatis Ditambahkan)</span>
+              </h2>
+              <p class="text-sm text-brand-muted mb-8 leading-relaxed">Kitab-kitab berikut adalah persyaratan wajib untuk program <span class="font-bold text-brand-brown">{{ selectedProgram?.judul }}</span> dan telah otomatis ditambahkan ke rincian tagihan Anda.</p>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div v-for="kitab in kitabWajibProgram" :key="kitab.id" class="flex items-start gap-4 p-4 border border-brand-orange/30 bg-white rounded-[20px] shadow-sm">
+                  <div class="w-10 h-10 rounded-full bg-brand-orange/10 text-brand-orange flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                  </div>
+                  <div class="flex-1">
+                    <p class="text-base font-bold text-brand-brown leading-snug">{{ kitab.judul }}</p>
+                    <p class="text-xs text-brand-muted uppercase tracking-widest mt-1 mb-2">{{ kitab.penulis }}</p>
+                    <p class="text-sm font-bold text-brand-orange">Rp {{ kitab.harga?.toLocaleString('id-ID') }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- PILIHAN KITAB TAMBAHAN -->
             <div v-if="availableKitabs.length > 0" class="bg-white border border-brand-border rounded-[30px] p-8 md:p-10 shadow-sm">
               <h2 class="font-display text-2xl text-brand-brown border-b border-brand-border/50 pb-4 mb-4">Kitab Tambahan <span class="text-brand-muted text-lg font-sans normal-case italic">(Opsional)</span></h2>

@@ -19,7 +19,7 @@
       <p class="text-red-500 font-medium">Data pendaftaran tidak ditemukan!</p>
     </div>
 
-    <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
       
       <!-- Kolom Kiri: Data Peserta & Alamat -->
       <div class="lg:col-span-2 space-y-6">
@@ -61,6 +61,28 @@
               <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Pilihan Jadwal</p>
               <p class="font-medium text-brand-orange">{{ item.jadwalPilihan || '-' }}</p>
             </div>
+            
+            <div v-if="item.dataPeserta?.tempatLahir && item.dataPeserta?.tempatLahir !== '-'">
+              <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">TTL</p>
+              <p class="font-medium text-brand-brown">{{ item.dataPeserta.tempatLahir }}, {{ formatDateOnly(item.dataPeserta.tanggalLahir) }}</p>
+            </div>
+            <div v-if="item.dataPeserta?.domisili && item.dataPeserta?.domisili !== '-'">
+              <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Domisili</p>
+              <p class="font-medium text-brand-brown">{{ item.dataPeserta.domisili }}</p>
+            </div>
+            <div v-if="item.dataPeserta?.pekerjaan && item.dataPeserta?.pekerjaan !== '-'">
+              <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Pekerjaan</p>
+              <p class="font-medium text-brand-brown">{{ item.dataPeserta.pekerjaan }}</p>
+            </div>
+            <div v-if="item.dataPeserta?.pernahBelajarBahasaArab && item.dataPeserta?.pernahBelajarBahasaArab !== '-'" class="md:col-span-2">
+              <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Pernah Belajar B. Arab?</p>
+              <p class="font-medium text-brand-brown whitespace-pre-wrap leading-relaxed">{{ item.dataPeserta.pernahBelajarBahasaArab }}</p>
+            </div>
+            <div v-if="item.dataPeserta?.pernahIkutProgramMubk !== undefined && item.dataPeserta?.tempatLahir !== '-'">
+              <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Pernah Ikut MUBK?</p>
+              <p class="font-medium text-brand-brown">{{ item.dataPeserta.pernahIkutProgramMubk ? 'Ya' : 'Belum' }}</p>
+            </div>
+
             <div>
               <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Tanggal Daftar</p>
               <p class="font-medium text-brand-brown">{{ formatDate(item.createdAt) }}</p>
@@ -75,14 +97,28 @@
             <svg class="w-5 h-5 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
             Alamat Pengiriman Kitab
           </h2>
-          <div class="bg-brand-cream/10 p-5 rounded-[20px] border border-brand-border/50">
+          <div class="bg-brand-cream/10 p-5 rounded-[20px] border border-brand-border/50 mb-6">
             <p class="text-brand-brown font-medium leading-relaxed whitespace-pre-wrap">{{ item.dataPeserta?.alamatPengiriman || '-' }}</p>
+          </div>
+          
+          <h3 class="font-display text-lg text-brand-brown mb-4 flex items-center gap-2 border-t border-brand-border/50 pt-6">
+            <svg class="w-5 h-5 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+            Daftar Kitab yang Dibeli
+          </h3>
+          <div class="space-y-3">
+            <div v-for="kitab in item.kitabDibeli" :key="kitab.kitabId" class="flex justify-between items-center bg-brand-cream/10 p-4 rounded-xl border border-brand-border/30">
+              <div>
+                <p class="font-bold text-brand-brown">{{ kitab.judul }}</p>
+                <p class="text-sm text-brand-muted">Rp {{ (kitab.harga || 0).toLocaleString('id-ID') }} &times; {{ kitab.qty || 1 }}</p>
+              </div>
+              <p class="font-bold text-brand-orange">Rp {{ ((kitab.harga || 0) * (kitab.qty || 1)).toLocaleString('id-ID') }}</p>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Kolom Kanan: Tagihan & Status -->
-      <div class="space-y-6">
+      <div class="space-y-6 sticky top-24">
         
         <!-- Card Rincian Tagihan -->
         <div class="bg-brand-brown text-white rounded-[30px] p-8 shadow-xl relative overflow-hidden">
@@ -207,6 +243,15 @@ const formatDate = (timestamp: any) => {
   if (!timestamp) return '-';
   const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
   return new Intl.DateTimeFormat('id-ID', { dateStyle: 'long', timeStyle: 'short' }).format(date);
+};
+
+const formatDateOnly = (dateStr: string) => {
+  if (!dateStr || dateStr === '1970-01-01' || dateStr === '-') return '-';
+  try {
+    return new Intl.DateTimeFormat('id-ID', { dateStyle: 'long' }).format(new Date(dateStr));
+  } catch (e) {
+    return dateStr;
+  }
 };
 
 const updateStatus = async (field: string, value: string) => {
