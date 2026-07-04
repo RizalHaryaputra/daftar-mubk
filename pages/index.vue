@@ -126,6 +126,13 @@
               </div>
             </template>
           </div>
+
+          <div class="mt-10">
+            <NuxtLink to="/program" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-brand-orange text-brand-deeper font-bold uppercase tracking-wider text-sm hover:bg-white hover:-translate-y-1 transition-all shadow-lg shadow-brand-orange/20">
+              Lihat Semua Program
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+            </NuxtLink>
+          </div>
         </div>
 
         <div class="md:w-6/12 relative hidden md:block">

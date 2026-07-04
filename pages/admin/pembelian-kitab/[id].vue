@@ -37,8 +37,8 @@
               <p class="font-medium text-brand-brown text-lg">{{ item.dataPeserta?.namaLengkap || '-' }}</p>
             </div>
             <div>
-              <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Jenis Kelamin</p>
-              <p class="font-medium text-brand-brown capitalize">{{ item.dataPeserta?.jenisKelamin || '-' }}</p>
+              <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Tanggal Pembelian</p>
+              <p class="font-medium text-brand-brown">{{ formatDate(item.createdAt) }}</p>
             </div>
             <div>
               <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Nomor WhatsApp</p>
@@ -52,11 +52,6 @@
             <div>
               <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Email</p>
               <p class="font-medium text-brand-brown">{{ item.dataPeserta?.email || '-' }}</p>
-            </div>
-
-            <div>
-              <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Tanggal Daftar</p>
-              <p class="font-medium text-brand-brown">{{ formatDate(item.createdAt) }}</p>
             </div>
           </div>
         </div>

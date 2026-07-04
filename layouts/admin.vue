@@ -1,13 +1,42 @@
 <template>
-  <div class="min-h-screen bg-brand-cream flex">
+  <div class="min-h-screen bg-brand-cream flex flex-col md:flex-row relative">
+    
+    <!-- Mobile Header -->
+    <div class="md:hidden bg-brand-deeper text-white flex items-center justify-between p-4 shadow-md z-30 sticky top-0">
+      <span class="font-display text-brand-orange text-xl tracking-tight">Admin<span class="text-white italic">Area</span></span>
+      <button @click="isSidebarOpen = !isSidebarOpen" class="p-2 -mr-2 focus:outline-none">
+        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path v-if="!isSidebarOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Sidebar Overlay (Mobile) -->
+    <div 
+      v-if="isSidebarOpen" 
+      @click="isSidebarOpen = false"
+      class="fixed inset-0 bg-black/50 z-30 md:hidden backdrop-blur-sm transition-opacity"
+    ></div>
+
     <!-- Sidebar -->
-    <aside class="w-64 bg-brand-deeper text-white flex flex-col shadow-2xl z-20">
-      <div class="p-8 border-b border-white/10">
+    <aside 
+      class="w-64 bg-brand-deeper text-white flex flex-col shadow-2xl z-40 fixed md:sticky top-0 h-screen transition-transform duration-300 ease-in-out shrink-0"
+      :class="isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
+    >
+      <div class="p-8 border-b border-white/10 hidden md:block">
         <span class="font-display text-brand-orange text-2xl tracking-tight">Admin<span
             class="text-white italic">Area</span></span>
       </div>
-      <nav class="flex-1 px-4 py-6 space-y-3">
+      <div class="p-6 border-b border-white/10 md:hidden flex justify-between items-center">
+        <span class="font-display text-brand-orange text-xl tracking-tight">Menu<span class="text-white italic">Admin</span></span>
+        <button @click="isSidebarOpen = false" class="p-2 text-white/50 hover:text-white">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+      <nav class="flex-1 px-4 py-6 space-y-3 overflow-y-auto">
         <NuxtLink to="/admin/dashboard"
+          @click="isSidebarOpen = false"
           class="flex items-center gap-3 px-5 py-3 rounded-2xl transition-all text-sm font-medium"
           :class="isActive('/admin/dashboard') ? 'bg-brand-orange text-white shadow-lg shadow-brand-orange/30' : 'text-white/70 hover:text-white hover:bg-white/5'">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -17,6 +46,7 @@
           Dashboard
         </NuxtLink>
         <NuxtLink to="/admin/pendaftaran"
+          @click="isSidebarOpen = false"
           class="flex items-center gap-3 px-5 py-3 rounded-2xl transition-all text-sm font-medium"
           :class="isActive('/admin/pendaftaran') ? 'bg-brand-orange text-white shadow-lg shadow-brand-orange/30' : 'text-white/70 hover:text-white hover:bg-white/5'">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -26,6 +56,7 @@
           Pendaftaran
         </NuxtLink>
         <NuxtLink to="/admin/pembelian-kitab"
+          @click="isSidebarOpen = false"
           class="flex items-center gap-3 px-5 py-3 rounded-2xl transition-all text-sm font-medium"
           :class="isActive('/admin/pembelian-kitab') ? 'bg-brand-orange text-white shadow-lg shadow-brand-orange/30' : 'text-white/70 hover:text-white hover:bg-white/5'">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -35,6 +66,7 @@
           Pembelian Kitab
         </NuxtLink>
         <NuxtLink to="/admin/program"
+          @click="isSidebarOpen = false"
           class="flex items-center gap-3 px-5 py-3 rounded-2xl transition-all text-sm font-medium"
           :class="isActive('/admin/program') ? 'bg-brand-orange text-white shadow-lg shadow-brand-orange/30' : 'text-white/70 hover:text-white hover:bg-white/5'">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -44,6 +76,7 @@
           Program
         </NuxtLink>
         <NuxtLink to="/admin/kitab"
+          @click="isSidebarOpen = false"
           class="flex items-center gap-3 px-5 py-3 rounded-2xl transition-all text-sm font-medium"
           :class="isActive('/admin/kitab') ? 'bg-brand-orange text-white shadow-lg shadow-brand-orange/30' : 'text-white/70 hover:text-white hover:bg-white/5'">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -53,6 +86,7 @@
           Kitab
         </NuxtLink>
         <NuxtLink to="/admin/ongkir"
+          @click="isSidebarOpen = false"
           class="flex items-center gap-3 px-5 py-3 rounded-2xl transition-all text-sm font-medium"
           :class="isActive('/admin/ongkir') ? 'bg-brand-orange text-white shadow-lg shadow-brand-orange/30' : 'text-white/70 hover:text-white hover:bg-white/5'">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -75,8 +109,8 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 p-8 md:p-12 overflow-auto h-screen">
-      <div class="max-w-6xl mx-auto">
+    <main class="flex-1 p-4 sm:p-8 md:p-12 overflow-auto md:h-screen min-h-screen">
+      <div class="max-w-6xl mx-auto pb-10">
         <slot />
       </div>
     </main>
@@ -84,10 +118,12 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useNuxtApp } from '#imports';
 import { signOut, type Auth } from 'firebase/auth';
 
+const isSidebarOpen = ref(false);
 const route = useRoute();
 const router = useRouter();
 const { $auth } = useNuxtApp();
