@@ -2,7 +2,8 @@
   <div class="bg-brand-cream font-sans selection:bg-brand-orange selection:text-white">
     
     <!-- 1. HERO SECTION (Light, with dark background behind the rounded bottom) -->
-    <div class="bg-brand-deeper">
+    <div class="relative">
+      <div class="absolute bottom-0 left-0 right-0 h-1/2 bg-brand-deeper"></div>
       <section class="bg-brand-cream rounded-b-[40px] md:rounded-b-[80px] pt-8 pb-32 px-6 relative overflow-hidden flex flex-col items-center text-center">
       <!-- Ornamen aksen (mirip sinar matahari di desain, kita pakai oranye) -->
       <div class="hidden md:block absolute top-12 left-12 md:top-24 md:left-24 text-brand-orange opacity-40">
@@ -280,9 +281,6 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-  layout: 'landing'
-})
 
 import { ref, onMounted } from 'vue';
 import { useNuxtApp } from '#imports';
