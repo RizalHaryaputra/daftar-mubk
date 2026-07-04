@@ -3,6 +3,10 @@ import { checkTransactionStatus } from '../../../utils/midtrans';
 
 export default defineEventHandler(async (event) => {
   const kodeInvoice = getRouterParam(event, 'kodeInvoice');
+  if (!kodeInvoice) {
+    throw createError({ statusCode: 400, statusMessage: 'Kode invoice tidak valid' });
+  }
+
   const db = getFirestoreDb();
   
   const docRef = db.collection('pendaftaran').doc(kodeInvoice);
@@ -15,7 +19,10 @@ export default defineEventHandler(async (event) => {
     });
   }
   
-  let data = doc.data();
+  let data = doc.data()!;
+  if (!data) {
+    throw createError({ statusCode: 404, statusMessage: 'Data invoice tidak ditemukan' });
+  }
   let statusPembayaran = data.statusPembayaran;
   
   // Jika masih pending, coba sinkronisasi manual dengan Midtrans 
@@ -42,7 +49,7 @@ export default defineEventHandler(async (event) => {
         });
         
         // Update local data variable to reflect changes
-        data = (await docRef.get()).data();
+        data = (await docRef.get()).data()!;
       }
     }
   }

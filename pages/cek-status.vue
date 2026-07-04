@@ -2,8 +2,8 @@
   <div class="max-w-2xl mx-auto pb-20 pt-8 px-4 space-y-8">
     
     <div class="text-center mb-12">
-      <h1 class="font-display text-4xl md:text-5xl text-brand-brown mb-4 font-bold tracking-tight">Cek Status <span class="text-brand-orange italic">Pendaftaran</span></h1>
-      <p class="text-brand-muted md:text-lg leading-relaxed max-w-md mx-auto">Masukkan kode invoice Anda (contoh: MUBK-YYYYMMDD-XXXX) untuk melacak status pendaftaran dan pembayaran Anda.</p>
+      <h1 class="font-display text-4xl md:text-5xl text-brand-brown mb-4 font-bold tracking-tight">Cek Status <span class="text-brand-orange italic">Transaksi</span></h1>
+      <p class="text-brand-muted md:text-lg leading-relaxed max-w-md mx-auto">Masukkan kode invoice Anda (contoh: MUBK-YYYYMMDD-XXXX) untuk melacak status pendaftaran program atau pembelian kitab Anda.</p>
     </div>
 
     <!-- Form Cari -->
@@ -45,7 +45,7 @@
         <div class="inline-block p-4 rounded-full bg-brand-cream/50 mb-4 border border-brand-border/30">
           <svg class="w-8 h-8 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
         </div>
-        <h2 class="font-display text-2xl text-brand-brown mb-2">Detail Pendaftaran</h2>
+        <h2 class="font-display text-2xl text-brand-brown mb-2">Detail {{ result.programId === null ? 'Pembelian Kitab' : 'Pendaftaran' }}</h2>
         <p class="text-xs font-bold uppercase tracking-widest text-brand-muted mb-4">Status Pembayaran</p>
         <div class="flex justify-center">
           <StatusBadge :status="result.statusPembayaran" class="scale-110" />
@@ -60,7 +60,7 @@
         </div>
         
         <div class="flex justify-between items-center py-2 border-b border-brand-border/30 border-dashed">
-          <span class="text-brand-muted">Nama Pendaftar</span>
+          <span class="text-brand-muted">Nama {{ result.programId === null ? 'Pembeli' : 'Pendaftar' }}</span>
           <span class="font-bold text-brand-brown">{{ result.dataPeserta?.namaLengkap }}</span>
         </div>
 

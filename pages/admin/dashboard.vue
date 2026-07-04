@@ -250,6 +250,9 @@ const fetchDashboardData = async () => {
     pendaftaranSnap.forEach((doc) => {
       const data = doc.data();
       
+      // Filter out standalone book purchases (Pembelian Kitab)
+      if (data.programId === null) return;
+      
       // Basic Stats
       if (data.statusPembayaran === 'pending') pendingCount++;
       if (data.statusPembayaran === 'success' && data.statusPengiriman === 'belum_dikirim') toShipCount++;
@@ -271,7 +274,7 @@ const fetchDashboardData = async () => {
     });
 
     stats.value = {
-      total: pendaftaranSnap.size,
+      total: pendaftaranSnap.docs.filter(d => d.data().programId !== null).length,
       pending: pendingCount,
       toShip: toShipCount
     };
@@ -302,10 +305,18 @@ const fetchDashboardData = async () => {
       }]
     };
 
-    // Fetch top 5 recent
-    const qRecent = query(collection(db, 'pendaftaran'), orderBy('createdAt', 'desc'), limit(5));
-    const recentSnap = await getDocs(qRecent);
-    recent.value = recentSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    // Fetch top 5 recent (filtered from already loaded data)
+    const allProgramRegs = pendaftaranSnap.docs
+      .map(doc => ({ id: doc.id, ...doc.data() }))
+      .filter((doc: any) => doc.programId !== null);
+      
+    allProgramRegs.sort((a: any, b: any) => {
+      const timeA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : new Date(a.createdAt || 0).getTime();
+      const timeB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : new Date(b.createdAt || 0).getTime();
+      return timeB - timeA;
+    });
+    
+    recent.value = allProgramRegs.slice(0, 5);
 
   } catch (error) {
     console.error('Failed to fetch dashboard data', error);

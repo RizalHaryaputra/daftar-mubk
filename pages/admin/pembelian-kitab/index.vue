@@ -3,8 +3,8 @@
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div>
-        <h1 class="font-display text-4xl text-brand-brown tracking-tight">Kelola Pendaftaran</h1>
-        <p class="text-brand-muted mt-2">Daftar transaksi pendaftaran program dari para calon santri.</p>
+        <h1 class="font-display text-4xl text-brand-brown tracking-tight">Kelola Pembelian Kitab</h1>
+        <p class="text-brand-muted mt-2">Daftar transaksi pembelian kitab tanpa pendaftaran program.</p>
       </div>
       <!-- Pendaftaran tidak punya tombol Tambah karena dibuat oleh user di frontend -->
     </div>
@@ -45,8 +45,8 @@
           <thead class="bg-gray-50/50 border-b border-brand-border/50 text-brand-muted font-bold tracking-widest uppercase text-xs">
             <tr>
               <th class="p-6">Invoice & Waktu</th>
-              <th class="p-6">Peserta</th>
-              <th class="p-6">Total Biaya</th>
+              <th class="p-6">Pembeli</th>
+              <th class="p-6">Total Bayar</th>
               <th class="p-6">Pembayaran</th>
               <th class="p-6">Pengiriman</th>
               <th class="p-6 text-right">Aksi</th>
@@ -55,7 +55,7 @@
           <tbody class="divide-y divide-brand-border/50">
             <tr v-if="paginatedData.length === 0 && !isLoading">
               <td colspan="6" class="p-16 text-center text-brand-muted">
-                Tidak ada pendaftaran yang cocok dengan kriteria pencarian Anda.
+                Tidak ada pesanan kitab yang cocok dengan kriteria pencarian Anda.
               </td>
             </tr>
             <tr v-for="item in paginatedData" :key="item.id" class="hover:bg-brand-cream/20 transition-colors">
@@ -74,12 +74,11 @@
                 <StatusBadge :status="item.statusPembayaran" />
               </td>
               <td class="p-6">
-                <span v-if="item.statusPengiriman === '-'" class="text-[10px] font-bold px-3 py-1.5 rounded-full border border-gray-200 bg-gray-100 text-gray-500 uppercase tracking-wider">Tidak Beli Kitab</span>
-                <span v-else-if="item.statusPengiriman === 'dikirim'" class="text-[10px] font-bold px-3 py-1.5 rounded-full border border-green-200 bg-green-100 text-green-700 uppercase tracking-wider">Dikirim</span>
+                <span v-if="item.statusPengiriman === 'dikirim'" class="text-[10px] font-bold px-3 py-1.5 rounded-full border border-green-200 bg-green-100 text-green-700 uppercase tracking-wider">Dikirim</span>
                 <span v-else class="text-[10px] font-bold px-3 py-1.5 rounded-full border border-amber-200 bg-amber-100 text-amber-700 uppercase tracking-wider">Belum Dikirim</span>
               </td>
               <td class="p-6 text-right space-x-2">
-                <NuxtLink :to="`/admin/pendaftaran/${item.id}`" class="inline-block px-4 py-2 bg-brand-cream text-brand-orange hover:bg-brand-orange hover:text-white transition-colors rounded-full font-bold text-xs uppercase tracking-wider">
+                <NuxtLink :to="`/admin/pembelian-kitab/${item.id}`" class="inline-block px-4 py-2 bg-brand-cream text-brand-orange hover:bg-brand-orange hover:text-white transition-colors rounded-full font-bold text-xs uppercase tracking-wider">
                   Detail
                 </NuxtLink>
               </td>
@@ -131,7 +130,7 @@ const fetchPendaftaran = async () => {
     const snap = await getDocs(q);
     pendaftaranList.value = snap.docs
       .map(doc => ({ id: doc.id, ...doc.data() }))
-      .filter((doc: any) => doc.programId !== null);
+      .filter((doc: any) => doc.programId === null);
   } catch (error) {
     console.error("Error fetching pendaftaran", error);
   } finally {

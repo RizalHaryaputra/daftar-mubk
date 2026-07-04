@@ -347,6 +347,18 @@
           {{ submitError }}
         </div>
 
+        <!-- Pending Invoice Info (Midtrans closed) -->
+        <div v-if="pendingInvoice" class="bg-brand-cream/40 text-brand-brown p-6 rounded-[20px] text-center border border-brand-orange/30 mt-4 shadow-sm">
+          <div class="w-12 h-12 bg-brand-orange/10 rounded-full flex items-center justify-center mx-auto mb-3 text-brand-orange">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          </div>
+          <p class="font-bold text-lg mb-1">Menunggu Pembayaran</p>
+          <p class="text-sm text-brand-muted mb-4">Pendaftaran berhasil disimpan dengan nomor invoice <strong class="text-brand-orange">{{ pendingInvoice }}</strong>. Silakan lanjutkan pembayaran untuk menyelesaikan pendaftaran Anda.</p>
+          <NuxtLink :to="`/cek-status?invoice=${pendingInvoice}`" class="inline-block w-full sm:w-auto bg-brand-orange text-white font-bold tracking-widest uppercase text-xs md:text-sm px-8 py-4 rounded-full hover:bg-orange-600 transition-all hover:shadow-lg shadow-brand-orange/20">
+            Cek Status & Lanjutkan
+          </NuxtLink>
+        </div>
+
       </form>
     </template>
   </div>
@@ -379,6 +391,7 @@ const validationError = ref('');
 // State form & submission
 const isSubmitting = ref(false);
 const submitError = ref('');
+const pendingInvoice = ref('');
 const selectedKitabIds = ref<string[]>([]);
 
 const form = ref({
@@ -426,6 +439,12 @@ const totalBayar = computed(() => {
 onMounted(async () => {
   const programId = route.query.programId as string;
   const kitabId = route.query.kitabId as string;
+
+  // Redirect to beli-kitab if user is trying to buy a kitab without a program
+  if (!programId && kitabId) {
+    navigateTo(`/beli-kitab?kitabId=${kitabId}`);
+    return;
+  }
 
   try {
     // Load ongkir setting
@@ -479,8 +498,8 @@ onMounted(async () => {
       availableKitabs.value = allKitabs.filter(k => !wajibIds.has(k.id));
     }
 
-    if (!programId && !kitabId) {
-      dataError.value = 'Silakan pilih program atau kitab terlebih dahulu dari halaman yang tersedia.';
+    if (!programId) {
+      dataError.value = 'Silakan pilih program terlebih dahulu dari halaman yang tersedia.';
     }
   } catch (e) {
     console.error('Failed to load form data:', e);
@@ -558,6 +577,7 @@ const submitForm = async () => {
   const payload = {
     programId: selectedProgram.value?.id ?? null,
     programNama: selectedProgram.value?.nama ?? null,
+    jadwalPilihan: form.value.jadwalPilihan ?? null,
     dataPeserta: {
       ...form.value.dataPeserta,
       alamatPengiriman: semuaKitabDibeli.value.length > 0 ? form.value.dataPeserta.alamatPengiriman : null
@@ -592,7 +612,10 @@ const submitForm = async () => {
         onSuccess: () => navigateTo(`/cek-status?invoice=${kodeInvoice}`),
         onPending: () => navigateTo(`/cek-status?invoice=${kodeInvoice}`),
         onError: () => { submitError.value = 'Terjadi error saat pembayaran. Silakan coba lagi.'; },
-        onClose: () => { submitError.value = 'Pembayaran dibatalkan. Anda bisa melanjutkan dari halaman Cek Status.'; }
+        onClose: () => {
+          submitError.value = '';
+          pendingInvoice.value = kodeInvoice;
+        }
       });
     } else {
       // Fallback redirect

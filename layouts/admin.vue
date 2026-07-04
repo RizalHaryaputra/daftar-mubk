@@ -25,6 +25,15 @@
           </svg>
           Pendaftaran
         </NuxtLink>
+        <NuxtLink to="/admin/pembelian-kitab"
+          class="flex items-center gap-3 px-5 py-3 rounded-2xl transition-all text-sm font-medium"
+          :class="isActive('/admin/pembelian-kitab') ? 'bg-brand-orange text-white shadow-lg shadow-brand-orange/30' : 'text-white/70 hover:text-white hover:bg-white/5'">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
+          Pembelian Kitab
+        </NuxtLink>
         <NuxtLink to="/admin/program"
           class="flex items-center gap-3 px-5 py-3 rounded-2xl transition-all text-sm font-medium"
           :class="isActive('/admin/program') ? 'bg-brand-orange text-white shadow-lg shadow-brand-orange/30' : 'text-white/70 hover:text-white hover:bg-white/5'">
