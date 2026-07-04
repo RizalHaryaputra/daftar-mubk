@@ -27,10 +27,10 @@
         <div class="flex gap-2 w-full sm:w-auto">
           <select v-model="filterStatus" class="w-full sm:w-auto px-6 py-3 rounded-full border-2 border-brand-border/50 bg-white focus:outline-none focus:border-brand-orange text-brand-brown font-medium cursor-pointer text-sm appearance-none">
             <option value="">Semua Status</option>
-            <option value="pending">Pending</option>
-            <option value="success">Success</option>
-            <option value="expire">Expire</option>
-            <option value="failed">Failed</option>
+            <option value="pending">Menunggu</option>
+            <option value="success">Lunas</option>
+            <option value="expire">Kedaluwarsa</option>
+            <option value="failed">Gagal</option>
           </select>
         </div>
       </div>
@@ -79,8 +79,8 @@
                 <span v-else class="text-[10px] font-bold px-3 py-1.5 rounded-full border border-amber-200 bg-amber-100 text-amber-700 uppercase tracking-wider">Belum Dikirim</span>
               </td>
               <td class="p-6 text-right space-x-2">
-                <NuxtLink :to="`/admin/pendaftaran/${item.id}`" class="inline-block px-4 py-2 bg-brand-cream text-brand-orange hover:bg-brand-orange hover:text-white transition-colors rounded-full font-bold text-xs uppercase tracking-wider">
-                  Detail
+                <NuxtLink :to="`/admin/pendaftaran/${item.id}`" title="Detail" class="inline-flex items-center justify-center w-8 h-8 bg-brand-cream text-brand-orange hover:bg-brand-orange hover:text-white transition-colors rounded-full">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                 </NuxtLink>
               </td>
             </tr>

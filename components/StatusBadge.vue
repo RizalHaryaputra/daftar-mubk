@@ -16,9 +16,9 @@ const props = defineProps({
 
 const label = computed(() => {
   switch (props.status) {
-    case 'pending': return 'Menunggu Pembayaran';
-    case 'success': return 'Terdaftar';
-    case 'expire': return 'Kadaluarsa';
+    case 'pending': return 'Menunggu';
+    case 'success': return 'Lunas';
+    case 'expire': return 'Kedaluwarsa';
     case 'failed': return 'Gagal';
     case 'dikirim': return 'Buku Dikirim';
     default: return props.status;

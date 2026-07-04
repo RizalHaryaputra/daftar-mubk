@@ -3,9 +3,9 @@
     
     <!-- 1. HERO SECTION (Light, with dark background behind the rounded bottom) -->
     <div class="bg-brand-deeper">
-      <section class="bg-brand-cream rounded-b-[40px] md:rounded-b-[80px] pt-8 pb-32 px-6 relative overflow-hidden flex flex-col items-center text-center shadow-2xl">
+      <section class="bg-brand-cream rounded-b-[40px] md:rounded-b-[80px] pt-8 pb-32 px-6 relative overflow-hidden flex flex-col items-center text-center">
       <!-- Ornamen aksen (mirip sinar matahari di desain, kita pakai oranye) -->
-      <div class="absolute top-12 left-12 md:top-24 md:left-24 text-brand-orange opacity-40">
+      <div class="hidden md:block absolute top-12 left-12 md:top-24 md:left-24 text-brand-orange opacity-40">
         <svg class="w-16 h-16 md:w-24 md:h-24 animate-spin-slow" viewBox="0 0 100 100" fill="currentColor">
           <path d="M50 0 L55 45 L100 50 L55 55 L50 100 L45 55 L0 50 L45 45 Z" />
         </svg>
@@ -111,11 +111,12 @@
             </div>
             <div v-else-if="programs.length === 0" class="text-white/50 text-sm py-4">Belum ada program unggulan.</div>
             <template v-else>
-              <div 
+              <NuxtLink 
                 v-for="(prog, idx) in programs" 
                 :key="prog.id"
+                :to="`/program/${prog.id}`"
                 @mouseenter="hoveredProgram = prog"
-                class="group flex items-center justify-between p-5 rounded-xl border transition-all cursor-pointer"
+                class="group flex items-center justify-between p-5 rounded-xl border transition-all cursor-pointer block"
                 :class="hoveredProgram?.id === prog.id ? 'border-brand-orange bg-white/5' : 'border-white/10 hover:border-white/30'"
               >
                 <div class="flex items-center gap-4">
@@ -123,7 +124,7 @@
                   <span class="text-white font-medium group-hover:text-brand-orange transition-colors">{{ prog.nama }}</span>
                 </div>
                 <span class="text-white/40 group-hover:text-brand-orange transition-transform group-hover:translate-x-2">&rarr;</span>
-              </div>
+              </NuxtLink>
             </template>
           </div>
 
@@ -255,8 +256,8 @@
     <!-- 7. FOOTER / CTA -->
     <section class="px-6 py-24 mt-12 relative overflow-hidden">
       <!-- Ornamen -->
-      <div class="absolute top-0 right-0 text-brand-orange/5 translate-x-1/3 -translate-y-1/3 pointer-events-none">
-        <svg width="400" height="400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2 10 10 2-10 2-2 10-2-10-10-2 10-2z"/></svg>
+      <div class="absolute top-0 right-0 md:top-4 md:right-10 text-brand-orange/5 pointer-events-none">
+        <svg width="250" height="250" md:width="350" md:height="350" viewBox="0 0 24 24" fill="currentColor" class="w-64 h-64 md:w-96 md:h-96"><path d="M12 0l2 10 10 2-10 2-2 10-2-10-10-2 10-2z"/></svg>
       </div>
 
       <div class="max-w-4xl mx-auto text-center space-y-8 relative z-10">
@@ -279,14 +280,15 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  layout: 'landing'
+})
+
 import { ref, onMounted } from 'vue';
 import { useNuxtApp } from '#imports';
 import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
 
-definePageMeta({
-  layout: 'landing'
-});
 
 const { $db } = useNuxtApp();
 const db = $db as Firestore;
@@ -304,7 +306,7 @@ onMounted(async () => {
       where('status', '==', 'aktif')
     );
     const snapPrograms = await getDocs(qPrograms);
-    let allPrograms = snapPrograms.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    let allPrograms = snapPrograms.docs.map(doc => ({ id: doc.id, ...doc.data() })) as any[];
     allPrograms.sort((a, b) => {
       const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
       const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
@@ -322,7 +324,7 @@ onMounted(async () => {
       where('status', '==', 'aktif')
     );
     const snapKitabs = await getDocs(qKitabs);
-    let allKitabs = snapKitabs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    let allKitabs = snapKitabs.docs.map(doc => ({ id: doc.id, ...doc.data() })) as any[];
     allKitabs.sort((a, b) => {
       const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
       const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
