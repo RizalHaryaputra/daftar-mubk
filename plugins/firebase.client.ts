@@ -3,7 +3,7 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { defineNuxtPlugin, useRuntimeConfig, useState } from '#imports';
 
-export default defineNuxtPlugin((nuxtApp) => {
+export default defineNuxtPlugin(async (nuxtApp) => {
   const config = useRuntimeConfig();
 
   const firebaseConfig = {
@@ -27,7 +27,17 @@ export default defineNuxtPlugin((nuxtApp) => {
   // Global state for user
   const user = useState('firebaseUser', () => null as any);
 
-  // Listen to auth state
+  // Wait for initial auth state before allowing app to mount
+  // This prevents the middleware from redirecting to login on refresh
+  await new Promise<void>((resolve) => {
+    const unsubscribe = auth.onAuthStateChanged((u) => {
+      user.value = u;
+      resolve();
+      unsubscribe();
+    });
+  });
+
+  // Continue listening for future changes
   auth.onAuthStateChanged((u) => {
     user.value = u;
   });
