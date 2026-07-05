@@ -62,6 +62,13 @@
         </div>
       </div>
 
+      <!-- Tautan Grup WhatsApp -->
+      <div class="flex flex-col gap-2">
+        <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Tautan Grup WhatsApp (Opsional)</label>
+        <input type="url" v-model="form.linkGrupWa" class="input-field" placeholder="Contoh: https://chat.whatsapp.com/..." />
+        <p class="text-[11px] text-brand-muted mt-1">Tautan ini hanya akan ditampilkan ke peserta setelah mereka melunasi pembayaran program.</p>
+      </div>
+
       <!-- Opsi Jadwal Belajar (Full Width Box) -->
       <div class="p-6 border-2 border-brand-border/50 rounded-[20px] space-y-5 bg-brand-cream/10">
         <div class="flex items-center justify-between border-b border-brand-border/30 pb-4">
@@ -217,7 +224,7 @@ const defaultForm = () => ({
   deskripsiSingkat: '',
   jadwal: [''],
   durasi: '',
-  harga: 0, status: 'aktif', gambarUrl: '', periode: '',
+  harga: 0, status: 'aktif', gambarUrl: '', periode: '', linkGrupWa: '',
   tanggalMulaiStr: '', tanggalAkhirStr: '', deadlineDaftarStr: '',
   wajibBeliKitab: false, kitabWajibIdsStr: ''
 });
@@ -249,7 +256,8 @@ const populateForm = () => {
       tanggalAkhirStr: item.tanggalAkhir?.toDate?.()?.toISOString().split('T')[0] ?? '',
       deadlineDaftarStr: item.deadlineDaftar?.toDate?.()?.toISOString().split('T')[0] ?? '',
       wajibBeliKitab: item.wajibBeliKitab ?? false,
-      kitabWajibIdsStr: ''
+      kitabWajibIdsStr: '',
+      linkGrupWa: item.linkGrupWa ?? ''
     };
     
     // Set checkboxes based on initialData.kitabWajibIds

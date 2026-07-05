@@ -23,6 +23,7 @@ export interface ConfirmationEmailOptions {
   total: number;
   items: EmailItemDetail[];
   tipePesanan: 'program' | 'kitab' | 'kombinasi';
+  linkGrupWa?: string | null;
 }
 
 export const sendConfirmationEmail = async (opts: ConfirmationEmailOptions) => {
@@ -38,7 +39,16 @@ export const sendConfirmationEmail = async (opts: ConfirmationEmailOptions) => {
 
   let instructionHtml = '';
   if (opts.tipePesanan === 'program' || opts.tipePesanan === 'kombinasi') {
-    instructionHtml += `<p style="margin: 16px 0; padding: 12px; background-color: #FFF3E0; border-left: 4px solid #F5720A; font-size: 14px; border-radius: 4px;"><strong>Info Program:</strong> Persiapkan diri Anda untuk kelas! Informasi tautan grup WhatsApp atau materi kelas dapat diakses melalui Dashboard Peserta.</p>`;
+    if (opts.linkGrupWa) {
+      instructionHtml += `
+        <div style="margin: 16px 0; padding: 16px; background-color: #E8F5E9; border-left: 4px solid #4CAF50; border-radius: 4px; text-align: center;">
+          <p style="margin: 0 0 12px 0; font-size: 14px; color: #2E7D32;"><strong>Info Program:</strong> Anda telah terdaftar dalam program kami. Silakan bergabung dengan grup WhatsApp untuk informasi selanjutnya.</p>
+          <a href="${opts.linkGrupWa}" target="_blank" style="display: inline-block; background-color: #25D366; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: bold;">Gabung Grup WhatsApp</a>
+        </div>
+      `;
+    } else {
+      instructionHtml += `<p style="margin: 16px 0; padding: 12px; background-color: #FFF3E0; border-left: 4px solid #F5720A; font-size: 14px; border-radius: 4px;"><strong>Info Program:</strong> Persiapkan diri Anda untuk kelas! Informasi lebih lanjut akan segera menyusul atau hubungi Admin.</p>`;
+    }
   }
   if (opts.tipePesanan === 'kitab' || opts.tipePesanan === 'kombinasi') {
     instructionHtml += `<p style="margin: 16px 0; padding: 12px; background-color: #FFF3E0; border-left: 4px solid #F5720A; font-size: 14px; border-radius: 4px;"><strong>Info Pengiriman:</strong> Kitab pesanan Anda sedang kami proses untuk pengemasan. Anda dapat melacak resi pengiriman melalui halaman Cek Status nanti.</p>`;
@@ -100,16 +110,17 @@ export interface InvoiceEmailOptions {
   to: string;
   namaLengkap: string;
   kodeInvoice: string;
-  total: number;
-  items: EmailItemDetail[];
-  tipePesanan: 'program' | 'kitab' | 'kombinasi';
+  total?: number;
+  items?: EmailItemDetail[];
+  tipePesanan?: 'program' | 'kitab' | 'kombinasi';
+  linkGrupWa?: string | null;
 }
 
 export const sendInvoiceEmail = async (opts: InvoiceEmailOptions) => {
   const transporter = createTransporter();
   const appUrl = process.env.APP_URL ?? 'http://localhost:3000';
 
-  const itemsHtml = opts.items.map(item => `
+  const itemsHtml = (opts.items || []).map(item => `
     <tr style="border-bottom: 1px solid #f0f0f0;">
       <td style="padding: 12px 0; color: #555;">${item.name} <span style="color: #999; font-size: 12px;">x${item.quantity}</span></td>
       <td style="padding: 12px 0; text-align: right; font-weight: 500;">Rp ${(item.price * item.quantity).toLocaleString('id-ID')}</td>
@@ -217,7 +228,7 @@ export const sendFailedEmail = async (opts: InvoiceEmailOptions) => {
   const transporter = createTransporter();
   const appUrl = process.env.APP_URL ?? 'http://localhost:3000';
 
-  const itemsHtml = opts.items.map(item => `
+  const itemsHtml = (opts.items || []).map(item => `
     <tr style="border-bottom: 1px solid #f0f0f0;">
       <td style="padding: 12px 0; color: #555;">${item.name} <span style="color: #999; font-size: 12px;">x${item.quantity}</span></td>
       <td style="padding: 12px 0; text-align: right; font-weight: 500;">Rp ${(item.price * item.quantity).toLocaleString('id-ID')}</td>

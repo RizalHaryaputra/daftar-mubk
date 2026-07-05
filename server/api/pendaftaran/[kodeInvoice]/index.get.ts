@@ -1,5 +1,6 @@
 import { getFirestoreDb } from '../../../utils/firebase';
 import { checkTransactionStatus } from '../../../utils/midtrans';
+import { sendConfirmationEmail, sendAdminNotificationEmail, sendFailedEmail } from '../../../utils/mailer';
 
 export default defineEventHandler(async (event) => {
   const kodeInvoice = getRouterParam(event, 'kodeInvoice');
@@ -50,6 +51,53 @@ export default defineEventHandler(async (event) => {
         
         // Update local data variable to reflect changes
         data = (await docRef.get()).data()!;
+
+        // Trigger Emails on manual sync
+        if (data?.dataPeserta?.email) {
+          const items = [];
+          if (data.rincianBiaya?.biayaProgram > 0) items.push({ name: data.programNama || 'Program', price: data.rincianBiaya.biayaProgram, quantity: 1 });
+          for (const k of data.kitabDibeli || []) items.push({ name: k.judul, price: k.harga, quantity: k.qty || 1 });
+          if (data.rincianBiaya?.ongkir > 0) items.push({ name: 'Ongkos Kirim', price: data.rincianBiaya.ongkir, quantity: 1 });
+
+          let tipePesanan: 'program' | 'kitab' | 'kombinasi' = 'program';
+          if (data.programId && (data.kitabDibeli?.length ?? 0) > 0) tipePesanan = 'kombinasi';
+          else if (!data.programId && (data.kitabDibeli?.length ?? 0) > 0) tipePesanan = 'kitab';
+
+          try {
+            if (newStatus === 'success') {
+              await sendConfirmationEmail({
+                to: data.dataPeserta.email,
+                namaLengkap: data.dataPeserta.namaLengkap,
+                kodeInvoice: data.kodeInvoice,
+                total: data.rincianBiaya?.total,
+                items,
+                tipePesanan,
+                linkGrupWa: data.linkGrupWa
+              });
+              await sendAdminNotificationEmail({
+                to: '',
+                namaLengkap: data.dataPeserta.namaLengkap,
+                kodeInvoice: data.kodeInvoice,
+                total: data.rincianBiaya?.total,
+                items,
+                tipePesanan,
+                linkGrupWa: data.linkGrupWa
+              });
+            } else if (newStatus === 'failed' || newStatus === 'expire') {
+              await sendFailedEmail({
+                to: data.dataPeserta.email,
+                namaLengkap: data.dataPeserta.namaLengkap,
+                kodeInvoice: data.kodeInvoice,
+                total: data.rincianBiaya?.total,
+                items,
+                tipePesanan,
+                linkGrupWa: data.linkGrupWa
+              });
+            }
+          } catch (e) {
+            console.error('Manual sync email error', e);
+          }
+        }
       }
     }
   }

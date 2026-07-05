@@ -44,6 +44,15 @@ export default defineEventHandler(async (event) => {
   // ===== 2. Generate Kode Invoice =====
   const kodeInvoice = generateInvoiceCode();
 
+  // Ambil linkGrupWa dari collection program jika ada
+  let linkGrupWa = null;
+  if (programId) {
+    const programSnap = await db.collection('programs').doc(programId).get();
+    if (programSnap.exists) {
+      linkGrupWa = programSnap.data()?.linkGrupWa || null;
+    }
+  }
+
   // ===== 3. Simpan ke Firestore =====
   const pendaftaranData = {
     kodeInvoice,
@@ -64,6 +73,7 @@ export default defineEventHandler(async (event) => {
       ongkir: rincianBiaya?.ongkir ?? 0,
       total: rincianBiaya?.total ?? 0
     },
+    linkGrupWa,
     statusPembayaran: 'pending',
     statusPengiriman: kitabDibeli?.length > 0 ? 'belum_dikirim' : '-',
     midtrans: {

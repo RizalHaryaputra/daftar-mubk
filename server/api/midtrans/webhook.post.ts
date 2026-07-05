@@ -66,7 +66,8 @@ export default defineEventHandler(async (event) => {
           kodeInvoice: data.kodeInvoice,
           total: data.rincianBiaya?.total,
           items,
-          tipePesanan
+          tipePesanan,
+          linkGrupWa: data.linkGrupWa
         });
         
         await sendAdminNotificationEmail({
@@ -75,7 +76,8 @@ export default defineEventHandler(async (event) => {
           kodeInvoice: data.kodeInvoice,
           total: data.rincianBiaya?.total,
           items,
-          tipePesanan
+          tipePesanan,
+          linkGrupWa: data.linkGrupWa
         });
       } catch (mailError) {
         // Jangan gagalkan webhook karena email gagal
