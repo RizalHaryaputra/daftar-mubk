@@ -53,7 +53,7 @@
             
             <!-- Floating Badges -->
             <div class="absolute top-8 right-8 flex flex-col gap-2 items-end">
-              <span v-if="program.status === 'aktif'" class="bg-brand-orange text-white text-xs font-bold px-4 py-2 rounded-full uppercase tracking-widest shadow-lg shadow-brand-orange/20">
+              <span v-if="isRegistrationOpen" class="bg-brand-orange text-white text-xs font-bold px-4 py-2 rounded-full uppercase tracking-widest shadow-lg shadow-brand-orange/20">
                 Terbuka
               </span>
               <span v-else class="bg-gray-100 text-gray-500 border border-gray-200 text-xs font-bold px-4 py-2 rounded-full uppercase tracking-widest">
@@ -144,7 +144,7 @@
           </div>
           
           <!-- Deadline Banner -->
-          <div v-if="program.deadlineDaftar && program.status === 'aktif'" class="bg-brand-cream/50 border border-brand-orange/30 rounded-2xl p-5 flex items-start gap-4">
+          <div v-if="program.deadlineDaftar && isRegistrationOpen" class="bg-brand-cream/50 border border-brand-orange/30 rounded-2xl p-5 flex items-start gap-4">
             <div class="w-10 h-10 rounded-full bg-brand-orange/10 flex items-center justify-center text-brand-orange shrink-0">
               <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             </div>
@@ -157,11 +157,7 @@
           <!-- Description -->
           <div class="space-y-4">
             <h2 class="font-display text-2xl text-brand-brown">Tentang Program</h2>
-            <div class="prose prose-brand max-w-none text-brand-muted leading-relaxed">
-              <p v-for="(paragraph, index) in program.deskripsi.split('\n')" :key="index" class="mb-4">
-                {{ paragraph }}
-              </p>
-            </div>
+            <div class="prose prose-brand max-w-none text-brand-muted leading-relaxed" v-html="program.deskripsi"></div>
           </div>
 
           <!-- Kitab Wajib Section -->
@@ -199,7 +195,7 @@
             </div>
             
             <NuxtLink 
-              v-if="program.status === 'aktif'" 
+              v-if="isRegistrationOpen" 
               :to="`/pendaftaran?programId=${program.id}`"
               class="relative z-10 bg-brand-orange text-white px-8 py-4 rounded-full font-bold uppercase tracking-widest text-sm hover:bg-orange-600 hover:shadow-[0_0_20px_rgba(198,132,54,0.4)] hover:-translate-y-1 transition-all shrink-0 w-full md:w-auto text-center"
             >
@@ -217,7 +213,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useNuxtApp } from '#imports';
 import { doc, getDoc, collection, query, where, getDocs, limit } from 'firebase/firestore';
@@ -237,6 +233,15 @@ const formatDate = (ts: any) => {
   const date = ts.toDate ? ts.toDate() : new Date(ts);
   return new Intl.DateTimeFormat('id-ID', { dateStyle: 'long' }).format(date);
 };
+
+const isRegistrationOpen = computed(() => {
+  if (!program.value || program.value.status !== 'aktif') return false;
+  if (program.value.deadlineDaftar) {
+    const deadline = program.value.deadlineDaftar.toDate ? program.value.deadlineDaftar.toDate() : new Date(program.value.deadlineDaftar);
+    if (deadline < new Date()) return false;
+  }
+  return true;
+});
 
 onMounted(async () => {
   try {

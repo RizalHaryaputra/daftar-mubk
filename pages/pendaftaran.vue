@@ -483,6 +483,19 @@ onMounted(async () => {
       }
       selectedProgram.value = { id: progSnap.id, ...progSnap.data() };
 
+      if (selectedProgram.value.status !== 'aktif') {
+        dataError.value = 'Mohon maaf, pendaftaran untuk program ini telah ditutup.';
+        return;
+      }
+
+      if (selectedProgram.value.deadlineDaftar) {
+        const deadline = selectedProgram.value.deadlineDaftar.toDate ? selectedProgram.value.deadlineDaftar.toDate() : new Date(selectedProgram.value.deadlineDaftar);
+        if (deadline < new Date()) {
+          dataError.value = 'Mohon maaf, batas waktu pendaftaran untuk program ini telah berakhir.';
+          return;
+        }
+      }
+
       // Auto-select jadwal jika hanya ada 1 opsi atau masih string
       if (Array.isArray(selectedProgram.value.jadwal)) {
         if (selectedProgram.value.jadwal.length === 1) {

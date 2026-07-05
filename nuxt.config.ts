@@ -16,6 +16,7 @@ export default defineNuxtConfig({
       midtransIsProduction: process.env.MIDTRANS_IS_PRODUCTION === 'true',
       cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
       cloudinaryUploadPreset: process.env.CLOUDINARY_UPLOAD_PRESET,
+      tinymceApiKey: process.env.TINYMCE_API_KEY,
     }
   },
   app: {

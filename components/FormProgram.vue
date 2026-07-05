@@ -18,8 +18,32 @@
 
       <!-- Deskripsi -->
       <div class="flex flex-col gap-2">
+        <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Deskripsi Singkat (Teks Murni) <span class="text-brand-orange">*</span></label>
+        <textarea v-model="form.deskripsiSingkat" required rows="2" class="input-field resize-none" placeholder="Deskripsi pendek untuk ditampilkan di kartu..."></textarea>
+      </div>
+
+      <div class="flex flex-col gap-2">
         <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Deskripsi Lengkap <span class="text-brand-orange">*</span></label>
-        <textarea v-model="form.deskripsi" required rows="4" class="input-field resize-none" placeholder="Jelaskan detail tentang program ini..."></textarea>
+        <ClientOnly>
+          <Editor
+            v-model="form.deskripsi"
+            :api-key="useRuntimeConfig().public.tinymceApiKey"
+            :init="{
+              height: 300,
+              menubar: false,
+              plugins: [
+                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+              ],
+              toolbar: 'undo redo | blocks | ' +
+                'bold italic forecolor | alignleft aligncenter ' +
+                'alignright alignjustify | bullist numlist outdent indent | ' +
+                'removeformat | help',
+              content_style: 'body { font-family:Plus Jakarta Sans,Arial,sans-serif; font-size:14px; color: #43302b; }'
+            }"
+          />
+        </ClientOnly>
       </div>
 
       <!-- Durasi, Harga, Periode -->
@@ -158,6 +182,8 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue';
+import Editor from '@tinymce/tinymce-vue';
+import { useRuntimeConfig } from '#imports';
 import { collection, getDocs } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
 import { useNuxtApp } from '#imports';
@@ -185,7 +211,11 @@ const kitabsList = ref<any[]>([]);
 const selectedKitabIds = ref<string[]>([]);
 
 const defaultForm = () => ({
-  nama: '', deskripsi: '', jadwal: [''], durasi: '',
+  nama: '',
+  deskripsi: '',
+  deskripsiSingkat: '',
+  jadwal: [''],
+  durasi: '',
   harga: 0, status: 'aktif', gambarUrl: '', periode: '',
   tanggalMulaiStr: '', tanggalAkhirStr: '', deadlineDaftarStr: '',
   wajibBeliKitab: false, kitabWajibIdsStr: ''
@@ -207,6 +237,7 @@ const populateForm = () => {
     form.value = {
       nama: item.nama ?? '',
       deskripsi: item.deskripsi ?? '',
+      deskripsiSingkat: item.deskripsiSingkat ?? '',
       jadwal: jadwalArr,
       durasi: item.durasi ?? '',
       harga: item.harga ?? 0,

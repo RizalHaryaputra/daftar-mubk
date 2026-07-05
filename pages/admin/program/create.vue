@@ -42,6 +42,7 @@ const handleSave = async (formData: any) => {
       nama: formData.nama,
       slug: slug,
       deskripsi: formData.deskripsi,
+      deskripsiSingkat: formData.deskripsiSingkat,
       jadwal: formData.jadwal,
       durasi: formData.durasi,
       harga: Number(formData.harga),

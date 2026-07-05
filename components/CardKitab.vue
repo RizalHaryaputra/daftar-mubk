@@ -19,8 +19,8 @@
       <h3 class="font-display text-xl md:text-2xl text-brand-brown leading-tight mb-1 group-hover:text-brand-orange transition-colors">{{ kitab.judul }}</h3>
       <p class="text-xs text-brand-muted mb-4 font-bold uppercase tracking-widest">{{ kitab.penulis || 'Penulis Unknown' }}</p>
       
-      <p class="text-sm text-brand-muted line-clamp-3 mb-6">
-        {{ kitab.deskripsi || 'Kitab rujukan berbahasa Arab yang digunakan untuk materi kurikulum.' }}
+      <p class="text-sm text-brand-muted mb-6 line-clamp-2">
+        {{ kitab.deskripsiSingkat || stripHtml(kitab.deskripsi) || 'Kitab dasar yang sangat direkomendasikan bagi pemula yang baru mulai belajar ilmu alat.' }}
       </p>
 
       <!-- Footer / Price -->
