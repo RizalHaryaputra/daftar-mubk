@@ -24,7 +24,7 @@
           />
         </div>
         
-        <div class="flex gap-2 w-full sm:w-auto">
+        <div class="flex flex-wrap gap-2 w-full sm:w-auto">
           <select v-if="availablePeriodes.length > 0" v-model="filterPeriode" class="w-full sm:w-auto px-6 py-3 rounded-full border-2 border-brand-border/50 bg-white focus:outline-none focus:border-brand-orange text-brand-brown font-medium cursor-pointer text-sm appearance-none">
             <option value="">Semua Periode</option>
             <option v-for="p in availablePeriodes" :key="p" :value="p">{{ p }}</option>
@@ -37,6 +37,11 @@
             <option value="expire">Kedaluwarsa</option>
             <option value="failed">Gagal</option>
           </select>
+
+          <button @click="exportToExcel" class="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-emerald-500 text-white font-bold tracking-widest text-xs uppercase hover:bg-emerald-600 transition-colors shadow-sm">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+            Ekspor Excel
+          </button>
         </div>
       </div>
 
@@ -116,9 +121,10 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
-import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import { collection, getDocs, orderBy, query, doc, updateDoc } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
 import { useNuxtApp } from '#imports';
+import * as XLSX from 'xlsx';
 
 definePageMeta({ layout: 'admin', middleware: ['admin-auth'] });
 
@@ -203,6 +209,43 @@ const availablePeriodes = computed(() => {
   });
   return Array.from(periodes).sort();
 });
+
+const exportToExcel = () => {
+  if (filteredData.value.length === 0) {
+    alert('Tidak ada data yang bisa diekspor sesuai filter saat ini.');
+    return;
+  }
+
+  const dataToExport = filteredData.value.map(p => ({
+    'Invoice': p.kodeInvoice || p.id,
+    'Waktu Daftar': p.createdAt ? formatDate(p.createdAt) : '-',
+    'Nama Lengkap': p.dataPeserta?.namaLengkap || '-',
+    'No. WhatsApp': p.dataPeserta?.noWa || '-',
+    'Email': p.dataPeserta?.email || '-',
+    'Jenis Kelamin': p.dataPeserta?.jenisKelamin || '-',
+    'Tempat Lahir': p.dataPeserta?.tempatLahir || '-',
+    'Tanggal Lahir': p.dataPeserta?.tanggalLahir || '-',
+    'Domisili': p.dataPeserta?.domisili || '-',
+    'Pekerjaan': p.dataPeserta?.pekerjaan || '-',
+    'Program': p.programNama || p.dataProgram?.nama || '-',
+    'Periode': p.enrichedPeriode || '-',
+    'Pilihan Jadwal': p.jadwalPilihan || '-',
+    'Biaya Program': p.rincianBiaya?.biayaProgram || 0,
+    'Total Kitab': p.rincianBiaya?.totalHargaKitab || 0,
+    'Ongkos Kirim': p.rincianBiaya?.ongkir || 0,
+    'Total Bayar': p.rincianBiaya?.total || 0,
+    'Status Pembayaran': p.statusPembayaran?.toUpperCase() || '-',
+    'Status Pengiriman': p.statusPengiriman?.replace('_', ' ').toUpperCase() || '-',
+    'Alamat Pengiriman': p.dataPeserta?.alamatPengiriman || '-'
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Pendaftaran");
+  
+  const dateStr = new Date().toISOString().split('T')[0];
+  XLSX.writeFile(workbook, `Data_Pendaftaran_MUBK_${dateStr}.xlsx`);
+};
 
 // Reset page when filter changes
 watch([searchQuery, filterStatus, filterPeriode], () => {

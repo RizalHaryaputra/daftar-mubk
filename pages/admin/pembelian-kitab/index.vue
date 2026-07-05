@@ -24,7 +24,7 @@
           />
         </div>
         
-        <div class="flex gap-2 w-full sm:w-auto">
+        <div class="flex flex-wrap gap-2 w-full sm:w-auto">
           <select v-model="filterStatus" class="w-full sm:w-auto px-6 py-3 rounded-full border-2 border-brand-border/50 bg-white focus:outline-none focus:border-brand-orange text-brand-brown font-medium cursor-pointer text-sm appearance-none">
             <option value="">Semua Status</option>
             <option value="pending">Menunggu</option>
@@ -32,6 +32,11 @@
             <option value="expire">Kedaluwarsa</option>
             <option value="failed">Gagal</option>
           </select>
+          
+          <button @click="exportToExcel" class="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-emerald-500 text-white font-bold tracking-widest text-xs uppercase hover:bg-emerald-600 transition-colors shadow-sm">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+            Ekspor Excel
+          </button>
         </div>
       </div>
 
@@ -68,11 +73,12 @@
                 <p class="font-bold text-brand-brown">{{ item.dataPeserta?.namaLengkap || '-' }}</p>
                 <p class="text-xs text-brand-muted mt-1">{{ item.dataPeserta?.noWa || '-' }}</p>
               </td>
-              <td class="p-6 max-w-[200px]">
-                <ul v-if="item.kitabDibeli && item.kitabDibeli.length > 0" class="space-y-1">
-                  <li v-for="(kitab, kIdx) in item.kitabDibeli" :key="kIdx" class="text-xs font-medium text-brand-brown whitespace-normal flex gap-1">
-                    <span class="text-brand-orange shrink-0">&bull;</span> 
-                    <span>{{ kitab.judul }} <span v-if="kitab.qty > 1" class="text-brand-muted">({{ kitab.qty }}x)</span></span>
+              <td class="p-6 whitespace-normal min-w-[250px]">
+                <ul v-if="item.kitabDibeli && item.kitabDibeli.length > 0" class="flex flex-col gap-1.5">
+                  <li v-for="(kitab, kIdx) in item.kitabDibeli" :key="kIdx" class="text-xs font-medium text-brand-brown leading-snug">
+                    <span class="text-brand-orange font-bold mr-1">&bull;</span> 
+                    {{ kitab.judul }} 
+                    <span v-if="kitab.qty > 1" class="font-bold text-brand-muted whitespace-nowrap ml-1">({{ kitab.qty }}x)</span>
                   </li>
                 </ul>
                 <span v-else class="text-xs text-brand-muted italic">-</span>
@@ -118,6 +124,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
 import { useNuxtApp } from '#imports';
+import * as XLSX from 'xlsx';
 
 definePageMeta({ layout: 'admin', middleware: ['admin-auth'] });
 
@@ -174,6 +181,43 @@ const filteredData = computed(() => {
 
   return result;
 });
+
+const exportToExcel = () => {
+  if (filteredData.value.length === 0) {
+    alert('Tidak ada data yang bisa diekspor sesuai filter saat ini.');
+    return;
+  }
+
+  const dataToExport = filteredData.value.map(p => {
+    // Format daftar kitab
+    let daftarKitabText = '-';
+    if (p.kitabDibeli && Array.isArray(p.kitabDibeli) && p.kitabDibeli.length > 0) {
+      daftarKitabText = p.kitabDibeli.map((k: any) => `${k.judul} (${k.qty || 1}x)`).join(', ');
+    }
+
+    return {
+      'Invoice': p.kodeInvoice || p.id,
+      'Waktu Transaksi': p.createdAt ? formatDate(p.createdAt) : '-',
+      'Nama Pembeli': p.dataPeserta?.namaLengkap || '-',
+      'No. WhatsApp': p.dataPeserta?.noWa || '-',
+      'Email': p.dataPeserta?.email || '-',
+      'Alamat Pengiriman': p.dataPeserta?.alamatPengiriman || '-',
+      'Daftar Kitab': daftarKitabText,
+      'Total Kitab': p.rincianBiaya?.totalHargaKitab || 0,
+      'Ongkos Kirim': p.rincianBiaya?.ongkir || 0,
+      'Total Bayar': p.rincianBiaya?.total || 0,
+      'Status Pembayaran': p.statusPembayaran?.toUpperCase() || '-',
+      'Status Pengiriman': p.statusPengiriman?.replace('_', ' ').toUpperCase() || '-'
+    };
+  });
+
+  const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Pembelian Kitab");
+  
+  const dateStr = new Date().toISOString().split('T')[0];
+  XLSX.writeFile(workbook, `Data_Pembelian_Kitab_MUBK_${dateStr}.xlsx`);
+};
 
 // Reset page when filter changes
 watch([searchQuery, filterStatus], () => {

@@ -42,8 +42,20 @@
               </div>
               <div class="flex-grow">
                 <h3 class="font-bold text-brand-brown">{{ k.judul }}</h3>
-                <p class="text-sm text-brand-muted">Rp {{ k.harga?.toLocaleString('id-ID') }}</p>
+                <p class="text-sm text-brand-muted">Rp {{ k.harga?.toLocaleString('id-ID') }} / pcs</p>
               </div>
+              
+              <!-- Qty Controls -->
+              <div class="flex items-center gap-2 bg-white rounded-full border border-brand-border/50 p-1">
+                <button type="button" @click="updateQty(k.id, -1)" class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-brand-cream text-brand-orange transition-colors">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" /></svg>
+                </button>
+                <span class="font-bold text-sm w-4 text-center text-brand-brown">{{ k.qty }}</span>
+                <button type="button" @click="updateQty(k.id, 1)" class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-brand-cream text-brand-orange transition-colors">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                </button>
+              </div>
+
               <!-- Allow deleting kitab if it's not the last one -->
               <button type="button" @click="removeKitab(k.id)" v-if="semuaKitabDibeli.length > 1" class="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-100 transition-colors">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
@@ -149,9 +161,9 @@
           <div class="space-y-4">
             <div class="pb-4 border-b border-brand-border/50 border-dashed space-y-3">
               <p class="font-bold text-brand-brown mb-2 text-sm md:text-base">Pembelian Kitab</p>
-              <div v-for="k in semuaKitabDibeli" :key="k.id" class="flex justify-between text-sm items-center">
-                <span class="text-brand-muted line-clamp-1 pr-4">- {{ k.judul }}</span>
-                <span class="font-medium text-brand-brown whitespace-nowrap">Rp {{ k.harga?.toLocaleString('id-ID') }}</span>
+              <div v-for="k in semuaKitabDibeli" :key="k.id" class="flex justify-between items-center text-sm">
+                <span class="text-brand-muted line-clamp-1 pr-4">- {{ k.judul }} <span class="text-xs font-bold text-brand-orange">({{ k.qty }}x)</span></span>
+                <span class="font-medium text-brand-brown whitespace-nowrap">Rp {{ ((k.harga ?? 0) * (k.qty ?? 1)).toLocaleString('id-ID') }}</span>
               </div>
             </div>
             
@@ -224,6 +236,7 @@ const isSubmitting = ref(false);
 const submitError = ref('');
 const pendingInvoice = ref('');
 const isSelectingKitab = ref(false);
+const kitabQty = ref<Record<string, number>>({});
 
 const form = ref({
   dataPeserta: {
@@ -239,7 +252,12 @@ const form = ref({
 });
 
 const semuaKitabDibeli = computed(() => {
-  return availableKitabs.value.filter(k => selectedKitabIds.value.includes(k.id));
+  return availableKitabs.value
+    .filter(k => selectedKitabIds.value.includes(k.id))
+    .map(k => ({
+      ...k,
+      qty: kitabQty.value[k.id] || 1
+    }));
 });
 
 const unselectedKitabs = computed(() => {
@@ -255,7 +273,7 @@ const nominalOngkir = computed(() => {
 });
 
 const totalBayar = computed(() => {
-  const totalKitab = semuaKitabDibeli.value.reduce((acc, k) => acc + (k.harga ?? 0), 0);
+  const totalKitab = semuaKitabDibeli.value.reduce((acc, k) => acc + ((k.harga ?? 0) * (k.qty ?? 1)), 0);
   return totalKitab + nominalOngkir.value;
 });
 
@@ -276,6 +294,7 @@ onMounted(async () => {
       const exists = availableKitabs.value.find(k => k.id === id);
       if (exists && !selectedKitabIds.value.includes(id)) {
         selectedKitabIds.value.push(id);
+        kitabQty.value[id] = 1;
       }
     });
 
@@ -292,13 +311,22 @@ onMounted(async () => {
 
 const removeKitab = (id: string) => {
   selectedKitabIds.value = selectedKitabIds.value.filter(k => k !== id);
+  delete kitabQty.value[id];
 };
 
 const addKitab = (id: string) => {
   if (!selectedKitabIds.value.includes(id)) {
     selectedKitabIds.value.push(id);
+    kitabQty.value[id] = 1;
   }
   isSelectingKitab.value = false;
+};
+
+const updateQty = (id: string, delta: number) => {
+  const current = kitabQty.value[id] || 1;
+  if (current + delta >= 1) {
+    kitabQty.value[id] = current + delta;
+  }
 };
 
 const submitForm = async () => {
@@ -329,7 +357,7 @@ const submitForm = async () => {
       kitabId: k.id,
       judul: k.judul,
       harga: k.harga,
-      qty: 1
+      qty: k.qty || 1
     })),
     ongkir: { 
       zona: form.value.ongkir.zona, 
@@ -337,7 +365,7 @@ const submitForm = async () => {
     },
     rincianBiaya: {
       biayaProgram: 0,
-      totalHargaKitab: semuaKitabDibeli.value.reduce((acc, k) => acc + k.harga, 0),
+      totalHargaKitab: semuaKitabDibeli.value.reduce((acc, k) => acc + ((k.harga ?? 0) * (k.qty ?? 1)), 0),
       ongkir: nominalOngkir.value,
       total: totalBayar.value
     }
