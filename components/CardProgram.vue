@@ -1,5 +1,5 @@
 <template>
-  <NuxtLink :to="`/program/${program.id}`" class="group bg-white border border-brand-border rounded-[30px] overflow-hidden hover:shadow-2xl hover:shadow-brand-deeper/10 transition-all duration-300 flex flex-col h-full relative hover:-translate-y-2">
+  <NuxtLink :to="`/program/${program.slug || program.id}`" class="group bg-white border border-brand-border rounded-[30px] overflow-hidden hover:shadow-2xl hover:shadow-brand-deeper/10 transition-all duration-300 flex flex-col h-full relative hover:-translate-y-2">
     <!-- Gambar Cover -->
     <div class="relative h-56 bg-brand-deeper overflow-hidden">
       <img v-if="program.gambarUrl" :src="program.gambarUrl" :alt="program.nama" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500" />

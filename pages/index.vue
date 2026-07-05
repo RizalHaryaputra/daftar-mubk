@@ -115,7 +115,7 @@
               <NuxtLink 
                 v-for="(prog, idx) in programs" 
                 :key="prog.id"
-                :to="`/program/${prog.id}`"
+                :to="`/program/${prog.slug || prog.id}`"
                 @mouseenter="hoveredProgram = prog"
                 class="group flex items-center justify-between p-5 rounded-xl border transition-all cursor-pointer block"
                 :class="hoveredProgram?.id === prog.id ? 'border-brand-orange bg-white/5' : 'border-white/10 hover:border-white/30'"
@@ -152,7 +152,7 @@
               <h3 class="font-display text-2xl text-white mb-2">{{ hoveredProgram.nama }}</h3>
               <p class="text-white/70 text-sm line-clamp-2 mb-4">{{ Array.isArray(hoveredProgram.jadwal) ? (hoveredProgram.jadwal.length + ' Pilihan Jadwal') : hoveredProgram.jadwal }} · Rp {{ (hoveredProgram.harga || 0).toLocaleString('id-ID') }}</p>
               
-              <NuxtLink :to="`/program/${hoveredProgram.id}`" class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white text-brand-deeper hover:bg-brand-orange hover:text-white transition-colors">
+              <NuxtLink :to="`/program/${hoveredProgram.slug || hoveredProgram.id}`" class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white text-brand-deeper hover:bg-brand-orange hover:text-white transition-colors">
                 <span class="rotate-45 block transform -translate-y-px">&uarr;</span>
               </NuxtLink>
             </div>
@@ -240,7 +240,7 @@
       </div>
       <div v-else-if="kitabs.length === 0" class="text-white/50 text-center py-10">Belum ada kitab pilihan.</div>
       <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <NuxtLink :to="`/kitab/${kitab.id}`" v-for="kitab in kitabs" :key="kitab.id" class="bg-white rounded-[24px] p-6 text-center border-4 border-transparent hover:border-brand-orange/20 flex flex-col items-center group relative hover:-translate-y-2 transition-all duration-300 shadow-xl">
+        <NuxtLink :to="`/kitab/${kitab.slug || kitab.id}`" v-for="kitab in kitabs" :key="kitab.id" class="bg-white rounded-[24px] p-6 text-center border-4 border-transparent hover:border-brand-orange/20 flex flex-col items-center group relative hover:-translate-y-2 transition-all duration-300 shadow-xl">
           <div class="w-16 h-16 rounded-full bg-brand-cream flex items-center justify-center mb-5 text-brand-orange border-2 border-brand-orange/20 relative group-hover:scale-110 transition-transform">
             <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
             <div class="absolute -top-1 -right-1 w-4 h-4 bg-brand-orange rounded-full border-2 border-white"></div>

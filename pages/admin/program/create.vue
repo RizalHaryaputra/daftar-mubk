@@ -35,8 +35,12 @@ const handleSave = async (formData: any) => {
       ? formData.kitabWajibIdsStr.split(',').map((s: string) => s.trim()).filter(Boolean)
       : [];
 
+    const baseText = formData.periode ? `${formData.nama} ${formData.periode}` : formData.nama;
+    const slug = generateSlug(baseText);
+
     const data: any = {
       nama: formData.nama,
+      slug: slug,
       deskripsi: formData.deskripsi,
       jadwal: formData.jadwal,
       durasi: formData.durasi,

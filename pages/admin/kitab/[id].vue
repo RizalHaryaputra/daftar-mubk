@@ -68,6 +68,7 @@ const handleSubmit = async (formData: any) => {
   try {
     const dataToUpdate = {
       ...formData,
+      slug: generateSlug(formData.judul),
       harga: Number(formData.harga),
       updatedAt: new Date()
     };

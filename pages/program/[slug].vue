@@ -172,7 +172,7 @@
             </div>
             
             <div class="grid grid-cols-1 gap-4">
-              <NuxtLink v-for="k in kitabWajib" :key="k.id" :to="`/kitab/${k.id}`" class="group flex items-start gap-4 p-4 rounded-[20px] border border-brand-border/50 hover:border-brand-orange hover:shadow-lg transition-all bg-white">
+              <NuxtLink v-for="k in kitabWajib" :key="k.id" :to="`/kitab/${k.slug || k.id}`" class="group flex items-start gap-4 p-4 rounded-[20px] border border-brand-border/50 hover:border-brand-orange hover:shadow-lg transition-all bg-white">
                 <div class="w-20 h-24 bg-brand-cream/30 rounded-xl overflow-hidden shrink-0 border border-brand-border/30">
                   <img v-if="k.gambarUrl" :src="k.gambarUrl" :alt="k.judul" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   <div v-else class="w-full h-full flex items-center justify-center text-brand-orange/30 font-serif text-3xl">ن</div>
@@ -220,7 +220,7 @@
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useNuxtApp } from '#imports';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs, limit } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
 
 const route = useRoute();
@@ -240,16 +240,26 @@ const formatDate = (ts: any) => {
 
 onMounted(async () => {
   try {
-    const programId = route.params.id as string;
-    const docRef = doc(db, 'programs', programId);
-    const docSnap = await getDoc(docRef);
+    const routeSlug = route.params.slug as string;
+    
+    // Attempt to find by slug first
+    const q = query(collection(db, 'programs'), where('slug', '==', routeSlug), limit(1));
+    const querySnapshot = await getDocs(q);
+    
+    if (!querySnapshot.empty && querySnapshot.docs.length > 0) {
+      const docSnap = querySnapshot.docs[0]!;
+      program.value = { id: docSnap.id, ...docSnap.data() };
+    } else {
+      // Fallback to fetching by ID for backward compatibility
+      const docRef = doc(db, 'programs', routeSlug);
+      const docSnap = await getDoc(docRef);
 
-    if (!docSnap.exists()) {
-      error.value = true;
-      return;
+      if (!docSnap.exists()) {
+        error.value = true;
+        return;
+      }
+      program.value = { id: docSnap.id, ...docSnap.data() };
     }
-
-    program.value = { id: docSnap.id, ...docSnap.data() };
 
     // Fetch kitab wajib jika ada
     if (program.value.wajibBeliKitab && program.value.kitabWajibIds?.length > 0) {

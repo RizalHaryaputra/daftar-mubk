@@ -48,6 +48,6 @@ const props = defineProps({
 });
 
 const handleClick = () => {
-  navigateTo(`/kitab/${props.kitab.id}`);
+  navigateTo(`/kitab/${props.kitab.slug || props.kitab.id}`);
 };
 </script>

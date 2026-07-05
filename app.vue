@@ -26,6 +26,16 @@ useHead({
 </script>
 
 <style>
+/* Global Text Selection Color */
+::selection {
+  background-color: #EA580C; /* Tailwind orange-600 to match brand-orange */
+  color: white;
+}
+::-moz-selection {
+  background-color: #EA580C;
+  color: white;
+}
+
 /* Animasi Transisi Halaman Global */
 .page-enter-active,
 .page-leave-active,

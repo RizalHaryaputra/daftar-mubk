@@ -37,6 +37,7 @@ const handleSubmit = async (formData: any) => {
   try {
     const dataToSave = {
       ...formData,
+      slug: generateSlug(formData.judul),
       harga: Number(formData.harga),
       createdAt: new Date(),
       updatedAt: new Date()

@@ -93,7 +93,7 @@
             {{ Array.isArray(selectedProgram.jadwal) ? (selectedProgram.jadwal.length + ' Pilihan Jadwal') : selectedProgram.jadwal }} · Rp {{ selectedProgram.harga?.toLocaleString('id-ID') }}
           </p>
         </div>
-        <NuxtLink :to="`/program/${selectedProgram.id}`" class="bg-brand-orange text-white text-sm font-bold uppercase tracking-widest px-6 py-3 rounded-full hover:bg-orange-600 transition-colors text-center self-start md:self-center shrink-0">Ganti Program</NuxtLink>
+        <NuxtLink :to="`/program/${selectedProgram.slug || selectedProgram.id}`" class="bg-brand-orange text-white text-sm font-bold uppercase tracking-widest px-6 py-3 rounded-full hover:bg-orange-600 transition-colors text-center self-start md:self-center shrink-0">Ganti Program</NuxtLink>
       </div>
 
       <!-- The Form -->
