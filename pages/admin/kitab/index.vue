@@ -27,13 +27,13 @@
           />
         </div>
         
-        <div class="flex gap-2 w-full sm:w-auto">
-          <select v-model="filterStatus" class="w-full md:w-auto px-6 py-3 rounded-full border-2 border-brand-border/50 bg-white focus:outline-none focus:border-brand-orange text-brand-brown font-medium cursor-pointer text-sm appearance-none">
+        <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <select v-model="filterStatus" class="w-full sm:w-auto px-6 py-3 border-2 border-brand-border/50 rounded-full text-sm focus:outline-none focus:border-brand-orange transition-colors font-medium text-brand-brown bg-white appearance-none cursor-pointer">
             <option value="">Semua Status</option>
             <option value="aktif">Aktif</option>
             <option value="nonaktif">Nonaktif</option>
           </select>
-          <select v-model="filterStandalone" class="w-full md:w-auto px-6 py-3 rounded-full border-2 border-brand-border/50 bg-white focus:outline-none focus:border-brand-orange text-brand-brown font-medium cursor-pointer text-sm appearance-none">
+          <select v-model="filterStandalone" class="w-full sm:w-auto px-6 py-3 border-2 border-brand-border/50 rounded-full text-sm focus:outline-none focus:border-brand-orange transition-colors font-medium text-brand-brown bg-white appearance-none cursor-pointer">
             <option value="">Semua Tipe</option>
             <option value="true">Standalone</option>
             <option value="false">Tidak Standalone</option>
