@@ -140,9 +140,10 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { collection, getDocs, doc, deleteDoc, orderBy, query } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
 import { useNuxtApp } from '#imports';
+import { useToast } from '~/composables/useToast';
 
 definePageMeta({ layout: 'admin', middleware: ['admin-auth'] });
 
@@ -150,6 +151,7 @@ const { $db } = useNuxtApp();
 const db = $db as Firestore;
 const programs = ref<any[]>([]);
 const isLoading = ref(true);
+const { showToast } = useToast();
 
 // States for Filter & Pagination
 const searchQuery = ref('');
@@ -193,9 +195,10 @@ const executeDelete = async () => {
   try {
     await deleteDoc(doc(db, 'programs', itemToDelete.value));
     fetchPrograms(); // Refresh the list
+    showToast('Program berhasil dihapus!', 'success');
   } catch (error) {
     console.error("Error deleting program", error);
-    alert('Gagal menghapus program.');
+    showToast('Gagal menghapus program.', 'error');
   } finally {
     isConfirmOpen.value = false;
     itemToDelete.value = null;

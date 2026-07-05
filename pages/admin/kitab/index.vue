@@ -136,11 +136,13 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { collection, getDocs, deleteDoc, doc, orderBy, query } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
 import { useNuxtApp } from '#imports';
+import { useToast } from '~/composables/useToast';
 
 definePageMeta({ layout: 'admin', middleware: ['admin-auth'] });
 
 const { $db } = useNuxtApp();
 const db = $db as Firestore;
+const { showToast } = useToast();
 
 const kitabs = ref<any[]>([]);
 const isLoading = ref(true);
@@ -210,12 +212,14 @@ const executeDelete = async () => {
   
   try {
     await deleteDoc(doc(db, 'kitabs', itemToDelete.value.id));
-    isDeleteModalOpen.value = false;
-    itemToDelete.value = null;
     fetchKitabs();
+    showToast('Kitab berhasil dihapus!', 'success');
   } catch (error) {
     console.error('Error deleting kitab:', error);
-    alert('Gagal menghapus kitab.');
+    showToast('Gagal menghapus kitab.', 'error');
+  } finally {
+    isDeleteModalOpen.value = false;
+    itemToDelete.value = null;
   }
 };
 </script>

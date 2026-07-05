@@ -19,12 +19,14 @@ import { collection, addDoc, Timestamp } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
 import { useNuxtApp } from '#imports';
 import { useRouter } from 'vue-router';
+import { useToast } from '~/composables/useToast';
 
 definePageMeta({ layout: 'admin', middleware: ['admin-auth'] });
 
 const { $db } = useNuxtApp();
 const db = $db as Firestore;
 const router = useRouter();
+const { showToast } = useToast();
 
 const isSaving = ref(false);
 
@@ -60,10 +62,11 @@ const handleSave = async (formData: any) => {
 
     await addDoc(collection(db, 'programs'), { ...data, createdAt: new Date() });
     
+    showToast('Program berhasil ditambahkan!', 'success');
     router.push('/admin/program');
   } catch (error) {
-    console.error('Error saving program:', error);
-    alert('Terjadi kesalahan saat menyimpan data.');
+    console.error('Error adding program', error);
+    showToast('Gagal menambahkan program. Silakan coba lagi.', 'error');
   } finally {
     isSaving.value = false;
   }

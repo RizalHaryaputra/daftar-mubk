@@ -16,11 +16,7 @@
       </button>
     </div>
 
-    <!-- Success Message -->
-    <div v-if="successMsg" class="bg-green-50/80 backdrop-blur-sm text-green-700 p-5 rounded-[20px] border-2 border-green-200 text-sm font-medium flex items-center gap-3 animate-fade-in">
-      <svg class="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-      {{ successMsg }}
-    </div>
+    <!-- Error/Success states are now handled by global toast -->
 
     <!-- Main Content Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
@@ -97,16 +93,18 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
 import { useNuxtApp } from '#imports';
 
+import { useToast } from '~/composables/useToast';
+
 definePageMeta({ layout: 'admin', middleware: ['admin-auth'] });
 
 const { $db } = useNuxtApp();
 const db = $db as Firestore;
+const { showToast } = useToast();
 
 // Gunakan field sesuai PRD: jogja, jawa, luarJawa (camelCase)
 const form = ref({ jogja: 15000, jawa: 25000, luarJawa: 45000 });
 const isLoading = ref(true);
 const isSaving = ref(false);
-const successMsg = ref('');
 const lastUpdated = ref('');
 
 onMounted(async () => {
@@ -127,7 +125,6 @@ onMounted(async () => {
 
 const saveOngkir = async () => {
   isSaving.value = true;
-  successMsg.value = '';
   try {
     await setDoc(doc(db, 'settings', 'ongkir'), {
       jogja: Number(form.value.jogja),
@@ -135,9 +132,11 @@ const saveOngkir = async () => {
       luarJawa: Number(form.value.luarJawa),
       updatedAt: new Date()
     });
-    successMsg.value = 'Pengaturan ongkir berhasil disimpan!';
+    showToast('Pengaturan ongkir berhasil disimpan!', 'success');
     lastUpdated.value = new Intl.DateTimeFormat('id-ID', { dateStyle: 'long', timeStyle: 'short' }).format(new Date());
-    setTimeout(() => { successMsg.value = ''; }, 3000);
+  } catch (error) {
+    console.error('Error saving ongkir:', error);
+    showToast('Gagal menyimpan pengaturan ongkir.', 'error');
   } finally {
     isSaving.value = false;
   }

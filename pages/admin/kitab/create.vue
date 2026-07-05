@@ -20,6 +20,7 @@ import { useRouter } from 'vue-router';
 import { collection, addDoc } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
 import { useNuxtApp } from '#imports';
+import { useToast } from '~/composables/useToast';
 
 definePageMeta({
   layout: 'admin',
@@ -29,6 +30,7 @@ definePageMeta({
 const router = useRouter();
 const { $db } = useNuxtApp();
 const db = $db as Firestore;
+const { showToast } = useToast();
 
 const isSaving = ref(false);
 
@@ -46,10 +48,11 @@ const handleSubmit = async (formData: any) => {
     await addDoc(collection(db, 'kitabs'), dataToSave);
     
     // Redirect back to list
+    showToast('Kitab berhasil ditambahkan!', 'success');
     router.push('/admin/kitab');
   } catch (error) {
-    console.error('Error adding kitab:', error);
-    alert('Terjadi kesalahan saat menyimpan kitab.');
+    console.error('Error adding kitab', error);
+    showToast('Gagal menambahkan kitab.', 'error');
   } finally {
     isSaving.value = false;
   }

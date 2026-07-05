@@ -26,6 +26,7 @@ import { doc, getDoc, updateDoc, Timestamp } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
 import { useNuxtApp } from '#imports';
 import { useRoute, useRouter } from 'vue-router';
+import { useToast } from '~/composables/useToast';
 
 definePageMeta({ layout: 'admin', middleware: ['admin-auth'] });
 
@@ -33,6 +34,7 @@ const { $db } = useNuxtApp();
 const db = $db as Firestore;
 const route = useRoute();
 const router = useRouter();
+const { showToast } = useToast();
 
 const programId = route.params.id as string;
 const isLoading = ref(true);
@@ -96,11 +98,11 @@ const handleSave = async (formData: any) => {
     else data.deadlineDaftar = null;
 
     await updateDoc(doc(db, 'programs', programId), data);
-    
+    showToast('Program berhasil diperbarui!', 'success');
     router.push('/admin/program');
   } catch (error) {
     console.error('Error updating program:', error);
-    alert('Terjadi kesalahan saat menyimpan data.');
+    showToast('Gagal memperbarui program. Silakan coba lagi.', 'error');
   } finally {
     isSaving.value = false;
   }

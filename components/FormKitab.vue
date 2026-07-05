@@ -31,7 +31,7 @@
 
       <!-- Deskripsi -->
       <div class="flex flex-col gap-2">
-        <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Deskripsi Singkat (Teks Murni) <span class="text-brand-orange">*</span></label>
+        <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Deskripsi Singkat<span class="text-brand-orange">*</span></label>
         <textarea v-model="form.deskripsiSingkat" required rows="2" class="input-field resize-none" placeholder="Deskripsi pendek untuk ditampilkan di kartu..."></textarea>
       </div>
 

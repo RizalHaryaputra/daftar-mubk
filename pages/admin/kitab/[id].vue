@@ -29,6 +29,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
 import { useNuxtApp } from '#imports';
+import { useToast } from '~/composables/useToast';
 
 definePageMeta({
   layout: 'admin',
@@ -41,6 +42,7 @@ const { $db } = useNuxtApp();
 const db = $db as Firestore;
 
 const id = route.params.id as string;
+const { showToast } = useToast();
 
 const isLoading = ref(true);
 const isSaving = ref(false);
@@ -74,12 +76,11 @@ const handleSubmit = async (formData: any) => {
     };
     
     await updateDoc(doc(db, 'kitabs', id), dataToUpdate);
-    
-    // Redirect back to list
+    showToast('Kitab berhasil diperbarui!', 'success');
     router.push('/admin/kitab');
   } catch (error) {
     console.error('Error updating kitab:', error);
-    alert('Terjadi kesalahan saat menyimpan perubahan.');
+    showToast('Gagal memperbarui kitab.', 'error');
   } finally {
     isSaving.value = false;
   }

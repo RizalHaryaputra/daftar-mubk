@@ -114,6 +114,8 @@
         <slot />
       </div>
     </main>
+    <!-- Toast Notifications -->
+    <AppToast />
   </div>
 </template>
 
