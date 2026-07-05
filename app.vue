@@ -23,6 +23,23 @@ useHead({
     }
   ]
 });
+
+useSeoMeta({
+  titleTemplate: (titleChunk) => {
+    return titleChunk ? `${titleChunk} | Daftar MUBK` : 'Daftar MUBK';
+  },
+  title: 'Beranda',
+  description: 'Portal resmi Pendaftaran Program MUBK dan Pembelian Kitab Pembelajaran secara daring yang mudah dan aman.',
+  ogTitle: 'Pendaftaran Program & Pembelian Kitab MUBK',
+  ogDescription: 'Portal resmi Pendaftaran Program MUBK dan Pembelian Kitab Pembelajaran secara daring yang mudah dan aman.',
+  ogImage: '/logo.webp',
+  ogUrl: 'https://daftar.mahadumar.id',
+  ogType: 'website',
+  twitterCard: 'summary_large_image',
+  twitterTitle: 'Pendaftaran Program & Pembelian Kitab MUBK',
+  twitterDescription: 'Portal resmi Pendaftaran Program MUBK dan Pembelian Kitab Pembelajaran secara daring yang mudah dan aman.',
+  twitterImage: '/logo.webp',
+});
 </script>
 
 <style>
