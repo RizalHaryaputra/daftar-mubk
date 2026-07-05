@@ -51,16 +51,16 @@
       </div>
 
       <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm whitespace-nowrap">
+        <table class="w-full text-left text-sm">
           <thead class="bg-gray-50/50 border-b border-brand-border/50 text-brand-muted font-bold tracking-widest uppercase text-xs">
             <tr>
-              <th class="p-6">Invoice & Waktu</th>
-              <th class="p-6">Peserta</th>
-              <th class="p-6">Program</th>
-              <th class="p-6">Total Biaya</th>
-              <th class="p-6">Pembayaran</th>
-              <th class="p-6">Pengiriman</th>
-              <th class="p-6 text-right">Aksi</th>
+              <th class="p-4 whitespace-nowrap">Invoice & Waktu</th>
+              <th class="p-4">Peserta</th>
+              <th class="p-4">Program</th>
+              <th class="p-4 whitespace-nowrap">Total Biaya</th>
+              <th class="p-4 whitespace-nowrap">Pembayaran</th>
+              <th class="p-4 whitespace-nowrap">Pengiriman</th>
+              <th class="p-4 text-right whitespace-nowrap">Aksi</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-brand-border/50">
@@ -70,30 +70,36 @@
               </td>
             </tr>
             <tr v-for="item in paginatedData" :key="item.id" class="hover:bg-brand-cream/20 transition-colors">
-              <td class="p-6">
+              <td class="p-4 whitespace-nowrap">
                 <p class="font-bold text-brand-brown text-sm uppercase">#{{ item.id }}</p>
                 <p class="text-xs text-brand-muted mt-1">{{ formatDate(item.createdAt) }}</p>
               </td>
-              <td class="p-6">
+              <td class="p-4 min-w-[150px]">
                 <p class="font-bold text-brand-brown">{{ item.dataPeserta?.namaLengkap || '-' }}</p>
                 <p class="text-xs text-brand-muted mt-1">{{ item.dataPeserta?.noWa || '-' }}</p>
               </td>
-              <td class="p-6">
+              <td class="p-4 min-w-[150px]">
                 <p class="font-bold text-brand-brown mb-1">{{ item.programNama || item.dataProgram?.nama || '-' }}</p>
                 <span v-if="item.enrichedPeriode" class="bg-brand-deeper text-brand-cream text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-widest whitespace-nowrap">{{ item.enrichedPeriode }}</span>
               </td>
-              <td class="p-6 font-bold text-brand-orange">
+              <td class="p-4 font-bold text-brand-orange whitespace-nowrap">
                 Rp {{ (item.rincianBiaya?.total || 0).toLocaleString('id-ID') }}
               </td>
-              <td class="p-6">
+              <td class="p-4 whitespace-nowrap">
                 <StatusBadge :status="item.statusPembayaran" />
               </td>
-              <td class="p-6">
+              <td class="p-4 whitespace-nowrap">
                 <span v-if="item.statusPengiriman === '-'" class="text-[10px] font-bold px-3 py-1.5 rounded-full border border-gray-200 bg-gray-100 text-gray-500 uppercase tracking-wider">Tidak Beli Kitab</span>
-                <span v-else-if="item.statusPengiriman === 'dikirim'" class="text-[10px] font-bold px-3 py-1.5 rounded-full border border-green-200 bg-green-100 text-green-700 uppercase tracking-wider">Dikirim</span>
-                <span v-else class="text-[10px] font-bold px-3 py-1.5 rounded-full border border-amber-200 bg-amber-100 text-amber-700 uppercase tracking-wider">Belum Dikirim</span>
+                <template v-else-if="item.ongkir?.zona === 'ambil_sendiri'">
+                  <span v-if="item.statusPengiriman === 'dikirim'" class="text-[10px] font-bold px-3 py-1.5 rounded-full border border-blue-200 bg-blue-100 text-blue-700 uppercase tracking-wider">Sudah Diambil</span>
+                  <span v-else class="text-[10px] font-bold px-3 py-1.5 rounded-full border border-amber-200 bg-amber-100 text-amber-700 uppercase tracking-wider">Belum Diambil</span>
+                </template>
+                <template v-else>
+                  <span v-if="item.statusPengiriman === 'dikirim'" class="text-[10px] font-bold px-3 py-1.5 rounded-full border border-green-200 bg-green-100 text-green-700 uppercase tracking-wider">Dikirim</span>
+                  <span v-else class="text-[10px] font-bold px-3 py-1.5 rounded-full border border-amber-200 bg-amber-100 text-amber-700 uppercase tracking-wider">Belum Dikirim</span>
+                </template>
               </td>
-              <td class="p-6 text-right space-x-2">
+              <td class="p-4 text-right space-x-2 whitespace-nowrap">
                 <NuxtLink :to="`/admin/pendaftaran/${item.id}`" title="Detail" class="inline-flex items-center justify-center w-8 h-8 bg-brand-cream text-brand-orange hover:bg-brand-orange hover:text-white transition-colors rounded-full">
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                 </NuxtLink>

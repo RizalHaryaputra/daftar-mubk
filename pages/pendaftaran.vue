@@ -265,18 +265,25 @@
 
               <div class="space-y-6 relative z-10">
                 <div class="flex flex-col gap-2">
-                  <label class="text-sm font-bold text-white/80 uppercase tracking-wider">Alamat Lengkap <span class="text-brand-orange">*</span></label>
-                  <textarea v-model="form.dataPeserta.alamatPengiriman" :required="semuaKitabDibeli.length > 0 && currentStep === 3" rows="4" placeholder="Nama jalan, RT/RW, Desa/Kelurahan, Kecamatan, Kota/Kab, Provinsi, Kode Pos" class="px-5 py-4 text-sm rounded-xl border border-white/20 bg-white/5 focus:outline-none focus:border-brand-orange focus:bg-white/10 transition-colors w-full text-white placeholder-white/30 resize-none"></textarea>
-                </div>
-
-                <div class="flex flex-col gap-2">
                   <label class="text-sm font-bold text-white/80 uppercase tracking-wider">Zona Ongkos Kirim <span class="text-brand-orange">*</span></label>
                   <select v-model="form.ongkir.zona" :required="semuaKitabDibeli.length > 0 && currentStep === 3" class="px-5 py-4 text-sm rounded-xl border border-white/20 bg-white/5 focus:outline-none focus:border-brand-orange transition-colors w-full text-white appearance-none">
                     <option value="" class="text-black">Pilih zona pengiriman</option>
                     <option value="jogja" class="text-black">DI Yogyakarta — Rp {{ ongkirSetting.jogja?.toLocaleString('id-ID') }}</option>
                     <option value="jawa" class="text-black">Jawa Luar DIY — Rp {{ ongkirSetting.jawa?.toLocaleString('id-ID') }}</option>
                     <option value="luar_jawa" class="text-black">Luar Jawa — Rp {{ ongkirSetting.luarJawa?.toLocaleString('id-ID') }}</option>
+                    <option value="ambil_sendiri" class="text-black font-bold">Ambil Sendiri di Kantor (Gratis)</option>
                   </select>
+                </div>
+
+                <div v-if="form.ongkir.zona === 'ambil_sendiri'" class="p-5 bg-white/10 rounded-xl border border-brand-orange/50 mt-4 text-sm text-white/90">
+                  <p class="font-bold text-brand-orange mb-2">Informasi Pengambilan:</p>
+                  <p>Silakan ambil kitab Anda langsung di kantor MUBK:</p>
+                  <p class="font-bold mt-1">Jl. Pogung Rejo No.412, RT.14/RW.51, Pogung Kidul, Sinduadi, Kec. Mlati, Kabupaten Sleman, Daerah Istimewa Yogyakarta 55284</p>
+                  <a href="https://maps.app.goo.gl/dDU9oY8jouPKLCCu7" target="_blank" rel="noopener noreferrer" class="inline-block mt-3 text-brand-orange hover:text-white underline">Lihat di Google Maps</a>
+                </div>
+                <div v-else class="flex flex-col gap-2 mt-4">
+                  <label class="text-sm font-bold text-white/80 uppercase tracking-wider">Alamat Lengkap <span class="text-brand-orange">*</span></label>
+                  <textarea v-model="form.dataPeserta.alamatPengiriman" :required="semuaKitabDibeli.length > 0 && currentStep === 3 && form.ongkir.zona !== 'ambil_sendiri'" rows="4" placeholder="Nama jalan, RT/RW, Desa/Kelurahan, Kecamatan, Kota/Kab, Provinsi, Kode Pos" class="px-5 py-4 text-sm rounded-xl border border-white/20 bg-white/5 focus:outline-none focus:border-brand-orange focus:bg-white/10 transition-colors w-full text-white placeholder-white/30 resize-none"></textarea>
                 </div>
               </div>
             </div>
@@ -449,6 +456,7 @@ const nominalOngkir = computed(() => {
   if (form.value.ongkir.zona === 'jogja') return ongkirSetting.value.jogja ?? 15000;
   if (form.value.ongkir.zona === 'jawa') return ongkirSetting.value.jawa ?? 25000;
   if (form.value.ongkir.zona === 'luar_jawa') return ongkirSetting.value.luarJawa ?? 45000;
+  if (form.value.ongkir.zona === 'ambil_sendiri') return 0;
   return 0;
 });
 
@@ -574,7 +582,7 @@ const nextStep = () => {
 
   if (currentStep.value === 3) {
     if (semuaKitabDibeli.value.length > 0) {
-      if (!form.value.dataPeserta.alamatPengiriman) {
+      if (form.value.ongkir.zona !== 'ambil_sendiri' && !form.value.dataPeserta.alamatPengiriman) {
         validationError.value = 'Alamat pengiriman wajib diisi karena ada pengiriman kitab.';
         return;
       }

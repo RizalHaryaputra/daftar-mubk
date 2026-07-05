@@ -115,9 +115,15 @@
               <label class="block text-xs font-bold text-brand-muted uppercase tracking-widest mb-2">Email <span class="text-red-500">*</span></label>
               <input type="email" v-model="form.dataPeserta.email" required class="input-field" placeholder="Masukkan email aktif Anda" />
             </div>
-            <div class="md:col-span-2">
+            <div v-if="form.ongkir.zona === 'ambil_sendiri'" class="md:col-span-2 p-5 bg-brand-orange/5 border border-brand-orange/30 rounded-2xl">
+              <p class="font-bold text-brand-orange mb-2 text-sm">Informasi Pengambilan Kitab:</p>
+              <p class="text-sm text-brand-brown">Silakan ambil kitab Anda langsung di kantor MUBK:</p>
+              <p class="text-sm font-bold mt-1 text-brand-brown">Jl. Pogung Rejo No.412, RT.14/RW.51, Pogung Kidul, Sinduadi, Kec. Mlati, Kabupaten Sleman, Daerah Istimewa Yogyakarta 55284</p>
+              <a href="https://maps.app.goo.gl/dDU9oY8jouPKLCCu7" target="_blank" rel="noopener noreferrer" class="inline-block mt-3 text-sm text-brand-orange hover:text-orange-700 underline font-medium">Lihat di Google Maps</a>
+            </div>
+            <div v-else class="md:col-span-2">
               <label class="block text-xs font-bold text-brand-muted uppercase tracking-widest mb-2">Alamat Pengiriman Lengkap <span class="text-red-500">*</span></label>
-              <textarea v-model="form.dataPeserta.alamatPengiriman" required rows="3" class="input-field resize-none" placeholder="Masukkan alamat lengkap (Jalan, RT/RW, Desa, Kecamatan, Kota/Kab, Kodepos)"></textarea>
+              <textarea v-model="form.dataPeserta.alamatPengiriman" :required="form.ongkir.zona !== 'ambil_sendiri'" rows="3" class="input-field resize-none" placeholder="Masukkan alamat lengkap (Jalan, RT/RW, Desa, Kecamatan, Kota/Kab, Kodepos)"></textarea>
             </div>
             <div class="md:col-span-2 bg-brand-cream/30 p-5 rounded-2xl border border-brand-border/50">
               <label class="block text-xs font-bold text-brand-muted uppercase tracking-widest mb-3">Pilih Zona Ongkos Kirim <span class="text-red-500">*</span></label>
@@ -142,6 +148,13 @@
                     <span class="font-bold text-brand-brown text-sm">Luar Jawa</span>
                   </div>
                   <span class="text-brand-orange font-medium text-sm">Rp {{ ongkirSetting.luarJawa?.toLocaleString('id-ID') }}</span>
+                </label>
+                <label class="flex flex-col p-4 bg-white border rounded-xl cursor-pointer transition-all hover:border-brand-orange sm:col-span-3" :class="form.ongkir.zona === 'ambil_sendiri' ? 'border-brand-orange shadow-md ring-1 ring-brand-orange/50' : 'border-brand-border/50'">
+                  <div class="flex items-center gap-2 mb-2">
+                    <input type="radio" v-model="form.ongkir.zona" value="ambil_sendiri" class="w-4 h-4 text-brand-orange accent-brand-orange" />
+                    <span class="font-bold text-brand-brown text-sm">Ambil Sendiri di Kantor</span>
+                  </div>
+                  <span class="text-brand-orange font-medium text-sm">Gratis</span>
                 </label>
               </div>
             </div>
@@ -269,6 +282,7 @@ const nominalOngkir = computed(() => {
   if (form.value.ongkir.zona === 'jogja') return ongkirSetting.value.jogja ?? 15000;
   if (form.value.ongkir.zona === 'jawa') return ongkirSetting.value.jawa ?? 25000;
   if (form.value.ongkir.zona === 'luar_jawa') return ongkirSetting.value.luarJawa ?? 45000;
+  if (form.value.ongkir.zona === 'ambil_sendiri') return 0;
   return 0;
 });
 

@@ -82,10 +82,11 @@
           <div class="absolute top-0 right-0 w-32 h-32 bg-brand-cream/30 rounded-bl-full -z-10"></div>
           <h2 class="font-display text-xl text-brand-brown mb-6 flex items-center gap-2">
             <svg class="w-5 h-5 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-            Alamat Pengiriman Kitab
+            {{ item.ongkir?.zona === 'ambil_sendiri' ? 'Alamat Pengambilan Kitab' : 'Alamat Pengiriman Kitab' }}
           </h2>
           <div class="bg-brand-cream/10 p-5 rounded-[20px] border border-brand-border/50">
-            <p class="text-brand-brown font-medium leading-relaxed whitespace-pre-wrap">{{ item.dataPeserta?.alamatPengiriman || '-' }}</p>
+            <p v-if="item.ongkir?.zona === 'ambil_sendiri'" class="text-brand-orange font-bold leading-relaxed whitespace-pre-wrap">AMBIL SENDIRI DI KANTOR</p>
+            <p v-else class="text-brand-brown font-medium leading-relaxed whitespace-pre-wrap">{{ item.dataPeserta?.alamatPengiriman || '-' }}</p>
           </div>
         </div>
       </div>
@@ -148,15 +149,23 @@
 
             <!-- Status Pengiriman -->
             <div v-if="item.kitabDibeli && item.kitabDibeli.length > 0">
-              <label class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-2 block">Status Pengiriman Kitab</label>
+              <label class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-2 block">
+                {{ item.ongkir?.zona === 'ambil_sendiri' ? 'Status Pengambilan Kitab' : 'Status Pengiriman Kitab' }}
+              </label>
               <div class="relative">
                 <select 
                   v-model="item.statusPengiriman" 
                   @change="handleStatusPengirimanChange"
                   class="w-full px-5 py-4 text-sm rounded-[20px] border-2 border-brand-border/50 bg-brand-cream/10 focus:outline-none focus:border-brand-orange transition-all text-brand-brown font-bold appearance-none cursor-pointer uppercase tracking-wider"
                 >
-                  <option value="belum_dikirim">BELUM DIKIRIM</option>
-                  <option value="dikirim">SUDAH DIKIRIM</option>
+                  <template v-if="item.ongkir?.zona === 'ambil_sendiri'">
+                    <option value="belum_dikirim">BELUM DIAMBIL</option>
+                    <option value="dikirim">SUDAH DIAMBIL</option>
+                  </template>
+                  <template v-else>
+                    <option value="belum_dikirim">BELUM DIKIRIM</option>
+                    <option value="dikirim">SUDAH DIKIRIM</option>
+                  </template>
                 </select>
                 <div class="absolute inset-y-0 right-5 flex items-center pointer-events-none">
                   <svg class="w-5 h-5 text-brand-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
@@ -164,7 +173,7 @@
               </div>
 
               <!-- Form Input Resi -->
-              <div v-if="item.statusPengiriman === 'dikirim'" class="mt-4 p-4 border border-brand-border/50 rounded-xl bg-white space-y-4">
+              <div v-if="item.statusPengiriman === 'dikirim' && item.ongkir?.zona !== 'ambil_sendiri'" class="mt-4 p-4 border border-brand-border/50 rounded-xl bg-white space-y-4">
                 <div>
                   <label class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1 block">Pilih Ekspedisi</label>
                   <select v-model="item.kurirPengiriman" class="w-full px-4 py-2.5 text-sm rounded-lg border-2 border-brand-border/50 focus:border-brand-orange outline-none">
@@ -264,8 +273,12 @@ const handleStatusPengirimanChange = () => {
   if (item.value.statusPengiriman !== 'dikirim') {
     updateStatus('statusPengiriman', item.value.statusPengiriman);
   } else {
-    if (!item.value.kurirPengiriman) {
-      item.value.kurirPengiriman = '';
+    if (item.value.ongkir?.zona === 'ambil_sendiri') {
+      updateStatus('statusPengiriman', item.value.statusPengiriman);
+    } else {
+      if (!item.value.kurirPengiriman) {
+        item.value.kurirPengiriman = '';
+      }
     }
   }
 };
