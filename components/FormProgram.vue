@@ -98,13 +98,13 @@
           <!-- Tanggal Akhir -->
           <div class="flex flex-col gap-2">
             <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Tanggal Belajar Berakhir</label>
-            <input type="date" v-model="form.tanggalAkhirStr" class="input-field" />
+            <input type="date" v-model="form.tanggalAkhirStr" :min="form.tanggalMulaiStr" class="input-field" />
           </div>
 
           <!-- Batas Daftar -->
           <div class="flex flex-col gap-2">
             <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Batas Akhir Pendaftaran</label>
-            <input type="date" v-model="form.deadlineDaftarStr" class="input-field" />
+            <input type="date" v-model="form.deadlineDaftarStr" :max="form.tanggalMulaiStr" class="input-field" />
           </div>
         </div>
         
@@ -184,6 +184,7 @@
 import { ref, watch, onMounted } from 'vue';
 import Editor from '@tinymce/tinymce-vue';
 import { useRuntimeConfig } from '#imports';
+import { useToast } from '~/composables/useToast';
 import { collection, getDocs } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
 import { useNuxtApp } from '#imports';
@@ -279,6 +280,20 @@ watch(() => props.initialData, () => {
 }, { deep: true });
 
 const onSubmit = () => {
+  if (form.value.tanggalMulaiStr && form.value.tanggalAkhirStr) {
+    if (new Date(form.value.tanggalAkhirStr) < new Date(form.value.tanggalMulaiStr)) {
+      useToast().showToast('Tanggal belajar berakhir tidak boleh lebih awal dari tanggal mulai', 'error');
+      return;
+    }
+  }
+  
+  if (form.value.tanggalMulaiStr && form.value.deadlineDaftarStr) {
+    if (new Date(form.value.deadlineDaftarStr) > new Date(form.value.tanggalMulaiStr)) {
+      useToast().showToast('Batas pendaftaran tidak boleh melebihi tanggal mulai belajar', 'error');
+      return;
+    }
+  }
+
   // Convert selected checkboxes back to comma-separated string for compatibility with parent components
   form.value.kitabWajibIdsStr = selectedKitabIds.value.join(',');
   

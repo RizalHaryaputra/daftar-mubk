@@ -1,4 +1,7 @@
 import { generateInvoiceCode } from '../../../utils/generateInvoiceCode';
+import { getFirestoreDb } from '~/server/utils/firebase';
+import { createSnapTransaction } from '~/server/utils/midtrans';
+import { sendInvoiceEmail } from '~/server/utils/mailer';
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
@@ -119,6 +122,22 @@ export default defineEventHandler(async (event) => {
     'midtrans.snapToken': snapResult.token,
     updatedAt: new Date()
   });
+
+  // ===== 6. Kirim Email Invoice (Background) =====
+  if (dataPeserta?.email) {
+    let tipePesanan: 'program' | 'kitab' | 'kombinasi' = 'program';
+    if (programId && (kitabDibeli?.length ?? 0) > 0) tipePesanan = 'kombinasi';
+    else if (!programId && (kitabDibeli?.length ?? 0) > 0) tipePesanan = 'kitab';
+
+    sendInvoiceEmail({
+      to: dataPeserta.email,
+      namaLengkap: dataPeserta.namaLengkap,
+      kodeInvoice: kodeInvoice,
+      total: total,
+      items: itemDetails,
+      tipePesanan
+    }).catch(err => console.error('Gagal kirim email invoice:', err));
+  }
 
   return {
     success: true,
