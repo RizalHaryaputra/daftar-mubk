@@ -127,11 +127,16 @@ onMounted(async () => {
   try {
     const q = query(
       collection(db, 'programs'),
-      where('status', '==', 'aktif'),
-      orderBy('createdAt', 'desc')
+      where('status', '==', 'aktif')
     );
     const snapshot = await getDocs(q);
-    programs.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    let allPrograms = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    allPrograms.sort((a: any, b: any) => {
+      const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+      const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+      return dateB.getTime() - dateA.getTime();
+    });
+    programs.value = allPrograms;
   } catch (e) {
     console.error('Failed to fetch programs:', e);
     error.value = true;
