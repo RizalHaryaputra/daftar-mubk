@@ -14,10 +14,11 @@
     <!-- Error / Empty State -->
     <div v-else-if="dataError" class="bg-white/60 p-10 md:p-14 rounded-[40px] text-center border border-brand-border/50 max-w-2xl mx-auto shadow-sm">
       <div class="w-20 h-20 bg-brand-orange/10 rounded-full flex items-center justify-center mx-auto mb-6 text-brand-orange">
-        <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+        <svg v-if="!route.query.programId" class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+        <svg v-else class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
       </div>
-      <h2 class="font-display text-3xl text-brand-brown mb-3">Pilih Program Dahulu</h2>
-      <p class="text-brand-muted mb-8 leading-relaxed text-sm md:text-base">Anda harus memilih program yang ingin diikuti sebelum mengisi formulir pendaftaran ini.</p>
+      <h2 class="font-display text-3xl text-brand-brown mb-3">{{ !route.query.programId ? 'Pilih Program Dahulu' : 'Ups, Terjadi Kesalahan' }}</h2>
+      <p class="text-brand-muted mb-8 leading-relaxed text-sm md:text-base">{{ dataError }}</p>
       
       <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
         <NuxtLink to="/program" class="bg-brand-orange text-white font-bold tracking-widest uppercase text-sm px-8 py-4 rounded-full hover:bg-orange-600 transition-all hover:shadow-xl hover:-translate-y-1 w-full sm:w-auto">
