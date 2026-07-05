@@ -2,12 +2,12 @@
   <div class="space-y-6 max-w-5xl mx-auto">
     <!-- Header -->
     <div>
-      <NuxtLink to="/admin/pendaftaran" class="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-brand-muted hover:text-brand-orange transition-colors mb-4">
+      <NuxtLink to="/admin/pembelian-kitab" class="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-brand-muted hover:text-brand-orange transition-colors mb-4">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-        Kembali ke Daftar Pendaftaran
+        Kembali ke Daftar Pembelian
       </NuxtLink>
-      <h1 class="font-display text-3xl text-brand-brown">Detail Pendaftaran</h1>
-      <p class="text-brand-muted mt-2">Kelola informasi peserta, tagihan, dan status pengiriman untuk invoice <span class="font-bold text-brand-brown uppercase">#{{ id }}</span></p>
+      <h1 class="font-display text-3xl text-brand-brown">Detail Pembelian Kitab</h1>
+      <p class="text-brand-muted mt-2">Kelola informasi pembeli, tagihan, dan status pengiriman untuk invoice <span class="font-bold text-brand-brown uppercase">#{{ id }}</span></p>
     </div>
 
     <div v-if="isLoading" class="bg-white p-10 rounded-[30px] border border-brand-border/50 text-center">
@@ -37,8 +37,8 @@
               <p class="font-medium text-brand-brown text-lg">{{ item.dataPeserta?.namaLengkap || '-' }}</p>
             </div>
             <div>
-              <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Jenis Kelamin</p>
-              <p class="font-medium text-brand-brown capitalize">{{ item.dataPeserta?.jenisKelamin || '-' }}</p>
+              <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Tanggal Pembelian</p>
+              <p class="font-medium text-brand-brown">{{ formatDate(item.createdAt) }}</p>
             </div>
             <div>
               <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Nomor WhatsApp</p>
@@ -53,39 +53,26 @@
               <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Email</p>
               <p class="font-medium text-brand-brown">{{ item.dataPeserta?.email || '-' }}</p>
             </div>
-            <div>
-              <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Program yang Diikuti</p>
-              <p class="font-medium text-brand-brown">{{ item.programNama || item.dataProgram?.nama || 'Nama Program Tidak Tersedia' }}</p>
-            </div>
-            <div>
-              <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Pilihan Jadwal</p>
-              <p class="font-medium text-brand-orange">{{ item.jadwalPilihan || '-' }}</p>
-            </div>
-            
-            <div v-if="item.dataPeserta?.tempatLahir && item.dataPeserta?.tempatLahir !== '-'">
-              <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">TTL</p>
-              <p class="font-medium text-brand-brown">{{ item.dataPeserta.tempatLahir }}, {{ formatDateOnly(item.dataPeserta.tanggalLahir) }}</p>
-            </div>
-            <div v-if="item.dataPeserta?.domisili && item.dataPeserta?.domisili !== '-'">
-              <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Domisili</p>
-              <p class="font-medium text-brand-brown">{{ item.dataPeserta.domisili }}</p>
-            </div>
-            <div v-if="item.dataPeserta?.pekerjaan && item.dataPeserta?.pekerjaan !== '-'">
-              <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Pekerjaan</p>
-              <p class="font-medium text-brand-brown">{{ item.dataPeserta.pekerjaan }}</p>
-            </div>
-            <div v-if="item.dataPeserta?.pernahBelajarBahasaArab && item.dataPeserta?.pernahBelajarBahasaArab !== '-'" class="md:col-span-2">
-              <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Pernah Belajar B. Arab?</p>
-              <p class="font-medium text-brand-brown whitespace-pre-wrap leading-relaxed">{{ item.dataPeserta.pernahBelajarBahasaArab }}</p>
-            </div>
-            <div v-if="item.dataPeserta?.pernahIkutProgramMubk !== undefined && item.dataPeserta?.tempatLahir !== '-'">
-              <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Pernah Ikut MUBK?</p>
-              <p class="font-medium text-brand-brown">{{ item.dataPeserta.pernahIkutProgramMubk ? 'Ya' : 'Belum' }}</p>
-            </div>
+          </div>
+        </div>
 
-            <div>
-              <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Tanggal Daftar</p>
-              <p class="font-medium text-brand-brown">{{ formatDate(item.createdAt) }}</p>
+        <!-- Card Daftar Kitab -->
+        <div v-if="item.kitabDibeli && item.kitabDibeli.length > 0" class="bg-white rounded-[30px] border border-brand-border/50 p-8 shadow-sm relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-brand-cream/30 rounded-bl-full -z-10"></div>
+          <h2 class="font-display text-xl text-brand-brown mb-6 flex items-center gap-2">
+            <svg class="w-5 h-5 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+            Daftar Kitab yang Dibeli
+          </h2>
+          
+          <div class="space-y-4">
+            <div v-for="(kitab, idx) in item.kitabDibeli" :key="idx" class="flex justify-between items-center p-4 bg-brand-cream/10 rounded-2xl border border-brand-border/50">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-white rounded-xl border border-brand-border/50 shadow-sm flex items-center justify-center text-brand-orange font-bold text-sm">
+                  {{ kitab.qty || 1 }}x
+                </div>
+                <p class="font-bold text-brand-brown">{{ kitab.judul }}</p>
+              </div>
+              <p class="font-bold text-brand-orange">Rp {{ ((kitab.harga || 0) * (kitab.qty || 1)).toLocaleString('id-ID') }}</p>
             </div>
           </div>
         </div>
@@ -97,23 +84,9 @@
             <svg class="w-5 h-5 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
             {{ item.ongkir?.zona === 'ambil_sendiri' ? 'Alamat Pengambilan Kitab' : 'Alamat Pengiriman Kitab' }}
           </h2>
-          <div class="bg-brand-cream/10 p-5 rounded-[20px] border border-brand-border/50 mb-6">
+          <div class="bg-brand-cream/10 p-5 rounded-[20px] border border-brand-border/50">
             <p v-if="item.ongkir?.zona === 'ambil_sendiri'" class="text-brand-orange font-bold leading-relaxed whitespace-pre-wrap">AMBIL SENDIRI DI KANTOR</p>
             <p v-else class="text-brand-brown font-medium leading-relaxed whitespace-pre-wrap">{{ item.dataPeserta?.alamatPengiriman || '-' }}</p>
-          </div>
-          
-          <h3 class="font-display text-lg text-brand-brown mb-4 flex items-center gap-2 border-t border-brand-border/50 pt-6">
-            <svg class="w-5 h-5 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-            Daftar Kitab yang Dibeli
-          </h3>
-          <div class="space-y-3">
-            <div v-for="kitab in item.kitabDibeli" :key="kitab.kitabId" class="flex justify-between items-center bg-brand-cream/10 p-4 rounded-xl border border-brand-border/30">
-              <div>
-                <p class="font-bold text-brand-brown">{{ kitab.judul }}</p>
-                <p class="text-sm text-brand-muted">Rp {{ (kitab.harga || 0).toLocaleString('id-ID') }} &times; {{ kitab.qty || 1 }}</p>
-              </div>
-              <p class="font-bold text-brand-orange">Rp {{ ((kitab.harga || 0) * (kitab.qty || 1)).toLocaleString('id-ID') }}</p>
-            </div>
           </div>
         </div>
       </div>
@@ -130,10 +103,6 @@
           </h2>
           
           <div class="space-y-3 mb-6">
-            <div class="flex justify-between items-center text-white/80 text-sm">
-              <span>Biaya Program</span>
-              <span class="font-medium">Rp {{ (item.rincianBiaya?.biayaProgram ?? item.rincianBiaya?.program ?? 0).toLocaleString('id-ID') }}</span>
-            </div>
             <div class="flex justify-between items-center text-white/80 text-sm">
               <span>Pembelian Kitab</span>
               <span class="font-medium">Rp {{ (item.rincianBiaya?.totalHargaKitab ?? item.rincianBiaya?.kitab ?? 0).toLocaleString('id-ID') }}</span>
@@ -203,7 +172,7 @@
                 </div>
               </div>
 
-              <!-- Form Input Resi (hanya muncul jika dikirim dan BUKAN ambil sendiri) -->
+              <!-- Form Input Resi -->
               <div v-if="item.statusPengiriman === 'dikirim' && item.ongkir?.zona !== 'ambil_sendiri'" class="mt-4 p-4 border border-brand-border/50 rounded-xl bg-white space-y-4">
                 <div>
                   <label class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1 block">Pilih Ekspedisi</label>
@@ -282,15 +251,6 @@ const formatDate = (timestamp: any) => {
   return new Intl.DateTimeFormat('id-ID', { dateStyle: 'long', timeStyle: 'short' }).format(date);
 };
 
-const formatDateOnly = (dateStr: string) => {
-  if (!dateStr || dateStr === '1970-01-01' || dateStr === '-') return '-';
-  try {
-    return new Intl.DateTimeFormat('id-ID', { dateStyle: 'long' }).format(new Date(dateStr));
-  } catch (e) {
-    return dateStr;
-  }
-};
-
 const updateStatus = async (field: string, value: string) => {
   isUpdating.value = true;
   try {
@@ -311,15 +271,11 @@ const updateStatus = async (field: string, value: string) => {
 
 const handleStatusPengirimanChange = () => {
   if (item.value.statusPengiriman !== 'dikirim') {
-    // Jika diubah ke belum_dikirim, langsung update ke database
     updateStatus('statusPengiriman', item.value.statusPengiriman);
   } else {
-    // Jika diubah ke 'dikirim'
     if (item.value.ongkir?.zona === 'ambil_sendiri') {
-      // Jika ambil sendiri, langsung simpan status (karena tidak butuh resi)
       updateStatus('statusPengiriman', item.value.statusPengiriman);
     } else {
-      // Jika butuh kurir, tampilkan dropdown dan inisialisasi
       if (!item.value.kurirPengiriman) {
         item.value.kurirPengiriman = '';
       }

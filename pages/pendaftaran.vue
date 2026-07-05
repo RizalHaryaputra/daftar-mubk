@@ -93,7 +93,7 @@
             {{ Array.isArray(selectedProgram.jadwal) ? (selectedProgram.jadwal.length + ' Pilihan Jadwal') : selectedProgram.jadwal }} · Rp {{ selectedProgram.harga?.toLocaleString('id-ID') }}
           </p>
         </div>
-        <NuxtLink :to="`/program/${selectedProgram.id}`" class="bg-brand-orange text-white text-sm font-bold uppercase tracking-widest px-6 py-3 rounded-full hover:bg-orange-600 transition-colors text-center self-start md:self-center shrink-0">Ganti Program</NuxtLink>
+        <NuxtLink :to="`/program/${selectedProgram.slug || selectedProgram.id}`" class="bg-brand-orange text-white text-sm font-bold uppercase tracking-widest px-6 py-3 rounded-full hover:bg-orange-600 transition-colors text-center self-start md:self-center shrink-0">Ganti Program</NuxtLink>
       </div>
 
       <!-- The Form -->
@@ -207,6 +207,29 @@
         <!-- ============================== -->
         <div v-show="currentStep === 3">
           <div class="space-y-10">
+            <!-- KITAB WAJIB PROGRAM -->
+            <div v-if="kitabWajibProgram.length > 0" class="bg-white border border-brand-border rounded-[30px] p-8 md:p-10 shadow-sm relative overflow-hidden">
+              <div class="absolute -top-10 -right-10 w-32 h-32 bg-brand-orange/10 rounded-full blur-2xl pointer-events-none"></div>
+              <h2 class="font-display text-2xl text-brand-brown border-b border-brand-border/50 pb-4 mb-4 flex items-center gap-2">
+                <svg class="w-6 h-6 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                Kitab Wajib <span class="text-brand-orange text-lg font-sans normal-case italic">(Otomatis Ditambahkan)</span>
+              </h2>
+              <p class="text-sm text-brand-muted mb-8 leading-relaxed">Kitab-kitab berikut adalah persyaratan wajib untuk program <span class="font-bold text-brand-brown">{{ selectedProgram?.judul }}</span> dan telah otomatis ditambahkan ke rincian tagihan Anda.</p>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div v-for="kitab in kitabWajibProgram" :key="kitab.id" class="flex items-start gap-4 p-4 border border-brand-orange/30 bg-white rounded-[20px] shadow-sm">
+                  <div class="w-10 h-10 rounded-full bg-brand-orange/10 text-brand-orange flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                  </div>
+                  <div class="flex-1">
+                    <p class="text-base font-bold text-brand-brown leading-snug">{{ kitab.judul }}</p>
+                    <p class="text-xs text-brand-muted uppercase tracking-widest mt-1 mb-2">{{ kitab.penulis }}</p>
+                    <p class="text-sm font-bold text-brand-orange">Rp {{ kitab.harga?.toLocaleString('id-ID') }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- PILIHAN KITAB TAMBAHAN -->
             <div v-if="availableKitabs.length > 0" class="bg-white border border-brand-border rounded-[30px] p-8 md:p-10 shadow-sm">
               <h2 class="font-display text-2xl text-brand-brown border-b border-brand-border/50 pb-4 mb-4">Kitab Tambahan <span class="text-brand-muted text-lg font-sans normal-case italic">(Opsional)</span></h2>
@@ -242,18 +265,25 @@
 
               <div class="space-y-6 relative z-10">
                 <div class="flex flex-col gap-2">
-                  <label class="text-sm font-bold text-white/80 uppercase tracking-wider">Alamat Lengkap <span class="text-brand-orange">*</span></label>
-                  <textarea v-model="form.dataPeserta.alamatPengiriman" :required="semuaKitabDibeli.length > 0 && currentStep === 3" rows="4" placeholder="Nama jalan, RT/RW, Desa/Kelurahan, Kecamatan, Kota/Kab, Provinsi, Kode Pos" class="px-5 py-4 text-sm rounded-xl border border-white/20 bg-white/5 focus:outline-none focus:border-brand-orange focus:bg-white/10 transition-colors w-full text-white placeholder-white/30 resize-none"></textarea>
-                </div>
-
-                <div class="flex flex-col gap-2">
                   <label class="text-sm font-bold text-white/80 uppercase tracking-wider">Zona Ongkos Kirim <span class="text-brand-orange">*</span></label>
                   <select v-model="form.ongkir.zona" :required="semuaKitabDibeli.length > 0 && currentStep === 3" class="px-5 py-4 text-sm rounded-xl border border-white/20 bg-white/5 focus:outline-none focus:border-brand-orange transition-colors w-full text-white appearance-none">
                     <option value="" class="text-black">Pilih zona pengiriman</option>
                     <option value="jogja" class="text-black">DI Yogyakarta — Rp {{ ongkirSetting.jogja?.toLocaleString('id-ID') }}</option>
                     <option value="jawa" class="text-black">Jawa Luar DIY — Rp {{ ongkirSetting.jawa?.toLocaleString('id-ID') }}</option>
                     <option value="luar_jawa" class="text-black">Luar Jawa — Rp {{ ongkirSetting.luarJawa?.toLocaleString('id-ID') }}</option>
+                    <option value="ambil_sendiri" class="text-black font-bold">Ambil Sendiri di Kantor (Gratis)</option>
                   </select>
+                </div>
+
+                <div v-if="form.ongkir.zona === 'ambil_sendiri'" class="p-5 bg-white/10 rounded-xl border border-brand-orange/50 mt-4 text-sm text-white/90">
+                  <p class="font-bold text-brand-orange mb-2">Informasi Pengambilan:</p>
+                  <p>Silakan ambil kitab Anda langsung di kantor MUBK:</p>
+                  <p class="font-bold mt-1">Jl. Pogung Rejo No.412, RT.14/RW.51, Pogung Kidul, Sinduadi, Kec. Mlati, Kabupaten Sleman, Daerah Istimewa Yogyakarta 55284</p>
+                  <a href="https://maps.app.goo.gl/dDU9oY8jouPKLCCu7" target="_blank" rel="noopener noreferrer" class="inline-block mt-3 text-brand-orange hover:text-white underline">Lihat di Google Maps</a>
+                </div>
+                <div v-else class="flex flex-col gap-2 mt-4">
+                  <label class="text-sm font-bold text-white/80 uppercase tracking-wider">Alamat Lengkap <span class="text-brand-orange">*</span></label>
+                  <textarea v-model="form.dataPeserta.alamatPengiriman" :required="semuaKitabDibeli.length > 0 && currentStep === 3 && form.ongkir.zona !== 'ambil_sendiri'" rows="4" placeholder="Nama jalan, RT/RW, Desa/Kelurahan, Kecamatan, Kota/Kab, Provinsi, Kode Pos" class="px-5 py-4 text-sm rounded-xl border border-white/20 bg-white/5 focus:outline-none focus:border-brand-orange focus:bg-white/10 transition-colors w-full text-white placeholder-white/30 resize-none"></textarea>
                 </div>
               </div>
             </div>
@@ -347,6 +377,18 @@
           {{ submitError }}
         </div>
 
+        <!-- Pending Invoice Info (Midtrans closed) -->
+        <div v-if="pendingInvoice" class="bg-brand-cream/40 text-brand-brown p-6 rounded-[20px] text-center border border-brand-orange/30 mt-4 shadow-sm">
+          <div class="w-12 h-12 bg-brand-orange/10 rounded-full flex items-center justify-center mx-auto mb-3 text-brand-orange">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          </div>
+          <p class="font-bold text-lg mb-1">Menunggu Pembayaran</p>
+          <p class="text-sm text-brand-muted mb-4">Pendaftaran berhasil disimpan dengan nomor invoice <strong class="text-brand-orange">{{ pendingInvoice }}</strong>. Silakan lanjutkan pembayaran untuk menyelesaikan pendaftaran Anda.</p>
+          <NuxtLink :to="`/cek-status?invoice=${pendingInvoice}`" class="inline-block w-full sm:w-auto bg-brand-orange text-white font-bold tracking-widest uppercase text-xs md:text-sm px-8 py-4 rounded-full hover:bg-orange-600 transition-all hover:shadow-lg shadow-brand-orange/20">
+            Cek Status & Lanjutkan
+          </NuxtLink>
+        </div>
+
       </form>
     </template>
   </div>
@@ -379,6 +421,7 @@ const validationError = ref('');
 // State form & submission
 const isSubmitting = ref(false);
 const submitError = ref('');
+const pendingInvoice = ref('');
 const selectedKitabIds = ref<string[]>([]);
 
 const form = ref({
@@ -413,6 +456,7 @@ const nominalOngkir = computed(() => {
   if (form.value.ongkir.zona === 'jogja') return ongkirSetting.value.jogja ?? 15000;
   if (form.value.ongkir.zona === 'jawa') return ongkirSetting.value.jawa ?? 25000;
   if (form.value.ongkir.zona === 'luar_jawa') return ongkirSetting.value.luarJawa ?? 45000;
+  if (form.value.ongkir.zona === 'ambil_sendiri') return 0;
   return 0;
 });
 
@@ -427,6 +471,12 @@ onMounted(async () => {
   const programId = route.query.programId as string;
   const kitabId = route.query.kitabId as string;
 
+  // Redirect to beli-kitab if user is trying to buy a kitab without a program
+  if (!programId && kitabId) {
+    navigateTo(`/beli-kitab?kitabId=${kitabId}`);
+    return;
+  }
+
   try {
     // Load ongkir setting
     const ongkirSnap = await getDoc(doc(db, 'settings', 'ongkir'));
@@ -440,6 +490,19 @@ onMounted(async () => {
         return;
       }
       selectedProgram.value = { id: progSnap.id, ...progSnap.data() };
+
+      if (selectedProgram.value.status !== 'aktif') {
+        dataError.value = 'Mohon maaf, pendaftaran untuk program ini telah ditutup.';
+        return;
+      }
+
+      if (selectedProgram.value.deadlineDaftar) {
+        const deadline = selectedProgram.value.deadlineDaftar.toDate ? selectedProgram.value.deadlineDaftar.toDate() : new Date(selectedProgram.value.deadlineDaftar);
+        if (deadline < new Date()) {
+          dataError.value = 'Mohon maaf, batas waktu pendaftaran untuk program ini telah berakhir.';
+          return;
+        }
+      }
 
       // Auto-select jadwal jika hanya ada 1 opsi atau masih string
       if (Array.isArray(selectedProgram.value.jadwal)) {
@@ -479,8 +542,8 @@ onMounted(async () => {
       availableKitabs.value = allKitabs.filter(k => !wajibIds.has(k.id));
     }
 
-    if (!programId && !kitabId) {
-      dataError.value = 'Silakan pilih program atau kitab terlebih dahulu dari halaman yang tersedia.';
+    if (!programId) {
+      dataError.value = 'Silakan pilih program terlebih dahulu dari halaman yang tersedia.';
     }
   } catch (e) {
     console.error('Failed to load form data:', e);
@@ -519,7 +582,7 @@ const nextStep = () => {
 
   if (currentStep.value === 3) {
     if (semuaKitabDibeli.value.length > 0) {
-      if (!form.value.dataPeserta.alamatPengiriman) {
+      if (form.value.ongkir.zona !== 'ambil_sendiri' && !form.value.dataPeserta.alamatPengiriman) {
         validationError.value = 'Alamat pengiriman wajib diisi karena ada pengiriman kitab.';
         return;
       }
@@ -558,6 +621,7 @@ const submitForm = async () => {
   const payload = {
     programId: selectedProgram.value?.id ?? null,
     programNama: selectedProgram.value?.nama ?? null,
+    jadwalPilihan: form.value.jadwalPilihan ?? null,
     dataPeserta: {
       ...form.value.dataPeserta,
       alamatPengiriman: semuaKitabDibeli.value.length > 0 ? form.value.dataPeserta.alamatPengiriman : null
@@ -592,7 +656,10 @@ const submitForm = async () => {
         onSuccess: () => navigateTo(`/cek-status?invoice=${kodeInvoice}`),
         onPending: () => navigateTo(`/cek-status?invoice=${kodeInvoice}`),
         onError: () => { submitError.value = 'Terjadi error saat pembayaran. Silakan coba lagi.'; },
-        onClose: () => { submitError.value = 'Pembayaran dibatalkan. Anda bisa melanjutkan dari halaman Cek Status.'; }
+        onClose: () => {
+          submitError.value = '';
+          pendingInvoice.value = kodeInvoice;
+        }
       });
     } else {
       // Fallback redirect

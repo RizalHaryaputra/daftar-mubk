@@ -9,12 +9,8 @@
 
       <!-- Tengah: Logo -->
       <div class="flex-shrink-0 mx-2 md:mx-4">
-        <NuxtLink to="/" class="font-display text-brand-orange text-xl md:text-2xl font-bold tracking-tight flex items-center gap-2">
-          <!-- Ornamen Bintang -->
-          <svg class="w-5 h-5 md:w-6 md:h-6 text-brand-orange animate-spin-slow" viewBox="0 0 100 100" fill="currentColor">
-            <path d="M50 0 L55 45 L100 50 L55 55 L50 100 L45 55 L0 50 L45 45 Z" />
-          </svg>
-          MUBK
+        <NuxtLink to="/" class="flex items-center justify-center bg-white rounded-full p-1.5 w-10 h-10 md:w-12 md:h-12 shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+          <img src="/logo.webp" alt="Logo MUBK" class="w-full h-full object-contain" />
         </NuxtLink>
       </div>
 
@@ -44,10 +40,10 @@
         v-if="isMobileMenuOpen"
         class="md:hidden absolute top-full left-4 right-4 mt-2 bg-brand-deeper text-white rounded-[30px] p-6 shadow-2xl border border-white/10 flex flex-col gap-4 z-10"
       >
-        <NuxtLink to="/" @click="isMobileMenuOpen = false" exact-active-class="!text-brand-orange !font-bold" class="text-white/80 hover:text-brand-orange text-lg font-semibold py-2 border-b border-white/5">Beranda</NuxtLink>
-        <NuxtLink to="/program" @click="isMobileMenuOpen = false" active-class="!text-brand-orange !font-bold" class="text-white/80 hover:text-brand-orange text-lg font-semibold py-2 border-b border-white/5">Program</NuxtLink>
-        <NuxtLink to="/kitab" @click="isMobileMenuOpen = false" active-class="!text-brand-orange !font-bold" class="text-white/80 hover:text-brand-orange text-lg font-semibold py-2 border-b border-white/5">Kitab</NuxtLink>
-        <NuxtLink to="/pendaftaran" @click="isMobileMenuOpen = false" active-class="!text-brand-orange !font-bold" class="text-white/80 hover:text-brand-orange text-lg font-semibold py-2">Pendaftaran</NuxtLink>
+        <NuxtLink to="/" @click="isMobileMenuOpen = false" exact-active-class="!text-brand-orange !font-bold" class="text-white/80 hover:text-brand-orange text-sm font-medium py-2 border-b border-white/5">Beranda</NuxtLink>
+        <NuxtLink to="/program" @click="isMobileMenuOpen = false" active-class="!text-brand-orange !font-bold" class="text-white/80 hover:text-brand-orange text-sm font-medium py-2 border-b border-white/5">Program</NuxtLink>
+        <NuxtLink to="/kitab" @click="isMobileMenuOpen = false" active-class="!text-brand-orange !font-bold" class="text-white/80 hover:text-brand-orange text-sm font-medium py-2 border-b border-white/5">Kitab</NuxtLink>
+        <NuxtLink to="/pendaftaran" @click="isMobileMenuOpen = false" active-class="!text-brand-orange !font-bold" class="text-white/80 hover:text-brand-orange text-sm font-medium py-2">Pendaftaran</NuxtLink>
       </div>
     </transition>
   </div>

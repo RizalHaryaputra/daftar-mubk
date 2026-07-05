@@ -20,11 +20,13 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Hanya transaksi pending yang dapat dilanjutkan' });
   }
   
-  // Dalam real implementasi, midtrans akan block orderId yg sama jika tidak expire.
-  // Biasanya kita append timestamp ke orderId saat request ulang atau reuse snapToken lama jika belum expire.
+  const snapToken = data.midtrans?.snapToken;
+  if (!snapToken) {
+    throw createError({ statusCode: 400, statusMessage: 'Token pembayaran tidak ditemukan. Silakan hubungi admin.' });
+  }
   
   return {
     success: true,
-    snapToken: 'mock-snap-token-123456' // using mock
+    snapToken: snapToken
   };
 });

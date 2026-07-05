@@ -45,10 +45,10 @@ export const checkTransactionStatus = async (orderId: string) => {
     return response;
   } catch (error: any) {
     // If 404, Midtrans API throws error if transaction is not found or not yet created fully
-    if (error?.httpStatusCode === 404) {
+    if (error?.httpStatusCode === 404 || (error?.message && error.message.includes('404'))) {
       return null;
     }
-    console.error('Midtrans Status Check Error:', error);
+    console.error('Midtrans Status Check Error:', error.message || error);
     return null;
   }
 };

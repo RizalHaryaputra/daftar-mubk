@@ -20,11 +20,17 @@
           <svg class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-brand-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           <input v-model="searchQuery" class="w-full pl-11 pr-4 py-3 border-2 border-brand-border/50 rounded-full text-sm focus:outline-none focus:border-brand-orange transition-colors font-medium text-brand-brown" placeholder="Cari nama program..." />
         </div>
-        <select v-model="statusFilter" class="w-full sm:w-auto px-6 py-3 border-2 border-brand-border/50 rounded-full text-sm focus:outline-none focus:border-brand-orange transition-colors font-medium text-brand-brown bg-white appearance-none cursor-pointer">
-          <option value="semua">Semua Status</option>
-          <option value="aktif">Aktif Saja</option>
-          <option value="nonaktif">Nonaktif Saja</option>
-        </select>
+        <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <select v-if="availablePeriodes.length > 0" v-model="periodeFilter" class="w-full sm:w-auto px-6 py-3 border-2 border-brand-border/50 rounded-full text-sm focus:outline-none focus:border-brand-orange transition-colors font-medium text-brand-brown bg-white appearance-none cursor-pointer">
+            <option value="semua">Semua Periode</option>
+            <option v-for="p in availablePeriodes" :key="p" :value="p">{{ p }}</option>
+          </select>
+          <select v-model="statusFilter" class="w-full sm:w-auto px-6 py-3 border-2 border-brand-border/50 rounded-full text-sm focus:outline-none focus:border-brand-orange transition-colors font-medium text-brand-brown bg-white appearance-none cursor-pointer">
+            <option value="semua">Semua Status</option>
+            <option value="aktif">Aktif Saja</option>
+            <option value="nonaktif">Nonaktif Saja</option>
+          </select>
+        </div>
       </div>
 
       <div v-if="isLoading" class="p-10 text-center text-brand-muted">
@@ -53,6 +59,7 @@
               <th class="p-6">Nama Program</th>
               <th class="p-6">Jadwal</th>
               <th class="p-6">Harga</th>
+              <th class="p-6">Periode</th>
               <th class="p-6">Status</th>
               <th class="p-6 text-right">Aksi</th>
             </tr>
@@ -65,27 +72,38 @@
               </td>
               <td class="p-6 text-brand-muted">
                 <template v-if="Array.isArray(item.jadwal)">
-                  <div class="flex flex-wrap gap-2 mt-1">
-                    <span v-for="(j, idx) in item.jadwal" :key="idx" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-brand-cream/40 border border-brand-border/50 text-xs text-brand-brown font-medium">
-                      <span class="w-1.5 h-1.5 rounded-full bg-brand-orange"></span>
+                  <div class="flex flex-col gap-2 mt-1 min-w-[200px]">
+                    <span v-for="(j, idx) in item.jadwal" :key="idx" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-brand-border shadow-sm text-[11px] text-brand-brown font-medium hover:border-brand-orange transition-colors">
+                      <svg class="w-3.5 h-3.5 text-brand-orange shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                       {{ j }}
                     </span>
                   </div>
                 </template>
-                <template v-else>{{ item.jadwal }}</template>
+                <template v-else>
+                  <div class="flex flex-col mt-1 min-w-[200px]">
+                    <span class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-brand-border shadow-sm text-[11px] text-brand-brown font-medium">
+                      <svg class="w-3.5 h-3.5 text-brand-orange shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                      {{ item.jadwal }}
+                    </span>
+                  </div>
+                </template>
               </td>
               <td class="p-6 text-brand-brown font-medium">Rp {{ item.harga?.toLocaleString('id-ID') }}</td>
+              <td class="p-6">
+                <span v-if="item.periode" class="bg-brand-deeper text-brand-cream text-[10px] font-bold px-3 py-1 rounded-md uppercase tracking-widest whitespace-nowrap">{{ item.periode }}</span>
+                <span v-else class="text-brand-muted text-xs italic">-</span>
+              </td>
               <td class="p-6">
                 <span :class="item.status === 'aktif' ? 'text-green-700 bg-green-100 border-green-200' : 'text-gray-500 bg-gray-100 border-gray-200'" class="text-xs font-bold px-3 py-1.5 rounded-full border uppercase tracking-wider">
                   {{ item.status }}
                 </span>
               </td>
               <td class="p-6 text-right space-x-2">
-                <NuxtLink :to="`/admin/program/${item.id}`" class="inline-block px-4 py-2 bg-brand-cream text-brand-orange hover:bg-brand-orange hover:text-white transition-colors rounded-full font-bold text-xs uppercase tracking-wider">
-                  Edit
+                <NuxtLink :to="`/admin/program/${item.id}`" title="Edit" class="inline-flex items-center justify-center w-8 h-8 bg-brand-cream text-brand-orange hover:bg-brand-orange hover:text-white transition-colors rounded-full">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                 </NuxtLink>
-                <button @click="deleteProgram(item.id)" class="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-colors rounded-full font-bold text-xs uppercase tracking-wider">
-                  Hapus
+                <button @click="deleteProgram(item.id)" title="Hapus" class="inline-flex items-center justify-center w-8 h-8 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-colors rounded-full">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                 </button>
               </td>
             </tr>
@@ -122,9 +140,10 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { collection, getDocs, doc, deleteDoc, orderBy, query } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
 import { useNuxtApp } from '#imports';
+import { useToast } from '~/composables/useToast';
 
 definePageMeta({ layout: 'admin', middleware: ['admin-auth'] });
 
@@ -132,10 +151,12 @@ const { $db } = useNuxtApp();
 const db = $db as Firestore;
 const programs = ref<any[]>([]);
 const isLoading = ref(true);
+const { showToast } = useToast();
 
 // States for Filter & Pagination
 const searchQuery = ref('');
 const statusFilter = ref('semua');
+const periodeFilter = ref('semua');
 const currentPage = ref(1);
 const itemsPerPage = 10;
 
@@ -174,9 +195,10 @@ const executeDelete = async () => {
   try {
     await deleteDoc(doc(db, 'programs', itemToDelete.value));
     fetchPrograms(); // Refresh the list
+    showToast('Program berhasil dihapus!', 'success');
   } catch (error) {
     console.error("Error deleting program", error);
-    alert('Gagal menghapus program.');
+    showToast('Gagal menghapus program.', 'error');
   } finally {
     isConfirmOpen.value = false;
     itemToDelete.value = null;
@@ -202,7 +224,19 @@ const filteredPrograms = computed(() => {
     result = result.filter(p => p.status === statusFilter.value);
   }
 
+  if (periodeFilter.value !== 'semua') {
+    result = result.filter(p => p.periode === periodeFilter.value);
+  }
+
   return result;
+});
+
+const availablePeriodes = computed(() => {
+  const periodes = new Set<string>();
+  programs.value.forEach(p => {
+    if (p.periode) periodes.add(p.periode);
+  });
+  return Array.from(periodes).sort();
 });
 
 const totalPages = computed(() => {

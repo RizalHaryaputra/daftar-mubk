@@ -31,8 +31,32 @@
 
       <!-- Deskripsi -->
       <div class="flex flex-col gap-2">
-        <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Deskripsi Singkat <span class="text-brand-orange">*</span></label>
-        <textarea v-model="form.deskripsi" required rows="3" class="input-field resize-none" placeholder="Deskripsi tentang kitab ini..."></textarea>
+        <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Deskripsi Singkat<span class="text-brand-orange">*</span></label>
+        <textarea v-model="form.deskripsiSingkat" required rows="2" class="input-field resize-none" placeholder="Deskripsi pendek untuk ditampilkan di kartu..."></textarea>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Deskripsi Lengkap <span class="text-brand-orange">*</span></label>
+        <ClientOnly>
+          <Editor
+            v-model="form.deskripsi"
+            :api-key="useRuntimeConfig().public.tinymceApiKey"
+            :init="{
+              height: 300,
+              menubar: false,
+              plugins: [
+                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+              ],
+              toolbar: 'undo redo | blocks | ' +
+                'bold italic forecolor | alignleft aligncenter ' +
+                'alignright alignjustify | bullist numlist outdent indent | ' +
+                'removeformat | help',
+              content_style: 'body { font-family:Plus Jakarta Sans,Arial,sans-serif; font-size:14px; color: #43302b; }'
+            }"
+          />
+        </ClientOnly>
       </div>
 
       <!-- Harga & Gambar -->
@@ -75,6 +99,8 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue';
+import Editor from '@tinymce/tinymce-vue';
+import { useRuntimeConfig } from '#imports';
 
 const props = defineProps({
   initialData: {
@@ -92,7 +118,7 @@ const emit = defineEmits(['submit']);
 const isEditing = ref(false);
 
 const defaultForm = () => ({
-  judul: '', penulis: '', kategori: '', deskripsi: '',
+  judul: '', penulis: '', kategori: '', deskripsi: '', deskripsiSingkat: '',
   harga: 0, status: 'aktif', gambarUrl: '', bisaStandalone: true
 });
 
@@ -107,6 +133,7 @@ const populateForm = () => {
       penulis: item.penulis ?? '',
       kategori: item.kategori ?? '',
       deskripsi: item.deskripsi ?? '',
+      deskripsiSingkat: item.deskripsiSingkat ?? '',
       harga: item.harga ?? 0,
       status: item.status ?? 'aktif',
       gambarUrl: item.gambarUrl ?? '',

@@ -18,12 +18,40 @@
 
       <!-- Deskripsi -->
       <div class="flex flex-col gap-2">
-        <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Deskripsi Lengkap <span class="text-brand-orange">*</span></label>
-        <textarea v-model="form.deskripsi" required rows="4" class="input-field resize-none" placeholder="Jelaskan detail tentang program ini..."></textarea>
+        <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Deskripsi Singkat<span class="text-brand-orange">*</span></label>
+        <textarea v-model="form.deskripsiSingkat" required rows="2" class="input-field resize-none" placeholder="Deskripsi pendek untuk ditampilkan di kartu..."></textarea>
       </div>
 
-      <!-- Durasi & Harga -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="flex flex-col gap-2">
+        <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Deskripsi Lengkap <span class="text-brand-orange">*</span></label>
+        <ClientOnly>
+          <Editor
+            v-model="form.deskripsi"
+            :api-key="useRuntimeConfig().public.tinymceApiKey"
+            :init="{
+              height: 300,
+              menubar: false,
+              plugins: [
+                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+              ],
+              toolbar: 'undo redo | blocks | ' +
+                'bold italic forecolor | alignleft aligncenter ' +
+                'alignright alignjustify | bullist numlist outdent indent | ' +
+                'removeformat | help',
+              content_style: 'body { font-family:Plus Jakarta Sans,Arial,sans-serif; font-size:14px; color: #43302b; }'
+            }"
+          />
+        </ClientOnly>
+      </div>
+
+      <!-- Durasi, Harga, Periode -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="flex flex-col gap-2">
+          <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Periode <span class="text-brand-orange">*</span></label>
+          <input v-model="form.periode" required class="input-field" placeholder="Contoh: Gel. 1 / Batch 2" />
+        </div>
         <div class="flex flex-col gap-2">
           <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Durasi Program <span class="text-brand-orange">*</span></label>
           <input v-model="form.durasi" required class="input-field" placeholder="Contoh: 3 bulan (12 pekan)" />
@@ -32,6 +60,13 @@
           <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Harga Pendaftaran (Rp) <span class="text-brand-orange">*</span></label>
           <input type="number" v-model="form.harga" required class="input-field" placeholder="0" />
         </div>
+      </div>
+
+      <!-- Tautan Grup WhatsApp -->
+      <div class="flex flex-col gap-2">
+        <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Tautan Grup WhatsApp (Opsional)</label>
+        <input type="url" v-model="form.linkGrupWa" class="input-field" placeholder="Contoh: https://chat.whatsapp.com/..." />
+        <p class="text-[11px] text-brand-muted mt-1">Tautan ini hanya akan ditampilkan ke peserta setelah mereka melunasi pembayaran program.</p>
       </div>
 
       <!-- Opsi Jadwal Belajar (Full Width Box) -->
@@ -67,10 +102,16 @@
             <input type="date" v-model="form.tanggalMulaiStr" class="input-field" />
           </div>
 
+          <!-- Tanggal Akhir -->
+          <div class="flex flex-col gap-2">
+            <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Tanggal Belajar Berakhir</label>
+            <input type="date" v-model="form.tanggalAkhirStr" :min="form.tanggalMulaiStr" class="input-field" />
+          </div>
+
           <!-- Batas Daftar -->
           <div class="flex flex-col gap-2">
             <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Batas Akhir Pendaftaran</label>
-            <input type="date" v-model="form.deadlineDaftarStr" class="input-field" />
+            <input type="date" v-model="form.deadlineDaftarStr" :max="form.tanggalMulaiStr" class="input-field" />
           </div>
         </div>
         
@@ -148,6 +189,9 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue';
+import Editor from '@tinymce/tinymce-vue';
+import { useRuntimeConfig } from '#imports';
+import { useToast } from '~/composables/useToast';
 import { collection, getDocs } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
 import { useNuxtApp } from '#imports';
@@ -175,9 +219,13 @@ const kitabsList = ref<any[]>([]);
 const selectedKitabIds = ref<string[]>([]);
 
 const defaultForm = () => ({
-  nama: '', deskripsi: '', jadwal: [''], durasi: '',
-  harga: 0, status: 'aktif', gambarUrl: '',
-  tanggalMulaiStr: '', deadlineDaftarStr: '',
+  nama: '',
+  deskripsi: '',
+  deskripsiSingkat: '',
+  jadwal: [''],
+  durasi: '',
+  harga: 0, status: 'aktif', gambarUrl: '', periode: '', linkGrupWa: '',
+  tanggalMulaiStr: '', tanggalAkhirStr: '', deadlineDaftarStr: '',
   wajibBeliKitab: false, kitabWajibIdsStr: ''
 });
 
@@ -197,15 +245,19 @@ const populateForm = () => {
     form.value = {
       nama: item.nama ?? '',
       deskripsi: item.deskripsi ?? '',
+      deskripsiSingkat: item.deskripsiSingkat ?? '',
       jadwal: jadwalArr,
       durasi: item.durasi ?? '',
       harga: item.harga ?? 0,
       status: item.status ?? 'aktif',
       gambarUrl: item.gambarUrl ?? '',
+      periode: item.periode ?? '',
       tanggalMulaiStr: item.tanggalMulai?.toDate?.()?.toISOString().split('T')[0] ?? '',
+      tanggalAkhirStr: item.tanggalAkhir?.toDate?.()?.toISOString().split('T')[0] ?? '',
       deadlineDaftarStr: item.deadlineDaftar?.toDate?.()?.toISOString().split('T')[0] ?? '',
       wajibBeliKitab: item.wajibBeliKitab ?? false,
-      kitabWajibIdsStr: ''
+      kitabWajibIdsStr: '',
+      linkGrupWa: item.linkGrupWa ?? ''
     };
     
     // Set checkboxes based on initialData.kitabWajibIds
@@ -236,6 +288,20 @@ watch(() => props.initialData, () => {
 }, { deep: true });
 
 const onSubmit = () => {
+  if (form.value.tanggalMulaiStr && form.value.tanggalAkhirStr) {
+    if (new Date(form.value.tanggalAkhirStr) < new Date(form.value.tanggalMulaiStr)) {
+      useToast().showToast('Tanggal belajar berakhir tidak boleh lebih awal dari tanggal mulai', 'error');
+      return;
+    }
+  }
+  
+  if (form.value.tanggalMulaiStr && form.value.deadlineDaftarStr) {
+    if (new Date(form.value.deadlineDaftarStr) > new Date(form.value.tanggalMulaiStr)) {
+      useToast().showToast('Batas pendaftaran tidak boleh melebihi tanggal mulai belajar', 'error');
+      return;
+    }
+  }
+
   // Convert selected checkboxes back to comma-separated string for compatibility with parent components
   form.value.kitabWajibIdsStr = selectedKitabIds.value.join(',');
   

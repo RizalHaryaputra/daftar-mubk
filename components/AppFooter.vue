@@ -1,27 +1,56 @@
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
+import type { Firestore } from 'firebase/firestore';
+import { useNuxtApp } from '#imports';
+
+const latestPrograms = ref<any[]>([]);
+
+onMounted(async () => {
+  try {
+    const { $db } = useNuxtApp();
+    const db = $db as Firestore;
+    
+    const q = query(
+      collection(db, 'programs'),
+      where('status', '==', 'aktif'),
+      orderBy('createdAt', 'desc'),
+      limit(3)
+    );
+    const snap = await getDocs(q);
+    latestPrograms.value = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (e) {
+    console.error('Failed to load footer programs:', e);
+  }
+});
+</script>
+
 <template>
   <div class="bg-brand-deeper w-full px-4 md:px-8 pb-6 md:pb-8 pt-8">
     <footer class="bg-brand-orange text-white rounded-[40px] max-w-7xl mx-auto px-8 md:px-12 py-12 md:py-16 flex flex-col shadow-2xl">
       
-      <!-- Top Section: Brand & Tagline -->
-      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-16">
-        <span class="font-display text-4xl md:text-5xl font-bold tracking-tight">MUBK</span>
-        <!-- <p class="text-white/90 text-sm md:text-base max-w-md md:text-right font-medium leading-relaxed">
-          Pusat pembelajaran bahasa Arab intensif di Yogyakarta. 
-          Membantu Anda merubah niat menjadi pemahaman nyata melalui kurikulum terstruktur.
-        </p> -->
-      </div>
-
-      <!-- Middle Section: Links Grid -->
-      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-x-8 gap-y-12 mb-16">
+      <!-- Main Footer Content -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-x-8 gap-y-12 mb-16">
         
+        <!-- Brand & Description (Takes 2 columns on lg) -->
+        <div class="lg:col-span-2 flex flex-col items-start md:pr-12">
+          <div class="bg-white p-3 md:p-4 rounded-[20px] md:rounded-[24px] mb-6 inline-block shadow-xl">
+            <img src="/logo.webp" alt="Logo MUBK" class="h-10 md:h-14 w-auto object-contain" />
+          </div>
+          <p class="text-white/90 text-sm md:text-base font-medium leading-relaxed">
+            Pusat pembelajaran bahasa Arab intensif di Yogyakarta. 
+            Membantu Anda merubah niat menjadi pemahaman nyata melalui kurikulum terstruktur dan bimbingan pengajar profesional.
+          </p>
+        </div>
+
         <!-- Column 1 -->
         <div>
           <h4 class="font-bold text-xs uppercase tracking-widest mb-6 opacity-80">Program Kami</h4>
           <ul class="space-y-4">
-            <li><NuxtLink to="/program" class="text-sm opacity-90 hover:opacity-100 transition-opacity">Nahwu Dasar</NuxtLink></li>
-            <li><NuxtLink to="/program" class="text-sm opacity-90 hover:opacity-100 transition-opacity">Sharaf Menengah</NuxtLink></li>
-            <li><NuxtLink to="/program" class="text-sm opacity-90 hover:opacity-100 transition-opacity">Baca Kitab</NuxtLink></li>
-            <li><NuxtLink to="/program" class="text-sm opacity-90 hover:opacity-100 transition-opacity">Semua Program &rarr;</NuxtLink></li>
+            <li v-for="prog in latestPrograms" :key="prog.id">
+              <NuxtLink :to="`/program/${prog.slug || prog.id}`" class="text-sm opacity-90 hover:opacity-100 transition-opacity">{{ prog.nama }}</NuxtLink>
+            </li>
+            <li><NuxtLink to="/program" class="text-sm font-thin opacity-90 hover:opacity-100 transition-opacity">Semua Program &rarr;</NuxtLink></li>
           </ul>
         </div>
         
@@ -44,20 +73,6 @@
             <li><a href="#" class="text-sm font-thin opacity-90 hover:opacity-100 transition-opacity">Panduan Belajar</a></li>
             <li><a href="#" class="text-sm font-thin opacity-90 hover:opacity-100 transition-opacity">Syarat & Ketentuan</a></li>
           </ul>
-        </div>
-        
-        <!-- Newsletter (Takes up 2 columns on large screens) -->
-        <div class="col-span-2 lg:col-span-2">
-          <h4 class="font-bold text-xs uppercase tracking-widest mb-6 opacity-80">Berlangganan Newsletter</h4>
-          <p class="text-sm font-thin mb-6 opacity-90 leading-relaxed">
-            Dapatkan informasi pendaftaran gelombang baru dan materi bahasa Arab eksklusif langsung ke email Anda.
-          </p>
-          <div class="flex gap-2">
-            <input type="email" placeholder="Masukkan email Anda" class="w-full bg-white/20 placeholder-white/80 border border-white/40 text-white rounded-full px-5 py-3 text-sm font-medium focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-colors" />
-            <button class="bg-white text-brand-orange px-6 py-3 rounded-full text-sm font-bold hover:bg-brand-cream transition-colors whitespace-nowrap shadow-md">
-              Langganan
-            </button>
-          </div>
         </div>
       </div>
 

@@ -1,5 +1,5 @@
 <template>
-  <NuxtLink :to="`/program/${program.id}`" class="group bg-white border border-brand-border rounded-[30px] overflow-hidden hover:shadow-2xl hover:shadow-brand-deeper/10 transition-all duration-300 flex flex-col h-full relative hover:-translate-y-2">
+  <NuxtLink :to="`/program/${program.slug || program.id}`" class="group bg-white border border-brand-border rounded-[30px] overflow-hidden hover:shadow-2xl hover:shadow-brand-deeper/10 transition-all duration-300 flex flex-col h-full relative hover:-translate-y-2">
     <!-- Gambar Cover -->
     <div class="relative h-56 bg-brand-deeper overflow-hidden">
       <img v-if="program.gambarUrl" :src="program.gambarUrl" :alt="program.nama" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500" />
@@ -14,7 +14,7 @@
       
       <!-- Badge Status -->
       <div class="absolute top-4 right-4 z-10">
-        <span v-if="program.status === 'aktif'" class="bg-brand-orange text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg">
+        <span v-if="isRegistrationOpen" class="bg-brand-orange text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg">
           Buka
         </span>
         <span v-else class="bg-white/90 text-brand-deeper text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg">
@@ -32,7 +32,7 @@
     <div class="p-6 md:p-8 flex-1 flex flex-col">
       <h3 class="font-display text-2xl text-brand-brown leading-tight mb-3 group-hover:text-brand-orange transition-colors">{{ program.nama }}</h3>
       <p class="text-sm text-brand-muted mb-6 line-clamp-3">
-        {{ program.deskripsi || 'Program intensif dengan ' + (Array.isArray(program.jadwal) ? program.jadwal.length + ' pilihan jadwal' : 'jadwal ' + program.jadwal) + '. Sangat cocok untuk Anda yang ingin belajar secara terstruktur.' }}
+        {{ program.deskripsiSingkat || stripHtml(program.deskripsi) || 'Program intensif dengan ' + (Array.isArray(program.jadwal) ? program.jadwal.length + ' pilihan jadwal' : 'jadwal ' + program.jadwal) + '. Sangat cocok untuk Anda yang ingin belajar secara terstruktur.' }}
       </p>
 
       <!-- Footer / Price -->
@@ -50,10 +50,21 @@
 </template>
 
 <script setup lang="ts">
-defineProps({
+import { computed } from 'vue';
+
+const props = defineProps({
   program: {
     type: Object,
     required: true
   }
+});
+
+const isRegistrationOpen = computed(() => {
+  if (!props.program || props.program.status !== 'aktif') return false;
+  if (props.program.deadlineDaftar) {
+    const deadline = props.program.deadlineDaftar.toDate ? props.program.deadlineDaftar.toDate() : new Date(props.program.deadlineDaftar);
+    if (deadline < new Date()) return false;
+  }
+  return true;
 });
 </script>

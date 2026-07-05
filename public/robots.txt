@@ -1,2 +1,5 @@
-User-Agent: *
-Disallow:
+User-agent: *
+Disallow: /admin/
+Allow: /
+
+Sitemap: https://daftar.mahadumar.id/sitemap.xml

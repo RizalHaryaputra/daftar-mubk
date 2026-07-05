@@ -2,7 +2,7 @@
   <div class="space-y-8">
     <!-- Header -->
     <div>
-      <NuxtLink to="/admin/kitab" class="inline-flex items-center gap-2 text-sm text-brand-muted hover:text-brand-orange transition-colors mb-4">
+      <NuxtLink to="/admin/kitab" class="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-brand-muted hover:text-brand-orange transition-colors mb-4">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
         Kembali ke Daftar Kitab
       </NuxtLink>
@@ -29,6 +29,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
 import { useNuxtApp } from '#imports';
+import { useToast } from '~/composables/useToast';
 
 definePageMeta({
   layout: 'admin',
@@ -41,6 +42,7 @@ const { $db } = useNuxtApp();
 const db = $db as Firestore;
 
 const id = route.params.id as string;
+const { showToast } = useToast();
 
 const isLoading = ref(true);
 const isSaving = ref(false);
@@ -68,17 +70,17 @@ const handleSubmit = async (formData: any) => {
   try {
     const dataToUpdate = {
       ...formData,
+      slug: generateSlug(formData.judul),
       harga: Number(formData.harga),
       updatedAt: new Date()
     };
     
     await updateDoc(doc(db, 'kitabs', id), dataToUpdate);
-    
-    // Redirect back to list
+    showToast('Kitab berhasil diperbarui!', 'success');
     router.push('/admin/kitab');
   } catch (error) {
     console.error('Error updating kitab:', error);
-    alert('Terjadi kesalahan saat menyimpan perubahan.');
+    showToast('Gagal memperbarui kitab.', 'error');
   } finally {
     isSaving.value = false;
   }

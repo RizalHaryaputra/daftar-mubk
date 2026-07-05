@@ -1,4 +1,7 @@
 import { generateInvoiceCode } from '../../../utils/generateInvoiceCode';
+import { getFirestoreDb } from '~/server/utils/firebase';
+import { createSnapTransaction } from '~/server/utils/midtrans';
+import { sendInvoiceEmail } from '~/server/utils/mailer';
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
@@ -41,6 +44,15 @@ export default defineEventHandler(async (event) => {
   // ===== 2. Generate Kode Invoice =====
   const kodeInvoice = generateInvoiceCode();
 
+  // Ambil linkGrupWa dari collection program jika ada
+  let linkGrupWa = null;
+  if (programId) {
+    const programSnap = await db.collection('programs').doc(programId).get();
+    if (programSnap.exists) {
+      linkGrupWa = programSnap.data()?.linkGrupWa || null;
+    }
+  }
+
   // ===== 3. Simpan ke Firestore =====
   const pendaftaranData = {
     kodeInvoice,
@@ -61,6 +73,7 @@ export default defineEventHandler(async (event) => {
       ongkir: rincianBiaya?.ongkir ?? 0,
       total: rincianBiaya?.total ?? 0
     },
+    linkGrupWa,
     statusPembayaran: 'pending',
     statusPengiriman: kitabDibeli?.length > 0 ? 'belum_dikirim' : '-',
     midtrans: {
@@ -119,6 +132,22 @@ export default defineEventHandler(async (event) => {
     'midtrans.snapToken': snapResult.token,
     updatedAt: new Date()
   });
+
+  // ===== 6. Kirim Email Invoice (Background) =====
+  if (dataPeserta?.email) {
+    let tipePesanan: 'program' | 'kitab' | 'kombinasi' = 'program';
+    if (programId && (kitabDibeli?.length ?? 0) > 0) tipePesanan = 'kombinasi';
+    else if (!programId && (kitabDibeli?.length ?? 0) > 0) tipePesanan = 'kitab';
+
+    sendInvoiceEmail({
+      to: dataPeserta.email,
+      namaLengkap: dataPeserta.namaLengkap,
+      kodeInvoice: kodeInvoice,
+      total: total,
+      items: itemDetails,
+      tipePesanan
+    }).catch(err => console.error('Gagal kirim email invoice:', err));
+  }
 
   return {
     success: true,

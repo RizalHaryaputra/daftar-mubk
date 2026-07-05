@@ -2,10 +2,11 @@
   <div class="bg-brand-cream font-sans selection:bg-brand-orange selection:text-white">
     
     <!-- 1. HERO SECTION (Light, with dark background behind the rounded bottom) -->
-    <div class="bg-brand-deeper">
-      <section class="bg-brand-cream rounded-b-[40px] md:rounded-b-[80px] pt-8 pb-32 px-6 relative overflow-hidden flex flex-col items-center text-center shadow-2xl">
+    <div class="relative">
+      <div class="absolute bottom-0 left-0 right-0 h-1/2 bg-brand-deeper"></div>
+      <section class="bg-brand-cream rounded-b-[40px] md:rounded-b-[80px] pt-8 pb-32 px-6 relative overflow-hidden flex flex-col items-center text-center">
       <!-- Ornamen aksen (mirip sinar matahari di desain, kita pakai oranye) -->
-      <div class="absolute top-12 left-12 md:top-24 md:left-24 text-brand-orange opacity-40">
+      <div class="hidden md:block absolute top-12 left-12 md:top-24 md:left-24 text-brand-orange opacity-40">
         <svg class="w-16 h-16 md:w-24 md:h-24 animate-spin-slow" viewBox="0 0 100 100" fill="currentColor">
           <path d="M50 0 L55 45 L100 50 L55 55 L50 100 L45 55 L0 50 L45 45 Z" />
         </svg>
@@ -111,20 +112,31 @@
             </div>
             <div v-else-if="programs.length === 0" class="text-white/50 text-sm py-4">Belum ada program unggulan.</div>
             <template v-else>
-              <div 
+              <NuxtLink 
                 v-for="(prog, idx) in programs" 
                 :key="prog.id"
+                :to="`/program/${prog.slug || prog.id}`"
                 @mouseenter="hoveredProgram = prog"
-                class="group flex items-center justify-between p-5 rounded-xl border transition-all cursor-pointer"
+                class="group flex items-center justify-between p-5 rounded-xl border transition-all cursor-pointer block"
                 :class="hoveredProgram?.id === prog.id ? 'border-brand-orange bg-white/5' : 'border-white/10 hover:border-white/30'"
               >
                 <div class="flex items-center gap-4">
                   <span class="text-white/40 font-mono text-sm">0{{ idx + 1 }}</span>
-                  <span class="text-white font-medium group-hover:text-brand-orange transition-colors">{{ prog.nama }}</span>
+                  <span class="text-white font-medium group-hover:text-brand-orange transition-colors flex items-center gap-2">
+                    {{ prog.nama }}
+                    <span v-if="prog.periode" class="hidden sm:inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest bg-white/10 text-white group-hover:bg-brand-orange transition-colors">{{ prog.periode }}</span>
+                  </span>
                 </div>
                 <span class="text-white/40 group-hover:text-brand-orange transition-transform group-hover:translate-x-2">&rarr;</span>
-              </div>
+              </NuxtLink>
             </template>
+          </div>
+
+          <div class="mt-10">
+            <NuxtLink to="/program" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-brand-orange text-brand-deeper font-bold uppercase tracking-wider text-sm hover:bg-white hover:-translate-y-1 transition-all shadow-lg shadow-brand-orange/20">
+              Lihat Semua Program
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+            </NuxtLink>
           </div>
         </div>
 
@@ -136,11 +148,11 @@
             <div class="absolute inset-0 bg-gradient-to-t from-brand-deeper via-brand-deeper/50 to-transparent opacity-90"></div>
             
             <div class="absolute bottom-8 left-8 right-8">
-              <p class="text-brand-orange text-xs font-bold uppercase tracking-widest mb-2">{{ hoveredProgram.level || 'Umum' }}</p>
+              <p class="text-brand-orange text-xs font-bold uppercase tracking-widest mb-2">{{ hoveredProgram.periode || 'Program Reguler' }}</p>
               <h3 class="font-display text-2xl text-white mb-2">{{ hoveredProgram.nama }}</h3>
               <p class="text-white/70 text-sm line-clamp-2 mb-4">{{ Array.isArray(hoveredProgram.jadwal) ? (hoveredProgram.jadwal.length + ' Pilihan Jadwal') : hoveredProgram.jadwal }} · Rp {{ (hoveredProgram.harga || 0).toLocaleString('id-ID') }}</p>
               
-              <NuxtLink :to="`/program/${hoveredProgram.id}`" class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white text-brand-deeper hover:bg-brand-orange hover:text-white transition-colors">
+              <NuxtLink :to="`/program/${hoveredProgram.slug || hoveredProgram.id}`" class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white text-brand-deeper hover:bg-brand-orange hover:text-white transition-colors">
                 <span class="rotate-45 block transform -translate-y-px">&uarr;</span>
               </NuxtLink>
             </div>
@@ -228,7 +240,7 @@
       </div>
       <div v-else-if="kitabs.length === 0" class="text-white/50 text-center py-10">Belum ada kitab pilihan.</div>
       <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <NuxtLink :to="`/kitab/${kitab.id}`" v-for="kitab in kitabs" :key="kitab.id" class="bg-white rounded-[24px] p-6 text-center border-4 border-transparent hover:border-brand-orange/20 flex flex-col items-center group relative hover:-translate-y-2 transition-all duration-300 shadow-xl">
+        <NuxtLink :to="`/kitab/${kitab.slug || kitab.id}`" v-for="kitab in kitabs" :key="kitab.id" class="bg-white rounded-[24px] p-6 text-center border-4 border-transparent hover:border-brand-orange/20 flex flex-col items-center group relative hover:-translate-y-2 transition-all duration-300 shadow-xl">
           <div class="w-16 h-16 rounded-full bg-brand-cream flex items-center justify-center mb-5 text-brand-orange border-2 border-brand-orange/20 relative group-hover:scale-110 transition-transform">
             <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
             <div class="absolute -top-1 -right-1 w-4 h-4 bg-brand-orange rounded-full border-2 border-white"></div>
@@ -248,8 +260,8 @@
     <!-- 7. FOOTER / CTA -->
     <section class="px-6 py-24 mt-12 relative overflow-hidden">
       <!-- Ornamen -->
-      <div class="absolute top-0 right-0 text-brand-orange/5 translate-x-1/3 -translate-y-1/3 pointer-events-none">
-        <svg width="400" height="400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2 10 10 2-10 2-2 10-2-10-10-2 10-2z"/></svg>
+      <div class="absolute top-0 right-0 md:top-4 md:right-10 text-brand-orange/5 pointer-events-none">
+        <svg width="250" height="250" md:width="350" md:height="350" viewBox="0 0 24 24" fill="currentColor" class="w-64 h-64 md:w-96 md:h-96"><path d="M12 0l2 10 10 2-10 2-2 10-2-10-10-2 10-2z"/></svg>
       </div>
 
       <div class="max-w-4xl mx-auto text-center space-y-8 relative z-10">
@@ -272,14 +284,12 @@
 </template>
 
 <script setup lang="ts">
+
 import { ref, onMounted } from 'vue';
 import { useNuxtApp } from '#imports';
 import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
 
-definePageMeta({
-  layout: 'landing'
-});
 
 const { $db } = useNuxtApp();
 const db = $db as Firestore;
@@ -291,26 +301,37 @@ const isLoading = ref(true);
 
 onMounted(async () => {
   try {
+    // Ambil program aktif, lalu urutkan di client untuk menghindari error Composite Index Firestore
     const qPrograms = query(
       collection(db, 'programs'),
-      where('status', '==', 'aktif'),
-      orderBy('createdAt', 'desc'),
-      limit(4)
+      where('status', '==', 'aktif')
     );
     const snapPrograms = await getDocs(qPrograms);
-    programs.value = snapPrograms.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    let allPrograms = snapPrograms.docs.map(doc => ({ id: doc.id, ...doc.data() })) as any[];
+    allPrograms.sort((a, b) => {
+      const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+      const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+      return dateB.getTime() - dateA.getTime();
+    });
+    programs.value = allPrograms.slice(0, 4);
+    
     if (programs.value.length > 0) {
       hoveredProgram.value = programs.value[0];
     }
 
+    // Ambil kitab aktif, urutkan di client
     const qKitabs = query(
       collection(db, 'kitabs'),
-      where('status', '==', 'aktif'),
-      orderBy('createdAt', 'desc'),
-      limit(4)
+      where('status', '==', 'aktif')
     );
     const snapKitabs = await getDocs(qKitabs);
-    kitabs.value = snapKitabs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    let allKitabs = snapKitabs.docs.map(doc => ({ id: doc.id, ...doc.data() })) as any[];
+    allKitabs.sort((a, b) => {
+      const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+      const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+      return dateB.getTime() - dateA.getTime();
+    });
+    kitabs.value = allKitabs.slice(0, 4);
   } catch (error) {
     console.error('Error fetching data for landing page:', error);
   } finally {

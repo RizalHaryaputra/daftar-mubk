@@ -1,75 +1,70 @@
-# Nuxt Minimal Starter
+# Portal Pendaftaran MUBK
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Portal web resmi untuk Pendaftaran Program Pembelajaran dan Pembelian Kitab Mahad Umar Bin Khattab (MUBK). Aplikasi ini dibangun dengan framework modern untuk memberikan pengalaman pengguna yang cepat, responsif, dan aman.
 
-## Setup
+## 🚀 Fitur Utama
 
-Make sure to install dependencies:
+- **Pendaftaran Program & Pembelian Kitab:** Integrasi form pendaftaran program dan pembelian kitab dalam satu alur (Checkout) maupun terpisah.
+- **Pembayaran Otomatis:** Terintegrasi dengan **Midtrans (Snap API)** untuk memproses pembayaran secara *real-time* (E-Wallet, Virtual Account, Qris, dll).
+- **Perhitungan Ongkos Kirim Dinamis:** Sistem perhitungan ongkos kirim berdasarkan zona wilayah, termasuk opsi "Ambil Sendiri di Kantor" (Rp 0).
+- **Pelacakan Pengiriman (Resi):** Sistem pelacakan pengiriman kitab. Admin dapat menginput nomor resi dan sistem akan otomatis mengirimkan email notifikasi ke peserta.
+- **Notifikasi Email Otomatis:** Mengirim kuitansi (Invoice) Lunas, serta informasi pengiriman barang langsung ke email peserta menggunakan **Nodemailer**.
+- **Dashboard Admin (CMS):** Area khusus pengurus untuk mengelola data pendaftaran, pesanan kitab, program baru, ongkos kirim, dan meng-ekspor data ke format Excel.
+- **Optimasi SEO & Performa:** Dukungan meta tag Open Graph (OG), pembuatan sitemap otomatis, rendering sisi server (SSR) yang cepat, serta *image optimization*.
 
-```bash
-# npm
-npm install
+## 🛠 Teknologi yang Digunakan
 
-# pnpm
-pnpm install
+- **Frontend:** [Nuxt 3](https://nuxt.com/), [Vue 3](https://vuejs.org/), [Tailwind CSS](https://tailwindcss.com/)
+- **Backend & Database:** [Firebase Firestore](https://firebase.google.com/docs/firestore) (Database NoSQL)
+- **Payment Gateway:** [Midtrans](https://midtrans.com/)
+- **Email Service:** Nodemailer (SMTP)
+- **Deployment:** [Vercel](https://vercel.com/) (Rekomendasi)
 
-# yarn
-yarn install
+## 📦 Panduan Instalasi (Development)
 
-# bun
-bun install
-```
+Pastikan Anda sudah menginstal Node.js (versi 18+) di perangkat Anda.
 
-## Development Server
+1. **Kloning Repositori & Instalasi Dependensi**
+   ```bash
+   npm install
+   ```
 
-Start the development server on `http://localhost:3000`:
+2. **Konfigurasi Environment Variables**
+   Buat file `.env` di *root folder* proyek Anda dan isi kredensial berikut:
 
-```bash
-# npm
-npm run dev
+   ```env
+   # Firebase Config
+   FIREBASE_API_KEY=your_api_key
+   FIREBASE_AUTH_DOMAIN=your_auth_domain
+   FIREBASE_PROJECT_ID=your_project_id
+   FIREBASE_STORAGE_BUCKET=your_storage_bucket
+   FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+   FIREBASE_APP_ID=your_app_id
 
-# pnpm
-pnpm dev
+   # Midtrans Config
+   MIDTRANS_CLIENT_KEY=your_client_key
+   MIDTRANS_SERVER_KEY=your_server_key
+   MIDTRANS_IS_PRODUCTION=false
 
-# yarn
-yarn dev
+   # Email Config (Nodemailer)
+   EMAIL_USER=your_email@gmail.com
+   EMAIL_PASS=your_app_password
+   ```
 
-# bun
-bun run dev
-```
+3. **Jalankan Development Server**
+   ```bash
+   npm run dev
+   ```
+   Aplikasi akan berjalan di `http://localhost:3000`.
 
-## Production
+## 🚀 Panduan Deployment (Vercel)
 
-Build the application for production:
+Aplikasi ini sangat siap untuk diluncurkan ke Vercel. 
+1. Hubungkan repositori GitHub Anda ke Vercel.
+2. Atur **Framework Preset** ke `Nuxt.js`.
+3. Masukkan seluruh konfigurasi dari file `.env` ke bagian **Environment Variables** di Vercel.
+4. Klik **Deploy**.
+5. Pastikan domain `daftar.mahadumar.id` sudah dikonfigurasi dan dihubungkan pada menu *Domains* di Vercel.
 
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+---
+*Dibuat untuk memudahkan operasional Mahad Umar Bin Khattab.*

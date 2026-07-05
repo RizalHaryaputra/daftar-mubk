@@ -93,11 +93,7 @@
                 <svg class="w-6 h-6 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 Deskripsi Kitab
               </h2>
-              <div class="prose prose-brand max-w-none text-brand-muted leading-relaxed">
-                <p v-for="(paragraph, index) in kitab.deskripsi.split('\n')" :key="index" class="mb-4">
-                  {{ paragraph }}
-                </p>
-              </div>
+              <div class="prose prose-brand max-w-none text-brand-muted leading-relaxed" v-html="kitab.deskripsi"></div>
             </div>
           </div>
           
@@ -130,7 +126,7 @@
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useNuxtApp } from '#imports';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs, limit } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
 
 const route = useRoute();
@@ -143,15 +139,26 @@ const error = ref(false);
 
 onMounted(async () => {
   try {
-    const kitabId = route.params.id as string;
-    const docRef = doc(db, 'kitabs', kitabId);
-    const docSnap = await getDoc(docRef);
+    const routeSlug = route.params.slug as string;
+    
+    // Attempt to find by slug first
+    const q = query(collection(db, 'kitabs'), where('slug', '==', routeSlug), limit(1));
+    const querySnapshot = await getDocs(q);
+    
+    if (!querySnapshot.empty && querySnapshot.docs.length > 0) {
+      const docSnap = querySnapshot.docs[0]!;
+      kitab.value = { id: docSnap.id, ...docSnap.data() };
+    } else {
+      // Fallback to fetching by ID
+      const docRef = doc(db, 'kitabs', routeSlug);
+      const docSnap = await getDoc(docRef);
 
-    if (!docSnap.exists()) {
-      error.value = true;
-      return;
+      if (!docSnap.exists()) {
+        error.value = true;
+        return;
+      }
+      kitab.value = { id: docSnap.id, ...docSnap.data() };
     }
-    kitab.value = { id: docSnap.id, ...docSnap.data() };
   } catch (e) {
     console.error('Failed to fetch kitab:', e);
     error.value = true;

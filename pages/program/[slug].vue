@@ -51,13 +51,16 @@
               </div>
             </div>
             
-            <!-- Floating Badge -->
-            <div class="absolute top-8 right-8 shadow-lg">
-              <span v-if="program.status === 'aktif'" class="bg-brand-orange text-white text-xs font-bold px-4 py-2 rounded-full uppercase tracking-widest shadow-lg shadow-brand-orange/20">
+            <!-- Floating Badges -->
+            <div class="absolute top-8 right-8 flex flex-col gap-2 items-end">
+              <span v-if="isRegistrationOpen" class="bg-brand-orange text-white text-xs font-bold px-4 py-2 rounded-full uppercase tracking-widest shadow-lg shadow-brand-orange/20">
                 Terbuka
               </span>
               <span v-else class="bg-gray-100 text-gray-500 border border-gray-200 text-xs font-bold px-4 py-2 rounded-full uppercase tracking-widest">
                 Ditutup
+              </span>
+              <span v-if="program.periode" class="bg-brand-deeper text-brand-cream text-xs font-bold px-4 py-2 rounded-full uppercase tracking-widest shadow-lg">
+                {{ program.periode }}
               </span>
             </div>
           </div>
@@ -70,46 +73,78 @@
           <div>
             <h1 class="font-display text-4xl md:text-5xl lg:text-6xl text-brand-brown mb-6 leading-tight">{{ program.nama }}</h1>
             
-            <!-- Quick Stats -->
-            <div class="grid grid-cols-2 gap-4 md:gap-6 py-6 border-y border-brand-border/50">
-              <div class="flex flex-col gap-1">
-                <span class="text-xs text-brand-muted uppercase tracking-widest font-bold flex items-center gap-1.5">
-                  <svg class="w-4 h-4 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                  Durasi
-                </span>
-                <span class="text-base font-medium text-brand-brown">{{ program.durasi }}</span>
+            <!-- Premium Quick Stats -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 py-6">
+              
+              <!-- Card Durasi -->
+              <div class="bg-brand-cream/30 border border-brand-orange/20 rounded-2xl p-5 hover:bg-brand-cream/50 transition-colors">
+                <div class="flex items-center gap-2 mb-3">
+                  <div class="w-8 h-8 rounded-full bg-brand-orange/10 flex items-center justify-center text-brand-orange">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  </div>
+                  <span class="text-xs text-brand-muted uppercase tracking-widest font-bold">Durasi Belajar</span>
+                </div>
+                <div class="pl-1">
+                  <p class="text-xl font-display text-brand-brown mb-1">{{ program.durasi }}</p>
+                  <div v-if="program.tanggalMulai && program.tanggalAkhir" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white border border-brand-border/50 text-[11px] text-brand-muted font-medium mt-1">
+                    <svg class="w-3 h-3 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    {{ formatDate(program.tanggalMulai) }} - {{ formatDate(program.tanggalAkhir) }}
+                  </div>
+                </div>
               </div>
               
-              <div class="flex flex-col gap-1">
-                <span class="text-xs text-brand-muted uppercase tracking-widest font-bold flex items-center gap-1.5">
-                  <svg class="w-4 h-4 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                  Biaya
-                </span>
-                <span class="text-base font-bold text-brand-orange">Rp {{ program.harga?.toLocaleString('id-ID') }}</span>
+              <!-- Card Biaya -->
+              <div class="bg-brand-orange/5 border border-brand-orange/20 rounded-2xl p-5 hover:bg-brand-orange/10 transition-colors relative overflow-hidden">
+                <!-- Aksen SVG -->
+                <div class="absolute -right-6 -top-6 text-brand-orange/10 pointer-events-none">
+                  <svg class="w-24 h-24" fill="currentColor" viewBox="0 0 100 100"><path d="M50 0 L55 45 L100 50 L55 55 L50 100 L45 55 L0 50 L45 45 Z" /></svg>
+                </div>
+                
+                <div class="flex items-center gap-2 mb-3 relative z-10">
+                  <div class="w-8 h-8 rounded-full bg-brand-orange text-white flex items-center justify-center shadow-md shadow-brand-orange/20">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  </div>
+                  <span class="text-xs text-brand-orange uppercase tracking-widest font-bold">Biaya Program</span>
+                </div>
+                <div class="pl-1 relative z-10">
+                  <div class="flex items-baseline gap-1">
+                    <span class="text-brand-orange font-bold">Rp</span>
+                    <span class="text-3xl md:text-4xl font-display font-bold text-brand-orange tracking-tight">{{ program.harga?.toLocaleString('id-ID') }}</span>
+                  </div>
+                </div>
               </div>
 
-              <div class="flex flex-col gap-1 col-span-2 mt-2 pt-4 border-t border-brand-border/30 border-dashed">
-                <span class="text-xs text-brand-muted uppercase tracking-widest font-bold flex items-center gap-1.5 mb-1">
-                  <svg class="w-4 h-4 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                  Pilihan Jadwal
-                </span>
-                <span class="text-base font-medium text-brand-brown">
+              <!-- Pilihan Jadwal -->
+              <div class="sm:col-span-2 mt-2">
+                <div class="flex items-center gap-3 mb-4">
+                  <h3 class="font-display text-xl text-brand-brown">Pilihan Jadwal</h3>
+                  <div class="h-px bg-brand-border/50 flex-grow"></div>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <template v-if="Array.isArray(program.jadwal)">
-                    <div class="flex flex-wrap gap-2 mt-1">
-                      <span v-for="(j, idx) in program.jadwal" :key="idx" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-brand-cream/50 border border-brand-orange/20 text-sm font-medium text-brand-brown">
-                        <svg class="w-4 h-4 text-brand-orange shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        <span class="leading-tight">{{ j }}</span>
-                      </span>
+                    <div v-for="(j, idx) in program.jadwal" :key="idx" class="flex items-center gap-3 p-4 rounded-xl border border-brand-border/60 bg-white hover:border-brand-orange/50 hover:shadow-md transition-all group cursor-default">
+                      <div class="w-10 h-10 rounded-full bg-brand-cream flex items-center justify-center shrink-0 group-hover:bg-brand-orange/10 transition-colors">
+                        <svg class="w-5 h-5 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                      </div>
+                      <span class="text-sm font-medium text-brand-brown leading-snug">{{ j }}</span>
                     </div>
                   </template>
-                  <template v-else>{{ program.jadwal }}</template>
-                </span>
+                  <template v-else>
+                    <div class="flex items-center gap-3 p-4 rounded-xl border border-brand-border/60 bg-white hover:border-brand-orange/50 hover:shadow-md transition-all group cursor-default">
+                      <div class="w-10 h-10 rounded-full bg-brand-cream flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                      </div>
+                      <span class="text-sm font-medium text-brand-brown leading-snug">{{ program.jadwal }}</span>
+                    </div>
+                  </template>
+                </div>
               </div>
             </div>
           </div>
           
           <!-- Deadline Banner -->
-          <div v-if="program.deadlineDaftar && program.status === 'aktif'" class="bg-brand-cream/50 border border-brand-orange/30 rounded-2xl p-5 flex items-start gap-4">
+          <div v-if="program.deadlineDaftar && isRegistrationOpen" class="bg-brand-cream/50 border border-brand-orange/30 rounded-2xl p-5 flex items-start gap-4">
             <div class="w-10 h-10 rounded-full bg-brand-orange/10 flex items-center justify-center text-brand-orange shrink-0">
               <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             </div>
@@ -122,11 +157,7 @@
           <!-- Description -->
           <div class="space-y-4">
             <h2 class="font-display text-2xl text-brand-brown">Tentang Program</h2>
-            <div class="prose prose-brand max-w-none text-brand-muted leading-relaxed">
-              <p v-for="(paragraph, index) in program.deskripsi.split('\n')" :key="index" class="mb-4">
-                {{ paragraph }}
-              </p>
-            </div>
+            <div class="prose prose-brand max-w-none text-brand-muted leading-relaxed" v-html="program.deskripsi"></div>
           </div>
 
           <!-- Kitab Wajib Section -->
@@ -137,7 +168,7 @@
             </div>
             
             <div class="grid grid-cols-1 gap-4">
-              <NuxtLink v-for="k in kitabWajib" :key="k.id" :to="`/kitab/${k.id}`" class="group flex items-start gap-4 p-4 rounded-[20px] border border-brand-border/50 hover:border-brand-orange hover:shadow-lg transition-all bg-white">
+              <NuxtLink v-for="k in kitabWajib" :key="k.id" :to="`/kitab/${k.slug || k.id}`" class="group flex items-start gap-4 p-4 rounded-[20px] border border-brand-border/50 hover:border-brand-orange hover:shadow-lg transition-all bg-white">
                 <div class="w-20 h-24 bg-brand-cream/30 rounded-xl overflow-hidden shrink-0 border border-brand-border/30">
                   <img v-if="k.gambarUrl" :src="k.gambarUrl" :alt="k.judul" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   <div v-else class="w-full h-full flex items-center justify-center text-brand-orange/30 font-serif text-3xl">ن</div>
@@ -164,7 +195,7 @@
             </div>
             
             <NuxtLink 
-              v-if="program.status === 'aktif'" 
+              v-if="isRegistrationOpen" 
               :to="`/pendaftaran?programId=${program.id}`"
               class="relative z-10 bg-brand-orange text-white px-8 py-4 rounded-full font-bold uppercase tracking-widest text-sm hover:bg-orange-600 hover:shadow-[0_0_20px_rgba(198,132,54,0.4)] hover:-translate-y-1 transition-all shrink-0 w-full md:w-auto text-center"
             >
@@ -182,10 +213,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useNuxtApp } from '#imports';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs, limit } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
 
 const route = useRoute();
@@ -203,18 +234,37 @@ const formatDate = (ts: any) => {
   return new Intl.DateTimeFormat('id-ID', { dateStyle: 'long' }).format(date);
 };
 
+const isRegistrationOpen = computed(() => {
+  if (!program.value || program.value.status !== 'aktif') return false;
+  if (program.value.deadlineDaftar) {
+    const deadline = program.value.deadlineDaftar.toDate ? program.value.deadlineDaftar.toDate() : new Date(program.value.deadlineDaftar);
+    if (deadline < new Date()) return false;
+  }
+  return true;
+});
+
 onMounted(async () => {
   try {
-    const programId = route.params.id as string;
-    const docRef = doc(db, 'programs', programId);
-    const docSnap = await getDoc(docRef);
+    const routeSlug = route.params.slug as string;
+    
+    // Attempt to find by slug first
+    const q = query(collection(db, 'programs'), where('slug', '==', routeSlug), limit(1));
+    const querySnapshot = await getDocs(q);
+    
+    if (!querySnapshot.empty && querySnapshot.docs.length > 0) {
+      const docSnap = querySnapshot.docs[0]!;
+      program.value = { id: docSnap.id, ...docSnap.data() };
+    } else {
+      // Fallback to fetching by ID for backward compatibility
+      const docRef = doc(db, 'programs', routeSlug);
+      const docSnap = await getDoc(docRef);
 
-    if (!docSnap.exists()) {
-      error.value = true;
-      return;
+      if (!docSnap.exists()) {
+        error.value = true;
+        return;
+      }
+      program.value = { id: docSnap.id, ...docSnap.data() };
     }
-
-    program.value = { id: docSnap.id, ...docSnap.data() };
 
     // Fetch kitab wajib jika ada
     if (program.value.wajibBeliKitab && program.value.kitabWajibIds?.length > 0) {
