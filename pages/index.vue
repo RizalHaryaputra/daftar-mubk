@@ -122,7 +122,10 @@
               >
                 <div class="flex items-center gap-4">
                   <span class="text-white/40 font-mono text-sm">0{{ idx + 1 }}</span>
-                  <span class="text-white font-medium group-hover:text-brand-orange transition-colors">{{ prog.nama }}</span>
+                  <span class="text-white font-medium group-hover:text-brand-orange transition-colors flex items-center gap-2">
+                    {{ prog.nama }}
+                    <span v-if="prog.periode" class="hidden sm:inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest bg-white/10 text-white group-hover:bg-brand-orange transition-colors">{{ prog.periode }}</span>
+                  </span>
                 </div>
                 <span class="text-white/40 group-hover:text-brand-orange transition-transform group-hover:translate-x-2">&rarr;</span>
               </NuxtLink>
@@ -145,7 +148,7 @@
             <div class="absolute inset-0 bg-gradient-to-t from-brand-deeper via-brand-deeper/50 to-transparent opacity-90"></div>
             
             <div class="absolute bottom-8 left-8 right-8">
-              <p class="text-brand-orange text-xs font-bold uppercase tracking-widest mb-2">{{ hoveredProgram.level || 'Umum' }}</p>
+              <p class="text-brand-orange text-xs font-bold uppercase tracking-widest mb-2">{{ hoveredProgram.periode || 'Program Reguler' }}</p>
               <h3 class="font-display text-2xl text-white mb-2">{{ hoveredProgram.nama }}</h3>
               <p class="text-white/70 text-sm line-clamp-2 mb-4">{{ Array.isArray(hoveredProgram.jadwal) ? (hoveredProgram.jadwal.length + ' Pilihan Jadwal') : hoveredProgram.jadwal }} · Rp {{ (hoveredProgram.harga || 0).toLocaleString('id-ID') }}</p>
               

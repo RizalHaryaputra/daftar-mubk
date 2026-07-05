@@ -56,6 +56,27 @@
           </div>
         </div>
 
+        <!-- Card Daftar Kitab -->
+        <div v-if="item.kitabDibeli && item.kitabDibeli.length > 0" class="bg-white rounded-[30px] border border-brand-border/50 p-8 shadow-sm relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-brand-cream/30 rounded-bl-full -z-10"></div>
+          <h2 class="font-display text-xl text-brand-brown mb-6 flex items-center gap-2">
+            <svg class="w-5 h-5 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+            Daftar Kitab yang Dibeli
+          </h2>
+          
+          <div class="space-y-4">
+            <div v-for="(kitab, idx) in item.kitabDibeli" :key="idx" class="flex justify-between items-center p-4 bg-brand-cream/10 rounded-2xl border border-brand-border/50">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-white rounded-xl border border-brand-border/50 shadow-sm flex items-center justify-center text-brand-orange font-bold text-sm">
+                  {{ kitab.qty || 1 }}x
+                </div>
+                <p class="font-bold text-brand-brown">{{ kitab.judul }}</p>
+              </div>
+              <p class="font-bold text-brand-orange">Rp {{ ((kitab.harga || 0) * (kitab.qty || 1)).toLocaleString('id-ID') }}</p>
+            </div>
+          </div>
+        </div>
+
         <!-- Card Alamat Pengiriman (Hanya jika beli kitab) -->
         <div v-if="item.kitabDibeli && item.kitabDibeli.length > 0" class="bg-white rounded-[30px] border border-brand-border/50 p-8 shadow-sm relative overflow-hidden">
           <div class="absolute top-0 right-0 w-32 h-32 bg-brand-cream/30 rounded-bl-full -z-10"></div>

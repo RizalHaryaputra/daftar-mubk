@@ -25,6 +25,11 @@
         </div>
         
         <div class="flex gap-2 w-full sm:w-auto">
+          <select v-if="availablePeriodes.length > 0" v-model="filterPeriode" class="w-full sm:w-auto px-6 py-3 rounded-full border-2 border-brand-border/50 bg-white focus:outline-none focus:border-brand-orange text-brand-brown font-medium cursor-pointer text-sm appearance-none">
+            <option value="">Semua Periode</option>
+            <option v-for="p in availablePeriodes" :key="p" :value="p">{{ p }}</option>
+          </select>
+          
           <select v-model="filterStatus" class="w-full sm:w-auto px-6 py-3 rounded-full border-2 border-brand-border/50 bg-white focus:outline-none focus:border-brand-orange text-brand-brown font-medium cursor-pointer text-sm appearance-none">
             <option value="">Semua Status</option>
             <option value="pending">Menunggu</option>
@@ -46,6 +51,7 @@
             <tr>
               <th class="p-6">Invoice & Waktu</th>
               <th class="p-6">Peserta</th>
+              <th class="p-6">Program</th>
               <th class="p-6">Total Biaya</th>
               <th class="p-6">Pembayaran</th>
               <th class="p-6">Pengiriman</th>
@@ -60,12 +66,16 @@
             </tr>
             <tr v-for="item in paginatedData" :key="item.id" class="hover:bg-brand-cream/20 transition-colors">
               <td class="p-6">
-                <p class="font-bold text-brand-brown text-base uppercase">#{{ item.id }}</p>
+                <p class="font-bold text-brand-brown text-sm uppercase">#{{ item.id }}</p>
                 <p class="text-xs text-brand-muted mt-1">{{ formatDate(item.createdAt) }}</p>
               </td>
               <td class="p-6">
                 <p class="font-bold text-brand-brown">{{ item.dataPeserta?.namaLengkap || '-' }}</p>
                 <p class="text-xs text-brand-muted mt-1">{{ item.dataPeserta?.noWa || '-' }}</p>
+              </td>
+              <td class="p-6">
+                <p class="font-bold text-brand-brown mb-1">{{ item.programNama || item.dataProgram?.nama || '-' }}</p>
+                <span v-if="item.enrichedPeriode" class="bg-brand-deeper text-brand-cream text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-widest whitespace-nowrap">{{ item.enrichedPeriode }}</span>
               </td>
               <td class="p-6 font-bold text-brand-orange">
                 Rp {{ (item.rincianBiaya?.total || 0).toLocaleString('id-ID') }}
@@ -121,16 +131,32 @@ const isLoading = ref(true);
 // States for Filter & Pagination
 const searchQuery = ref('');
 const filterStatus = ref('');
+const filterPeriode = ref('');
 const currentPage = ref(1);
 const itemsPerPage = 10;
 
 const fetchPendaftaran = async () => {
   isLoading.value = true;
   try {
+    // Fetch programs to map periode
+    const programsSnap = await getDocs(collection(db, 'programs'));
+    const programsMap = new Map();
+    programsSnap.forEach(doc => {
+      programsMap.set(doc.id, doc.data());
+    });
+
     const q = query(collection(db, 'pendaftaran'), orderBy('createdAt', 'desc'));
     const snap = await getDocs(q);
     pendaftaranList.value = snap.docs
-      .map(doc => ({ id: doc.id, ...doc.data() }))
+      .map(doc => {
+        const data = doc.data();
+        const p = programsMap.get(data.programId);
+        return { 
+          id: doc.id, 
+          ...data,
+          enrichedPeriode: p?.periode || null
+        };
+      })
       .filter((doc: any) => doc.programId !== null);
   } catch (error) {
     console.error("Error fetching pendaftaran", error);
@@ -163,11 +189,23 @@ const filteredData = computed(() => {
     result = result.filter(p => p.statusPembayaran === filterStatus.value);
   }
 
+  if (filterPeriode.value) {
+    result = result.filter(p => p.enrichedPeriode === filterPeriode.value);
+  }
+
   return result;
 });
 
+const availablePeriodes = computed(() => {
+  const periodes = new Set<string>();
+  pendaftaranList.value.forEach(p => {
+    if (p.enrichedPeriode) periodes.add(p.enrichedPeriode);
+  });
+  return Array.from(periodes).sort();
+});
+
 // Reset page when filter changes
-watch([searchQuery, filterStatus], () => {
+watch([searchQuery, filterStatus, filterPeriode], () => {
   currentPage.value = 1;
 });
 

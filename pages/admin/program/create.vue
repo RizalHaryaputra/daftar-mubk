@@ -41,6 +41,7 @@ const handleSave = async (formData: any) => {
       jadwal: formData.jadwal,
       durasi: formData.durasi,
       harga: Number(formData.harga),
+      periode: formData.periode || '',
       status: formData.status,
       gambarUrl: formData.gambarUrl || null,
       wajibBeliKitab: formData.wajibBeliKitab,
@@ -49,6 +50,7 @@ const handleSave = async (formData: any) => {
     };
 
     if (formData.tanggalMulaiStr) data.tanggalMulai = Timestamp.fromDate(new Date(formData.tanggalMulaiStr));
+    if (formData.tanggalAkhirStr) data.tanggalAkhir = Timestamp.fromDate(new Date(formData.tanggalAkhirStr));
     if (formData.deadlineDaftarStr) data.deadlineDaftar = Timestamp.fromDate(new Date(formData.deadlineDaftarStr));
 
     await addDoc(collection(db, 'programs'), { ...data, createdAt: new Date() });

@@ -22,8 +22,12 @@
         <textarea v-model="form.deskripsi" required rows="4" class="input-field resize-none" placeholder="Jelaskan detail tentang program ini..."></textarea>
       </div>
 
-      <!-- Durasi & Harga -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Durasi, Harga, Periode -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="flex flex-col gap-2">
+          <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Periode <span class="text-brand-orange">*</span></label>
+          <input v-model="form.periode" required class="input-field" placeholder="Contoh: Gel. 1 / Batch 2" />
+        </div>
         <div class="flex flex-col gap-2">
           <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Durasi Program <span class="text-brand-orange">*</span></label>
           <input v-model="form.durasi" required class="input-field" placeholder="Contoh: 3 bulan (12 pekan)" />
@@ -65,6 +69,12 @@
           <div class="flex flex-col gap-2">
             <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Tanggal Mulai Belajar</label>
             <input type="date" v-model="form.tanggalMulaiStr" class="input-field" />
+          </div>
+
+          <!-- Tanggal Akhir -->
+          <div class="flex flex-col gap-2">
+            <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Tanggal Belajar Berakhir</label>
+            <input type="date" v-model="form.tanggalAkhirStr" class="input-field" />
           </div>
 
           <!-- Batas Daftar -->
@@ -176,8 +186,8 @@ const selectedKitabIds = ref<string[]>([]);
 
 const defaultForm = () => ({
   nama: '', deskripsi: '', jadwal: [''], durasi: '',
-  harga: 0, status: 'aktif', gambarUrl: '',
-  tanggalMulaiStr: '', deadlineDaftarStr: '',
+  harga: 0, status: 'aktif', gambarUrl: '', periode: '',
+  tanggalMulaiStr: '', tanggalAkhirStr: '', deadlineDaftarStr: '',
   wajibBeliKitab: false, kitabWajibIdsStr: ''
 });
 
@@ -202,7 +212,9 @@ const populateForm = () => {
       harga: item.harga ?? 0,
       status: item.status ?? 'aktif',
       gambarUrl: item.gambarUrl ?? '',
+      periode: item.periode ?? '',
       tanggalMulaiStr: item.tanggalMulai?.toDate?.()?.toISOString().split('T')[0] ?? '',
+      tanggalAkhirStr: item.tanggalAkhir?.toDate?.()?.toISOString().split('T')[0] ?? '',
       deadlineDaftarStr: item.deadlineDaftar?.toDate?.()?.toISOString().split('T')[0] ?? '',
       wajibBeliKitab: item.wajibBeliKitab ?? false,
       kitabWajibIdsStr: ''

@@ -46,6 +46,7 @@
             <tr>
               <th class="p-6">Invoice & Waktu</th>
               <th class="p-6">Pembeli</th>
+              <th class="p-6">Kitab</th>
               <th class="p-6">Total Bayar</th>
               <th class="p-6">Pembayaran</th>
               <th class="p-6">Pengiriman</th>
@@ -60,12 +61,21 @@
             </tr>
             <tr v-for="item in paginatedData" :key="item.id" class="hover:bg-brand-cream/20 transition-colors">
               <td class="p-6">
-                <p class="font-bold text-brand-brown text-base uppercase">#{{ item.id }}</p>
+                <p class="font-bold text-brand-brown text-sm uppercase">#{{ item.id }}</p>
                 <p class="text-xs text-brand-muted mt-1">{{ formatDate(item.createdAt) }}</p>
               </td>
               <td class="p-6">
                 <p class="font-bold text-brand-brown">{{ item.dataPeserta?.namaLengkap || '-' }}</p>
                 <p class="text-xs text-brand-muted mt-1">{{ item.dataPeserta?.noWa || '-' }}</p>
+              </td>
+              <td class="p-6 max-w-[200px]">
+                <ul v-if="item.kitabDibeli && item.kitabDibeli.length > 0" class="space-y-1">
+                  <li v-for="(kitab, kIdx) in item.kitabDibeli" :key="kIdx" class="text-xs font-medium text-brand-brown whitespace-normal flex gap-1">
+                    <span class="text-brand-orange shrink-0">&bull;</span> 
+                    <span>{{ kitab.judul }} <span v-if="kitab.qty > 1" class="text-brand-muted">({{ kitab.qty }}x)</span></span>
+                  </li>
+                </ul>
+                <span v-else class="text-xs text-brand-muted italic">-</span>
               </td>
               <td class="p-6 font-bold text-brand-orange">
                 Rp {{ (item.rincianBiaya?.total || 0).toLocaleString('id-ID') }}
