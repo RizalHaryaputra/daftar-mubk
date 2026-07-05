@@ -183,7 +183,7 @@
               <div class="relative">
                 <select 
                   v-model="item.statusPengiriman" 
-                  @change="updateStatus('statusPengiriman', item.statusPengiriman)"
+                  @change="handleStatusPengirimanChange"
                   class="w-full px-5 py-4 text-sm rounded-[20px] border-2 border-brand-border/50 bg-brand-cream/10 focus:outline-none focus:border-brand-orange transition-all text-brand-brown font-bold appearance-none cursor-pointer uppercase tracking-wider"
                 >
                   <option value="belum_dikirim">BELUM DIKIRIM</option>
@@ -192,6 +192,32 @@
                 <div class="absolute inset-y-0 right-5 flex items-center pointer-events-none">
                   <svg class="w-5 h-5 text-brand-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                 </div>
+              </div>
+
+              <!-- Form Input Resi (hanya muncul jika dikirim) -->
+              <div v-if="item.statusPengiriman === 'dikirim'" class="mt-4 p-4 border border-brand-border/50 rounded-xl bg-white space-y-4">
+                <div>
+                  <label class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1 block">Pilih Ekspedisi</label>
+                  <select v-model="item.kurirPengiriman" class="w-full px-4 py-2.5 text-sm rounded-lg border-2 border-brand-border/50 focus:border-brand-orange outline-none">
+                    <option value="" disabled>Pilih Kurir</option>
+                    <option value="JNE">JNE</option>
+                    <option value="J&T Express">J&T Express</option>
+                    <option value="SiCepat">SiCepat</option>
+                    <option value="Pos Indonesia">Pos Indonesia</option>
+                    <option value="AnterAja">AnterAja</option>
+                    <option value="Wahana">Wahana</option>
+                    <option value="Ninja Xpress">Ninja Xpress</option>
+                    <option value="Shopee Express">Shopee Express</option>
+                    <option value="Lainnya">Lainnya</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1 block">Nomor Resi</label>
+                  <input type="text" v-model="item.nomorResi" placeholder="Contoh: JT12345678" class="w-full px-4 py-2.5 text-sm rounded-lg border-2 border-brand-border/50 focus:border-brand-orange outline-none uppercase" />
+                </div>
+                <button @click="simpanResi" :disabled="isUpdating || !item.kurirPengiriman || !item.nomorResi" class="w-full py-3 bg-brand-orange text-white text-sm font-bold rounded-lg hover:bg-opacity-90 disabled:opacity-50 transition">
+                  {{ isUpdating ? 'Menyimpan...' : 'Simpan & Kirim Email Resi' }}
+                </button>
               </div>
             </div>
             
@@ -213,12 +239,14 @@ import { useRoute } from 'vue-router';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
 import { useNuxtApp } from '#imports';
+import { useToast } from '~/composables/useToast';
 
 definePageMeta({ layout: 'admin', middleware: ['admin-auth'] });
 
 const route = useRoute();
 const { $db } = useNuxtApp();
 const db = $db as Firestore;
+const { showToast } = useToast();
 
 const id = route.params.id as string;
 const isLoading = ref(true);
@@ -262,14 +290,46 @@ const updateStatus = async (field: string, value: string) => {
       [field]: value,
       updatedAt: new Date()
     });
-    // Menampilkan toast atau indikator visual sementara (bisa juga pakai alert)
   } catch (error) {
     console.error('Failed to update status', error);
-    alert('Gagal mengubah status');
+    showToast('Gagal mengubah status', 'error');
   } finally {
     setTimeout(() => {
       isUpdating.value = false;
-    }, 1000);
+    }, 500);
+  }
+};
+
+const handleStatusPengirimanChange = () => {
+  if (item.value.statusPengiriman !== 'dikirim') {
+    // Jika diubah ke belum_dikirim, langsung update ke database
+    updateStatus('statusPengiriman', item.value.statusPengiriman);
+  } else {
+    // Jika diubah ke 'dikirim', pastikan dropdown kurir menampilkan placeholder
+    if (!item.value.kurirPengiriman) {
+      item.value.kurirPengiriman = '';
+    }
+  }
+};
+
+const simpanResi = async () => {
+  if (!item.value.kurirPengiriman || !item.value.nomorResi) return;
+  isUpdating.value = true;
+  try {
+    const response = await $fetch('/api/admin/kirim-resi', {
+      method: 'POST',
+      body: {
+        pendaftaranId: item.value.id,
+        kurir: item.value.kurirPengiriman,
+        nomorResi: item.value.nomorResi
+      }
+    });
+    showToast('Resi berhasil disimpan dan email telah dikirim!', 'success');
+  } catch (err) {
+    console.error('Failed to send resi:', err);
+    showToast('Gagal menyimpan resi', 'error');
+  } finally {
+    isUpdating.value = false;
   }
 };
 </script>

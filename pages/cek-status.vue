@@ -136,6 +136,22 @@
             Gabung Grup WhatsApp
           </a>
         </div>
+
+        <!-- Tracking Info -->
+        <div v-if="result.statusPengiriman === 'dikirim' && result.nomorResi" class="mt-4 p-5 bg-blue-50 border border-blue-200 rounded-2xl">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+              <svg class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-blue-800 uppercase tracking-widest">Paket Sedang Dikirim</p>
+              <p class="text-sm text-blue-900 font-medium">{{ result.kurirPengiriman }} - {{ result.nomorResi }}</p>
+            </div>
+          </div>
+          <a :href="'https://cekresi.com/?noresi=' + result.nomorResi" target="_blank" rel="noopener noreferrer" class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl text-sm font-bold transition-colors">
+            Lacak Paket Sekarang
+          </a>
+        </div>
       </div>
 
       <div v-else-if="result.statusPembayaran === 'expire' || result.statusPembayaran === 'failed'" class="pt-6 border-t border-brand-border/50 relative z-10">

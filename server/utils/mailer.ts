@@ -281,3 +281,61 @@ export const sendFailedEmail = async (opts: InvoiceEmailOptions) => {
     html
   });
 };
+
+export interface ResiEmailOptions {
+  to: string;
+  namaLengkap: string;
+  kodeInvoice: string;
+  kurir: string;
+  nomorResi: string;
+}
+
+export const sendResiEmail = async (opts: ResiEmailOptions) => {
+  const transporter = createTransporter();
+  const appUrl = process.env.APP_URL ?? 'http://localhost:3000';
+
+  const html = `
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; color: #333; background-color: #f9f9f9; padding: 20px;">
+      <div style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+        <div style="background-color: #3D1F1A; padding: 30px 24px; text-align: center;">
+          <h1 style="color: #F5720A; margin: 0; font-size: 24px; letter-spacing: 1px;">MUBK Yogyakarta</h1>
+        </div>
+        
+        <div style="padding: 32px 24px;">
+          <div style="text-align: center; margin-bottom: 24px;">
+            <div style="display: inline-block; background-color: #E3F2FD; color: #1976D2; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 14px; margin-bottom: 16px;">
+              🚚 Paket Telah Dikirim!
+            </div>
+            <h2 style="margin: 0; font-size: 20px; color: #3D1F1A;">Halo, ${opts.namaLengkap}</h2>
+            <p style="color: #666; margin-top: 8px; font-size: 15px;">Kabar baik! Kitab pesanan Anda (Invoice #${opts.kodeInvoice}) sudah kami serahkan ke pihak ekspedisi dan saat ini sedang dalam perjalanan menuju alamat Anda.</p>
+          </div>
+
+          <div style="margin-top: 32px; border: 1px solid #eee; border-radius: 8px; padding: 20px; background-color: #fafafa; text-align: center;">
+            <p style="margin: 0 0 8px 0; font-size: 13px; color: #888; text-transform: uppercase; letter-spacing: 1px;">Jasa Pengiriman</p>
+            <p style="margin: 0 0 20px 0; font-size: 18px; font-weight: bold; color: #333;">${opts.kurir}</p>
+            
+            <p style="margin: 0 0 8px 0; font-size: 13px; color: #888; text-transform: uppercase; letter-spacing: 1px;">Nomor Resi</p>
+            <p style="margin: 0; font-size: 22px; font-weight: bold; color: #F5720A; letter-spacing: 2px;">${opts.nomorResi}</p>
+          </div>
+
+          <div style="text-align: center; margin-top: 32px;">
+            <a href="https://cekresi.com/?noresi=${opts.nomorResi}" target="_blank" style="display: inline-block; background-color: #1976D2; color: #ffffff; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-size: 15px; font-weight: bold; box-shadow: 0 4px 6px rgba(25, 118, 210, 0.2);">
+              Lacak Paket Sekarang
+            </a>
+          </div>
+
+          <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #eee; text-align: center;">
+            <p style="margin: 0; font-size: 13px; color: #888; line-height: 1.5;">Status pelacakan mungkin membutuhkan waktu hingga 24 jam untuk diperbarui oleh pihak ekspedisi.<br>Anda juga dapat mengecek status pesanan melalui <a href="${appUrl}/cek-status?invoice=${opts.kodeInvoice}" style="color: #F5720A; text-decoration: none; font-weight: bold;">website kami</a>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  await transporter.sendMail({
+    from: `"MUBK Yogyakarta" <${process.env.EMAIL_USER}>`,
+    to: opts.to,
+    subject: `🚚 Paket Dikirim — ${opts.kodeInvoice}`,
+    html
+  });
+};
