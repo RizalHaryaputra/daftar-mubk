@@ -13,6 +13,9 @@ import { useRuntimeConfig, useHead } from '#imports';
 const config = useRuntimeConfig();
 
 useHead({
+  meta: [
+    { name: 'google-site-verification', content: '4FVBr1EKug_oNIlZYTuM2BqdtldfUdJTb5HhHx1mGEY' }
+  ],
   script: [
     {
       src: config.public.midtransIsProduction
