@@ -133,13 +133,13 @@ export default defineEventHandler(async (event) => {
     updatedAt: new Date()
   });
 
-  // ===== 6. Kirim Email Invoice (Background) =====
+  // ===== 6. Kirim Email Invoice =====
   if (dataPeserta?.email) {
     let tipePesanan: 'program' | 'kitab' | 'kombinasi' = 'program';
     if (programId && (kitabDibeli?.length ?? 0) > 0) tipePesanan = 'kombinasi';
     else if (!programId && (kitabDibeli?.length ?? 0) > 0) tipePesanan = 'kitab';
 
-    sendInvoiceEmail({
+    await sendInvoiceEmail({
       to: dataPeserta.email,
       namaLengkap: dataPeserta.namaLengkap,
       kodeInvoice: kodeInvoice,
