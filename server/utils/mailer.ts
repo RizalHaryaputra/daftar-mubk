@@ -187,30 +187,44 @@ export const sendAdminNotificationEmail = async (opts: ConfirmationEmailOptions)
     </tr>
   `).join('');
 
+  const linkPath = opts.tipePesanan === 'kitab' ? '/admin/pembelian-kitab' : '/admin/pendaftaran';
   const html = `
-    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-      <div style="background-color: #3D1F1A; padding: 24px; text-align: center;">
-        <h1 style="color: #F5720A; margin: 0; font-size: 22px;">Admin Notification</h1>
-      </div>
-      <div style="padding: 32px 24px; border: 1px solid #eee; border-top: none;">
-        <p style="font-size: 16px; margin-top: 0;">Pembayaran berhasil diterima dari <strong>${opts.namaLengkap}</strong>!</p>
-        <p><strong>Tipe Pesanan:</strong> ${opts.tipePesanan.toUpperCase()}</p>
-        
-        <div style="margin-top: 20px; border: 1px solid #eee; border-radius: 8px; padding: 16px;">
-          <p style="margin-top: 0; color: #888; font-size: 12px;">INVOICE: ${opts.kodeInvoice}</p>
-          <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-            ${itemsHtml}
-            <tr>
-              <td style="padding: 12px 0 0; font-weight: bold;">Total Pembayaran</td>
-              <td style="padding: 12px 0 0; text-align: right; font-weight: bold; color: #F5720A;">Rp ${opts.total?.toLocaleString('id-ID')}</td>
-            </tr>
-          </table>
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; color: #333; background-color: #f9f9f9; padding: 20px;">
+      <div style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+        <div style="background-color: #3D1F1A; padding: 30px 24px; text-align: center;">
+          <h1 style="color: #F5720A; margin: 0; font-size: 24px; letter-spacing: 1px;">Admin Notification</h1>
+          <p style="color: #e0e0e0; margin: 8px 0 0; font-size: 14px;">Pesanan Baru Diterima</p>
         </div>
         
-        <div style="margin-top: 24px;">
-          <a href="${appUrl}/admin" style="display: inline-block; background-color: #F5720A; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: bold;">
-            Buka Dashboard Admin
-          </a>
+        <div style="padding: 32px 24px;">
+          <div style="text-align: center; margin-bottom: 24px;">
+            <div style="display: inline-block; background-color: #E8F5E9; color: #2E7D32; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 14px; margin-bottom: 16px;">
+              ✓ Pembayaran Lunas
+            </div>
+            <h2 style="margin: 0; font-size: 20px; color: #3D1F1A;">Pesanan dari ${opts.namaLengkap}</h2>
+            <p style="color: #666; margin-top: 8px; font-size: 15px;">Tipe Pesanan: <strong>${opts.tipePesanan.toUpperCase()}</strong></p>
+          </div>
+
+          <div style="margin-top: 32px; border: 1px solid #eee; border-radius: 8px; padding: 20px;">
+            <h3 style="margin-top: 0; margin-bottom: 16px; font-size: 14px; text-transform: uppercase; color: #888; letter-spacing: 1px; border-bottom: 1px solid #eee; padding-bottom: 8px;">Rincian Pesanan (#${opts.kodeInvoice})</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+              ${itemsHtml}
+              <tr>
+                <td style="padding: 16px 0 8px; font-weight: bold; font-size: 16px;">Total Pembayaran</td>
+                <td style="padding: 16px 0 8px; text-align: right; font-weight: bold; font-size: 18px; color: #F5720A;">Rp ${opts.total?.toLocaleString('id-ID')}</td>
+              </tr>
+            </table>
+          </div>
+
+          <div style="text-align: center; margin-top: 32px;">
+            <a href="${appUrl}${linkPath}" style="display: inline-block; background-color: #F5720A; color: #ffffff; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-size: 15px; font-weight: bold; box-shadow: 0 4px 6px rgba(245, 114, 10, 0.2);">
+              Kelola Pesanan
+            </a>
+          </div>
+        </div>
+        
+        <div style="background-color: #f5f5f5; padding: 20px; text-align: center; border-top: 1px solid #eee;">
+          <p style="margin: 0; font-size: 12px; color: #888;">Ini adalah email otomatis dari sistem MUBK.</p>
         </div>
       </div>
     </div>
