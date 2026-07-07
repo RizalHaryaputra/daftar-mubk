@@ -63,10 +63,24 @@
       </div>
 
       <!-- Tautan Grup WhatsApp -->
-      <div class="flex flex-col gap-2">
-        <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Tautan Grup WhatsApp (Opsional)</label>
-        <input type="url" v-model="form.linkGrupWa" class="input-field" placeholder="Contoh: https://chat.whatsapp.com/..." />
-        <p class="text-[11px] text-brand-muted mt-1">Tautan ini hanya akan ditampilkan ke peserta setelah mereka melunasi pembayaran program.</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border-2 border-brand-border/50 rounded-[20px] bg-brand-cream/10">
+        <div class="md:col-span-2 border-b border-brand-border/30 pb-3">
+          <p class="text-xs font-bold text-brand-brown uppercase tracking-widest mb-1">Tautan Grup WhatsApp (Opsional)</p>
+          <p class="text-[11px] text-brand-muted leading-relaxed">Tautan ini dikirim otomatis berdasarkan jenis kelamin peserta setelah pembayaran lunas.</p>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label class="text-xs font-bold text-brand-orange uppercase tracking-widest">Laki-laki (Ikhwan)</label>
+          <input type="url" v-model="form.linkGrupWaLaki" class="input-field" placeholder="Contoh: https://chat.whatsapp.com/laki..." />
+        </div>
+        <div class="flex flex-col gap-2">
+          <label class="text-xs font-bold text-brand-orange uppercase tracking-widest">Perempuan (Akhwat)</label>
+          <input type="url" v-model="form.linkGrupWaPerempuan" class="input-field" placeholder="Contoh: https://chat.whatsapp.com/pr..." />
+        </div>
+        <!-- Fallback/Legacy link preview -->
+        <div class="md:col-span-2 flex flex-col gap-2" v-if="form.linkGrupWa && !form.linkGrupWaLaki && !form.linkGrupWaPerempuan">
+          <label class="text-xs font-bold text-brand-muted uppercase tracking-widest">Tautan Lama (Terbaca oleh sistem sebagai Fallback)</label>
+          <input type="url" v-model="form.linkGrupWa" class="input-field opacity-60" readonly />
+        </div>
       </div>
 
       <!-- Opsi Jadwal Belajar (Full Width Box) -->
@@ -224,7 +238,7 @@ const defaultForm = () => ({
   deskripsiSingkat: '',
   jadwal: [''],
   durasi: '',
-  harga: 0, status: 'aktif', gambarUrl: '', periode: '', linkGrupWa: '',
+  harga: 0, status: 'aktif', gambarUrl: '', periode: '', linkGrupWa: '', linkGrupWaLaki: '', linkGrupWaPerempuan: '',
   tanggalMulaiStr: '', tanggalAkhirStr: '', deadlineDaftarStr: '',
   wajibBeliKitab: false, kitabWajibIdsStr: ''
 });
@@ -257,7 +271,9 @@ const populateForm = () => {
       deadlineDaftarStr: item.deadlineDaftar?.toDate?.()?.toISOString().split('T')[0] ?? '',
       wajibBeliKitab: item.wajibBeliKitab ?? false,
       kitabWajibIdsStr: '',
-      linkGrupWa: item.linkGrupWa ?? ''
+      linkGrupWa: item.linkGrupWa ?? '',
+      linkGrupWaLaki: item.linkGrupWaLaki ?? '',
+      linkGrupWaPerempuan: item.linkGrupWaPerempuan ?? ''
     };
     
     // Set checkboxes based on initialData.kitabWajibIds

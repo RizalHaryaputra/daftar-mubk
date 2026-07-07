@@ -84,6 +84,8 @@ const handleSave = async (formData: any) => {
       status: formData.status,
       gambarUrl: formData.gambarUrl || null,
       linkGrupWa: formData.linkGrupWa || null,
+      linkGrupWaLaki: formData.linkGrupWaLaki || null,
+      linkGrupWaPerempuan: formData.linkGrupWaPerempuan || null,
       wajibBeliKitab: formData.wajibBeliKitab,
       kitabWajibIds,
       updatedAt: new Date()

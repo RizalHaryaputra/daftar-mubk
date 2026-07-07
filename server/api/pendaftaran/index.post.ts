@@ -44,12 +44,22 @@ export default defineEventHandler(async (event) => {
   // ===== 2. Generate Kode Invoice =====
   const kodeInvoice = generateInvoiceCode();
 
-  // Ambil linkGrupWa dari collection program jika ada
+  // Ambil linkGrupWa dari collection program jika ada, sesuaikan dengan jenis kelamin
   let linkGrupWa = null;
   if (programId) {
     const programSnap = await db.collection('programs').doc(programId).get();
     if (programSnap.exists) {
-      linkGrupWa = programSnap.data()?.linkGrupWa || null;
+      const progData = programSnap.data();
+      const jk = dataPeserta?.jenisKelamin?.toLowerCase() || '';
+      
+      if (jk === 'laki-laki' && progData?.linkGrupWaLaki) {
+        linkGrupWa = progData.linkGrupWaLaki;
+      } else if (jk === 'perempuan' && progData?.linkGrupWaPerempuan) {
+        linkGrupWa = progData.linkGrupWaPerempuan;
+      } else {
+        // Fallback ke linkGrupWa umum jika tidak spesifik atau spesifiknya kosong
+        linkGrupWa = progData?.linkGrupWa || null;
+      }
     }
   }
 
