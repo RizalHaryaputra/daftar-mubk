@@ -232,7 +232,7 @@ export const sendAdminNotificationEmail = async (opts: ConfirmationEmailOptions)
 
   await transporter.sendMail({
     from: `"MUBK System" <${process.env.EMAIL_USER}>`,
-    to: "rizalharyaputra.2023@student.uny.ac.id", // Kirim ke admin
+    to: "mahadumar.ypia@gmail.com", // Kirim ke admin
     subject: `🔔 LUNAS: ${opts.tipePesanan.toUpperCase()} — ${opts.kodeInvoice}`,
     html
   });
