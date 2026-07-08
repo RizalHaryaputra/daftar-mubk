@@ -58,6 +58,26 @@
         </div>
       </div>
 
+      <!-- Konfigurasi Target & Mode Belajar -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 border-2 border-brand-border/50 rounded-[20px] bg-brand-cream/10">
+        <div class="flex flex-col gap-2">
+          <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Target Peserta <span class="text-brand-orange">*</span></label>
+          <select v-model="form.targetGender" required class="input-field bg-white">
+            <option value="keduanya">Umum (Ikhwan & Akhwat)</option>
+            <option value="ikhwan">Khusus Ikhwan (Laki-laki)</option>
+            <option value="akhwat">Khusus Akhwat (Perempuan)</option>
+          </select>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Mode Belajar <span class="text-brand-orange">*</span></label>
+          <select v-model="form.modeBelajar" required class="input-field bg-white">
+            <option value="keduanya">Offline & Online</option>
+            <option value="offline">Hanya Offline (Tatap Muka)</option>
+            <option value="online">Hanya Online</option>
+          </select>
+        </div>
+      </div>
+
       <!-- Opsi Paket Harga -->
       <div class="p-6 border-2 border-brand-border/50 rounded-[20px] space-y-5 bg-brand-cream/10">
         <div class="flex items-center justify-between border-b border-brand-border/30 pb-4">
@@ -137,20 +157,20 @@
         <div class="flex flex-col gap-6">
           <!-- Tanggal Mulai -->
           <div class="flex flex-col gap-2">
-            <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Tanggal Mulai Belajar</label>
-            <input type="date" v-model="form.tanggalMulaiStr" class="input-field" />
+            <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Tanggal Mulai Belajar <span class="text-brand-orange">*</span></label>
+            <input type="date" v-model="form.tanggalMulaiStr" required class="input-field" />
           </div>
 
           <!-- Tanggal Akhir -->
           <div class="flex flex-col gap-2">
-            <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Tanggal Belajar Berakhir</label>
-            <input type="date" v-model="form.tanggalAkhirStr" :min="form.tanggalMulaiStr" class="input-field" />
+            <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Tanggal Belajar Berakhir <span class="text-brand-orange">*</span></label>
+            <input type="date" v-model="form.tanggalAkhirStr" required :min="form.tanggalMulaiStr" class="input-field" />
           </div>
 
           <!-- Batas Daftar -->
           <div class="flex flex-col gap-2">
-            <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Batas Akhir Pendaftaran</label>
-            <input type="date" v-model="form.deadlineDaftarStr" :max="form.tanggalMulaiStr" class="input-field" />
+            <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Batas Akhir Pendaftaran <span class="text-brand-orange">*</span></label>
+            <input type="date" v-model="form.deadlineDaftarStr" required :max="form.tanggalMulaiStr" class="input-field" />
           </div>
         </div>
         
@@ -267,7 +287,8 @@ const defaultForm = () => ({
   paketHarga: [{ nama: 'Reguler', harga: 0 }],
   status: 'aktif', gambarUrl: '', periode: '', linkGrupWa: '', linkGrupWaLaki: '', linkGrupWaPerempuan: '',
   tanggalMulaiStr: '', tanggalAkhirStr: '', deadlineDaftarStr: '',
-  wajibBeliKitab: false, kitabWajibIdsStr: ''
+  wajibBeliKitab: false, kitabWajibIdsStr: '',
+  targetGender: 'keduanya', modeBelajar: 'keduanya'
 });
 
 const form = ref(defaultForm());
@@ -301,7 +322,9 @@ const populateForm = () => {
       kitabWajibIdsStr: '',
       linkGrupWa: item.linkGrupWa ?? '',
       linkGrupWaLaki: item.linkGrupWaLaki ?? '',
-      linkGrupWaPerempuan: item.linkGrupWaPerempuan ?? ''
+      linkGrupWaPerempuan: item.linkGrupWaPerempuan ?? '',
+      targetGender: item.targetGender ?? 'keduanya',
+      modeBelajar: item.modeBelajar ?? 'keduanya'
     };
     
     // Set checkboxes based on initialData.kitabWajibIds
@@ -332,6 +355,16 @@ watch(() => props.initialData, () => {
 }, { deep: true });
 
 const onSubmit = () => {
+  if (!form.value.deskripsi || form.value.deskripsi.trim() === '') {
+    useToast().showToast('Deskripsi lengkap wajib diisi', 'error');
+    return;
+  }
+
+  if (!form.value.tanggalMulaiStr || !form.value.tanggalAkhirStr || !form.value.deadlineDaftarStr) {
+    useToast().showToast('Semua tanggal (Mulai, Berakhir, dan Batas Daftar) wajib diisi', 'error');
+    return;
+  }
+
   if (form.value.tanggalMulaiStr && form.value.tanggalAkhirStr) {
     if (new Date(form.value.tanggalAkhirStr) < new Date(form.value.tanggalMulaiStr)) {
       useToast().showToast('Tanggal belajar berakhir tidak boleh lebih awal dari tanggal mulai', 'error');

@@ -47,7 +47,7 @@
               <svg v-if="currentStep > 1" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
               <span v-else>1</span>
             </div>
-            <span class="text-[11px] uppercase tracking-widest font-bold hidden sm:block">Data Diri</span>
+            <span class="text-[11px] uppercase tracking-widest font-bold hidden sm:block">Program</span>
           </div>
           
           <!-- Step 2 -->
@@ -58,7 +58,7 @@
               <svg v-if="currentStep > 2" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
               <span v-else>2</span>
             </div>
-            <span class="text-[11px] uppercase tracking-widest font-bold hidden sm:block">Tambahan</span>
+            <span class="text-[11px] uppercase tracking-widest font-bold hidden sm:block">Data Diri</span>
           </div>
           
           <!-- Step 3 -->
@@ -91,7 +91,7 @@
           <p class="text-xs text-brand-orange uppercase tracking-widest font-bold mb-1">Program Pilihan</p>
           <p class="font-display text-2xl mb-1">{{ selectedProgram.nama }}</p>
           <p class="text-sm text-white/70">
-            {{ Array.isArray(selectedProgram.jadwal) ? (selectedProgram.jadwal.length + ' Pilihan Jadwal') : selectedProgram.jadwal }} · Rp {{ selectedProgram.harga?.toLocaleString('id-ID') }}
+            {{ Array.isArray(selectedProgram.jadwal) ? (selectedProgram.jadwal.length + ' Pilihan Jadwal') : selectedProgram.jadwal }} · Rp {{ (form.paketHargaPilihan?.harga ?? selectedProgram.harga ?? 0).toLocaleString('id-ID') }}
           </p>
         </div>
         <NuxtLink :to="`/program/${selectedProgram.slug || selectedProgram.id}`" class="bg-brand-orange text-white text-sm font-bold uppercase tracking-widest px-6 py-3 rounded-full hover:bg-orange-600 transition-colors text-center self-start md:self-center shrink-0">Ganti Program</NuxtLink>
@@ -101,11 +101,11 @@
       <form ref="formRef" @submit.prevent="submitForm" class="space-y-10">
 
         <!-- ============================== -->
-        <!-- STEP 1: DATA DIRI              -->
+        <!-- STEP 1: PILIHAN PROGRAM        -->
         <!-- ============================== -->
         <div v-show="currentStep === 1">
           <div class="bg-white border border-brand-border rounded-[30px] p-8 md:p-10 shadow-sm">
-            <h2 class="font-display text-2xl text-brand-brown border-b border-brand-border/50 pb-4 mb-8">Data Diri</h2>
+            <h2 class="font-display text-2xl text-brand-brown border-b border-brand-border/50 pb-4 mb-8">Pilihan Program</h2>
 
             <div class="space-y-6">
               <!-- Pilihan Jadwal (Dynamic based on program) -->
@@ -133,31 +133,62 @@
                 </div>
               </div>
 
+              <!-- Pilihan Mode Belajar -->
+              <div v-if="selectedProgram && selectedProgram.modeBelajar === 'keduanya'" class="flex flex-col gap-3 pb-6 border-b border-brand-border/30">
+                <label class="text-sm font-bold text-brand-brown uppercase tracking-wider">Pilih Mode Belajar <span class="text-brand-orange">*</span></label>
+                <div class="flex flex-col gap-3">
+                  <label class="flex items-center gap-3 text-sm cursor-pointer group bg-brand-cream/30 p-4 rounded-xl border border-brand-border/50 hover:border-brand-orange transition-colors">
+                    <input type="radio" v-model="form.modeBelajarPilihan" value="offline" :required="currentStep === 1" class="w-5 h-5 text-brand-orange focus:ring-brand-orange border-brand-border" />
+                    <span class="group-hover:text-brand-orange transition-colors font-medium text-brand-brown">Tatap Muka (Offline)</span>
+                  </label>
+                  <label class="flex items-center gap-3 text-sm cursor-pointer group bg-brand-cream/30 p-4 rounded-xl border border-brand-border/50 hover:border-brand-orange transition-colors">
+                    <input type="radio" v-model="form.modeBelajarPilihan" value="online" :required="currentStep === 1" class="w-5 h-5 text-brand-orange focus:ring-brand-orange border-brand-border" />
+                    <span class="group-hover:text-brand-orange transition-colors font-medium text-brand-brown">Virtual (Online)</span>
+                  </label>
+                </div>
+              </div>
+
+              </div>
+            </div>
+          </div>
+
+        <!-- ============================== -->
+        <!-- STEP 2: DATA DIRI              -->
+        <!-- ============================== -->
+        <div v-show="currentStep === 2">
+          <div class="bg-white border border-brand-border rounded-[30px] p-8 md:p-10 shadow-sm">
+            <h2 class="font-display text-2xl text-brand-brown border-b border-brand-border/50 pb-4 mb-8">Data Diri</h2>
+
+            <div class="space-y-6 mb-8 pb-8 border-b border-brand-border/50">
               <div class="flex flex-col gap-2">
                 <label class="text-sm font-bold text-brand-brown uppercase tracking-wider">Nama Lengkap <span class="text-brand-orange">*</span></label>
-                <input type="text" v-model="form.dataPeserta.namaLengkap" :required="currentStep === 1" placeholder="Fulan bin Fulan" class="input-field" />
+                <input type="text" v-model="form.dataPeserta.namaLengkap" :required="currentStep === 2" placeholder="Fulan bin Fulan" class="input-field" />
               </div>
 
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="flex flex-col gap-2">
                   <label class="text-sm font-bold text-brand-brown uppercase tracking-wider">Email <span class="text-brand-orange">*</span></label>
-                  <input type="email" v-model="form.dataPeserta.email" :required="currentStep === 1" placeholder="email@contoh.com" class="input-field" />
+                  <input type="email" v-model="form.dataPeserta.email" :required="currentStep === 2" placeholder="email@contoh.com" class="input-field" />
                 </div>
                 <div class="flex flex-col gap-2">
                   <label class="text-sm font-bold text-brand-brown uppercase tracking-wider">No. WhatsApp <span class="text-brand-orange">*</span></label>
-                  <input type="tel" v-model="form.dataPeserta.noWa" :required="currentStep === 1" placeholder="08xxxxxxxxxx" class="input-field" />
+                  <input type="tel" v-model="form.dataPeserta.noWa" :required="currentStep === 2" placeholder="08xxxxxxxxxx" class="input-field" />
                 </div>
               </div>
 
               <div class="flex flex-col gap-3">
-                <label class="text-sm font-bold text-brand-brown uppercase tracking-wider">Jenis Kelamin <span class="text-brand-orange">*</span></label>
+                <div class="flex items-center justify-between">
+                  <label class="text-sm font-bold text-brand-brown uppercase tracking-wider">Jenis Kelamin <span class="text-brand-orange">*</span></label>
+                  <span v-if="selectedProgram?.targetGender === 'ikhwan'" class="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Khusus Ikhwan</span>
+                  <span v-else-if="selectedProgram?.targetGender === 'akhwat'" class="text-[10px] bg-pink-100 text-pink-700 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Khusus Akhwat</span>
+                </div>
                 <div class="flex gap-8">
-                  <label class="flex items-center gap-3 text-sm cursor-pointer group">
-                    <input type="radio" v-model="form.dataPeserta.jenisKelamin" value="laki-laki" :required="currentStep === 1" class="w-5 h-5 text-brand-orange focus:ring-brand-orange border-brand-border" />
+                  <label v-if="!selectedProgram || selectedProgram.targetGender !== 'akhwat'" class="flex items-center gap-3 text-sm cursor-pointer group">
+                    <input type="radio" v-model="form.dataPeserta.jenisKelamin" value="laki-laki" :required="currentStep === 2" class="w-5 h-5 text-brand-orange focus:ring-brand-orange border-brand-border" :disabled="selectedProgram?.targetGender === 'ikhwan'" />
                     <span class="group-hover:text-brand-orange transition-colors">Laki-laki</span>
                   </label>
-                  <label class="flex items-center gap-3 text-sm cursor-pointer group">
-                    <input type="radio" v-model="form.dataPeserta.jenisKelamin" value="perempuan" :required="currentStep === 1" class="w-5 h-5 text-brand-orange focus:ring-brand-orange border-brand-border" />
+                  <label v-if="!selectedProgram || selectedProgram.targetGender !== 'ikhwan'" class="flex items-center gap-3 text-sm cursor-pointer group">
+                    <input type="radio" v-model="form.dataPeserta.jenisKelamin" value="perempuan" :required="currentStep === 2" class="w-5 h-5 text-brand-orange focus:ring-brand-orange border-brand-border" :disabled="selectedProgram?.targetGender === 'akhwat'" />
                     <span class="group-hover:text-brand-orange transition-colors">Perempuan</span>
                   </label>
                 </div>
@@ -166,33 +197,26 @@
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="flex flex-col gap-2">
                   <label class="text-sm font-bold text-brand-brown uppercase tracking-wider">Tempat Lahir <span class="text-brand-orange">*</span></label>
-                  <input type="text" v-model="form.dataPeserta.tempatLahir" :required="currentStep === 1" placeholder="Kota kelahiran" class="input-field" />
+                  <input type="text" v-model="form.dataPeserta.tempatLahir" :required="currentStep === 2" placeholder="Kota kelahiran" class="input-field" />
                 </div>
                 <div class="flex flex-col gap-2">
                   <label class="text-sm font-bold text-brand-brown uppercase tracking-wider">Tanggal Lahir <span class="text-brand-orange">*</span></label>
-                  <input type="date" v-model="form.dataPeserta.tanggalLahir" :required="currentStep === 1" class="input-field" />
+                  <input type="date" v-model="form.dataPeserta.tanggalLahir" :required="currentStep === 2" class="input-field" />
                 </div>
               </div>
 
               <div class="flex flex-col gap-2">
                 <label class="text-sm font-bold text-brand-brown uppercase tracking-wider">Domisili <span class="text-brand-orange">*</span></label>
-                <input type="text" v-model="form.dataPeserta.domisili" :required="currentStep === 1" placeholder="Kota/Kabupaten domisili sekarang" class="input-field" />
+                <input type="text" v-model="form.dataPeserta.domisili" :required="currentStep === 2" placeholder="Kota/Kabupaten domisili sekarang" class="input-field" />
               </div>
 
               <div class="flex flex-col gap-2">
                 <label class="text-sm font-bold text-brand-brown uppercase tracking-wider">Pekerjaan / Profesi <span class="text-brand-orange">*</span></label>
-                <input type="text" v-model="form.dataPeserta.pekerjaan" :required="currentStep === 1" placeholder="Mahasiswa, Guru, Karyawan, dll." class="input-field" />
+                <input type="text" v-model="form.dataPeserta.pekerjaan" :required="currentStep === 2" placeholder="Mahasiswa, Guru, Karyawan, dll." class="input-field" />
               </div>
             </div>
-          </div>
-        </div>
 
-        <!-- ============================== -->
-        <!-- STEP 2: DATA LAINNYA           -->
-        <!-- ============================== -->
-        <div v-show="currentStep === 2">
-          <div class="bg-white border border-brand-border rounded-[30px] p-8 md:p-10 shadow-sm">
-            <h2 class="font-display text-2xl text-brand-brown border-b border-brand-border/50 pb-4 mb-8">Data Lainnya</h2>
+            <h2 class="font-display text-2xl text-brand-brown border-b border-brand-border/50 pb-4 mb-8">Informasi Tambahan</h2>
 
             <div class="space-y-8">
               <div class="flex flex-col gap-2">
@@ -478,6 +502,7 @@ const form = ref({
     alamatPengiriman: null as string | null
   },
   jadwalPilihan: '',
+  modeBelajarPilihan: '',
   paketHargaPilihan: null as any,
   donasi: 0,
   ongkir: {
@@ -567,6 +592,20 @@ onMounted(async () => {
         form.value.paketHargaPilihan = { nama: 'Reguler', harga: selectedProgram.value.harga ?? 0 };
       }
 
+      // Auto-select jenis kelamin jika target spesifik
+      if (selectedProgram.value.targetGender === 'ikhwan') {
+        form.value.dataPeserta.jenisKelamin = 'laki-laki';
+      } else if (selectedProgram.value.targetGender === 'akhwat') {
+        form.value.dataPeserta.jenisKelamin = 'perempuan';
+      }
+
+      // Auto-select mode belajar jika target spesifik
+      if (selectedProgram.value.modeBelajar === 'offline') {
+        form.value.modeBelajarPilihan = 'offline';
+      } else if (selectedProgram.value.modeBelajar === 'online') {
+        form.value.modeBelajarPilihan = 'online';
+      }
+
       // Fetch kitab wajib program
       if (selectedProgram.value.wajibBeliKitab && selectedProgram.value.kitabWajibIds?.length > 0) {
         const promises = selectedProgram.value.kitabWajibIds.map((id: string) => getDoc(doc(db, 'kitabs', id)));
@@ -618,13 +657,24 @@ const nextStep = () => {
   
   // Custom Validation Logic per step
   if (currentStep.value === 1) {
+    if (selectedProgram.value && !form.value.jadwalPilihan && Array.isArray(selectedProgram.value?.jadwal) && selectedProgram.value.jadwal.length > 1) {
+      validationError.value = 'Mohon pilih Jadwal Pembelajaran yang tersedia.';
+      return;
+    }
+    if (selectedProgram.value && !form.value.paketHargaPilihan && Array.isArray(selectedProgram.value?.paketHarga) && selectedProgram.value.paketHarga.length > 1) {
+      validationError.value = 'Mohon pilih Paket Pendaftaran.';
+      return;
+    }
+    if (selectedProgram.value?.modeBelajar === 'keduanya' && !form.value.modeBelajarPilihan) {
+      validationError.value = 'Mohon pilih Mode Belajar.';
+      return;
+    }
+  }
+
+  if (currentStep.value === 2) {
     const { namaLengkap, email, noWa, jenisKelamin, tempatLahir, tanggalLahir, domisili, pekerjaan } = form.value.dataPeserta;
     if (!namaLengkap || !email || !noWa || !jenisKelamin || !tempatLahir || !tanggalLahir || !domisili || !pekerjaan) {
       validationError.value = 'Mohon lengkapi semua isian wajib (*) di Data Diri.';
-      return;
-    }
-    if (selectedProgram.value && !form.value.jadwalPilihan) {
-      validationError.value = 'Mohon pilih Jadwal Pembelajaran yang tersedia.';
       return;
     }
     // Basic email validation
@@ -676,6 +726,7 @@ const submitForm = async () => {
     programId: selectedProgram.value?.id ?? null,
     programNama: selectedProgram.value?.nama ?? null,
     jadwalPilihan: form.value.jadwalPilihan ?? null,
+    modeBelajar: form.value.modeBelajarPilihan || (selectedProgram.value?.modeBelajar !== 'keduanya' ? selectedProgram.value?.modeBelajar : null),
     dataPeserta: {
       ...form.value.dataPeserta,
       alamatPengiriman: semuaKitabDibeli.value.length > 0 ? form.value.dataPeserta.alamatPengiriman : null

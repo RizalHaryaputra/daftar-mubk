@@ -116,6 +116,37 @@
             <div class="flex flex-col gap-6 pt-10 border-t border-brand-border/50">
               <h2 class="font-display text-2xl text-brand-brown mb-2">Rincian & Biaya Program</h2>
               
+              <!-- Badges Konfigurasi -->
+              <div class="grid grid-cols-2 gap-3 mb-2">
+                <!-- Target Gender -->
+                <div v-if="program.targetGender === 'ikhwan'" class="flex items-center justify-center gap-1.5 px-3 py-2 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg text-sm font-bold shadow-sm text-center">
+                  <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                  <span>Khusus Ikhwan</span>
+                </div>
+                <div v-else-if="program.targetGender === 'akhwat'" class="flex items-center justify-center gap-1.5 px-3 py-2 bg-pink-50 text-pink-700 border border-pink-200 rounded-lg text-sm font-bold shadow-sm text-center">
+                  <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                  <span>Khusus Akhwat</span>
+                </div>
+                <div v-else class="flex items-center justify-center gap-1.5 px-3 py-2 bg-green-50 text-green-700 border border-green-200 rounded-lg text-sm font-bold shadow-sm text-center">
+                  <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                  <span>Terbuka Umum</span>
+                </div>
+
+                <!-- Mode Belajar -->
+                <div v-if="program.modeBelajar === 'offline'" class="flex items-center justify-center gap-1.5 px-3 py-2 bg-brand-cream/50 text-brand-brown border border-brand-orange/30 rounded-lg text-sm font-bold shadow-sm text-center">
+                  <svg class="w-4 h-4 text-brand-orange shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                  <span>Tatap Muka (Offline)</span>
+                </div>
+                <div v-else-if="program.modeBelajar === 'online'" class="flex items-center justify-center gap-1.5 px-3 py-2 bg-brand-cream/50 text-brand-brown border border-brand-orange/30 rounded-lg text-sm font-bold shadow-sm text-center">
+                  <svg class="w-4 h-4 text-brand-orange shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
+                  <span>Virtual (Online)</span>
+                </div>
+                <div v-else class="flex items-center justify-center gap-1.5 px-3 py-2 bg-brand-cream/50 text-brand-brown border border-brand-orange/30 rounded-lg text-sm font-bold shadow-sm text-center">
+                  <svg class="w-4 h-4 text-brand-orange shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                  <span>Online & Offline</span>
+                </div>
+              </div>
+
               <!-- Card Durasi -->
               <div class="bg-brand-cream/30 border border-brand-orange/20 rounded-2xl p-6 hover:bg-brand-cream/50 transition-colors flex flex-col gap-4">
                 <div class="flex items-center gap-4">
