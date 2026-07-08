@@ -103,22 +103,22 @@ export default defineEventHandler(async (event) => {
   await docRef.set(pendaftaranData);
 
   // ===== 4. Create Transaksi Midtrans Snap =====
-  const total = rincianBiaya?.total ?? 0;
+  const total = Math.round(rincianBiaya?.total ?? 0);
   const itemDetails = [];
 
   if (rincianBiaya?.biayaProgram > 0) {
     itemDetails.push({
       id: programId ?? 'program',
-      price: rincianBiaya.biayaProgram,
+      price: Math.round(rincianBiaya.biayaProgram),
       quantity: 1,
-      name: `${programNama ?? 'Program MUBK'} (${rincianBiaya.namaPaket ?? 'Reguler'})`
+      name: `${programNama ?? 'Program MUBK'} (${rincianBiaya.namaPaket ?? 'Reguler'})`.substring(0, 50)
     });
   }
 
   if (rincianBiaya?.donasi > 0) {
     itemDetails.push({
       id: 'donasi_sukarela',
-      price: rincianBiaya.donasi,
+      price: Math.round(rincianBiaya.donasi),
       quantity: 1,
       name: 'Donasi / Infaq Sukarela'
     });
@@ -127,18 +127,18 @@ export default defineEventHandler(async (event) => {
   for (const kitab of kitabDibeli ?? []) {
     itemDetails.push({
       id: kitab.kitabId,
-      price: kitab.harga,
+      price: Math.round(kitab.harga),
       quantity: kitab.qty ?? 1,
-      name: kitab.judul
+      name: kitab.judul.substring(0, 50)
     });
   }
 
   if (rincianBiaya?.ongkir > 0) {
     itemDetails.push({
       id: 'ongkir',
-      price: rincianBiaya.ongkir,
+      price: Math.round(rincianBiaya.ongkir),
       quantity: 1,
-      name: `Ongkos Kirim (${ongkir?.zona})`
+      name: `Ongkos Kirim (${ongkir?.zona})`.substring(0, 50)
     });
   }
 
