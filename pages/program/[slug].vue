@@ -73,62 +73,136 @@
           <div>
             <h1 class="font-display text-4xl md:text-5xl lg:text-6xl text-brand-brown mb-6 leading-tight">{{ program.nama }}</h1>
             
-            <!-- Premium Quick Stats -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 py-6">
+            <!-- Deadline Banner -->
+            <div v-if="program.deadlineDaftar && isRegistrationOpen" class="bg-brand-cream/50 border border-brand-orange/30 rounded-2xl p-5 flex items-start gap-4 mb-8">
+              <div class="w-10 h-10 rounded-full bg-brand-orange/10 flex items-center justify-center text-brand-orange shrink-0">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              </div>
+              <div>
+                <p class="text-sm font-bold text-brand-brown">Batas Pendaftaran</p>
+                <p class="text-sm text-brand-muted mt-0.5">Segera daftar sebelum <span class="font-bold text-brand-orange">{{ formatDate(program.deadlineDaftar) }}</span> untuk mengamankan kursi Anda.</p>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="space-y-4 mb-10">
+              <h2 class="font-display text-2xl text-brand-brown">Tentang Program</h2>
+              <div class="prose prose-brand max-w-none text-brand-muted leading-relaxed" v-html="program.deskripsi"></div>
+            </div>
+
+            <!-- Kitab Wajib Section -->
+            <div v-if="kitabWajib.length > 0" class="mb-10">
+              <div class="flex items-center gap-3 mb-5">
+                <h2 class="font-display text-2xl text-brand-brown">Kitab Referensi Utama</h2>
+                <span class="px-3 py-1 bg-brand-orange/10 text-brand-orange text-xs font-bold uppercase tracking-widest rounded-full">Wajib</span>
+              </div>
               
-              <!-- Card Durasi -->
-              <div class="bg-brand-cream/30 border border-brand-orange/20 rounded-2xl p-5 hover:bg-brand-cream/50 transition-colors">
-                <div class="flex items-center gap-2 mb-3">
-                  <div class="w-8 h-8 rounded-full bg-brand-orange/10 flex items-center justify-center text-brand-orange">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <div class="grid grid-cols-1 gap-4">
+                <NuxtLink v-for="k in kitabWajib" :key="k.id" :to="`/kitab/${k.slug || k.id}`" class="group flex items-start gap-4 p-4 rounded-[20px] border border-brand-border/50 hover:border-brand-orange hover:shadow-lg transition-all bg-white">
+                  <div class="w-20 h-24 bg-brand-cream/30 rounded-xl overflow-hidden shrink-0 border border-brand-border/30">
+                    <img v-if="k.gambarUrl" :src="k.gambarUrl" :alt="k.judul" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <div v-else class="w-full h-full flex items-center justify-center text-brand-orange/30 font-serif text-3xl">ن</div>
                   </div>
-                  <span class="text-xs text-brand-muted uppercase tracking-widest font-bold">Durasi Belajar</span>
+                  <div>
+                    <h3 class="font-bold text-brand-brown group-hover:text-brand-orange transition-colors line-clamp-2 leading-snug">{{ k.judul }}</h3>
+                    <p class="text-xs text-brand-muted uppercase tracking-widest mt-1.5 mb-2">{{ k.penulis }}</p>
+                    <p class="text-sm font-bold text-brand-brown">Rp {{ k.harga?.toLocaleString('id-ID') }}</p>
+                  </div>
+                </NuxtLink>
+              </div>
+            </div>
+
+            <!-- Premium Quick Stats -->
+            <div class="flex flex-col gap-6 pt-10 border-t border-brand-border/50">
+              <h2 class="font-display text-2xl text-brand-brown mb-2">Rincian & Biaya Program</h2>
+              
+              <!-- Badges Konfigurasi -->
+              <div class="grid grid-cols-2 gap-3 mb-2">
+                <!-- Target Gender -->
+                <div v-if="program.targetGender === 'ikhwan'" class="flex items-center justify-center gap-1.5 px-3 py-2 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg text-sm font-bold shadow-sm text-center">
+                  <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                  <span>Khusus Ikhwan</span>
                 </div>
-                <div class="pl-1">
-                  <p class="text-xl font-display text-brand-brown mb-1">{{ program.durasi }}</p>
-                  <div v-if="program.tanggalMulai && program.tanggalAkhir" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white border border-brand-border/50 text-[11px] text-brand-muted font-medium mt-1">
-                    <svg class="w-3 h-3 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                    {{ formatDate(program.tanggalMulai) }} - {{ formatDate(program.tanggalAkhir) }}
+                <div v-else-if="program.targetGender === 'akhwat'" class="flex items-center justify-center gap-1.5 px-3 py-2 bg-pink-50 text-pink-700 border border-pink-200 rounded-lg text-sm font-bold shadow-sm text-center">
+                  <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                  <span>Khusus Akhwat</span>
+                </div>
+                <div v-else class="flex items-center justify-center gap-1.5 px-3 py-2 bg-green-50 text-green-700 border border-green-200 rounded-lg text-sm font-bold shadow-sm text-center">
+                  <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                  <span>Terbuka Umum</span>
+                </div>
+
+                <!-- Mode Belajar -->
+                <div v-if="program.modeBelajar === 'offline'" class="flex items-center justify-center gap-1.5 px-3 py-2 bg-brand-cream/50 text-brand-brown border border-brand-orange/30 rounded-lg text-sm font-bold shadow-sm text-center">
+                  <svg class="w-4 h-4 text-brand-orange shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                  <span>Tatap Muka (Offline)</span>
+                </div>
+                <div v-else-if="program.modeBelajar === 'online'" class="flex items-center justify-center gap-1.5 px-3 py-2 bg-brand-cream/50 text-brand-brown border border-brand-orange/30 rounded-lg text-sm font-bold shadow-sm text-center">
+                  <svg class="w-4 h-4 text-brand-orange shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
+                  <span>Virtual (Online)</span>
+                </div>
+                <div v-else class="flex items-center justify-center gap-1.5 px-3 py-2 bg-brand-cream/50 text-brand-brown border border-brand-orange/30 rounded-lg text-sm font-bold shadow-sm text-center">
+                  <svg class="w-4 h-4 text-brand-orange shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                  <span>Online & Offline</span>
+                </div>
+              </div>
+
+              <!-- Card Durasi -->
+              <div class="bg-brand-cream/30 border border-brand-orange/20 rounded-2xl p-6 hover:bg-brand-cream/50 transition-colors flex flex-col gap-4">
+                <div class="flex items-center gap-4">
+                  <div class="w-12 h-12 rounded-full bg-brand-orange/10 flex items-center justify-center text-brand-orange shrink-0">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                   </div>
+                  <div>
+                    <span class="text-xs text-brand-muted uppercase tracking-widest font-bold block mb-1">Durasi Belajar</span>
+                    <p class="text-2xl font-display text-brand-brown">{{ program.durasi }}</p>
+                  </div>
+                </div>
+                <div v-if="program.tanggalMulai && program.tanggalAkhir" class="flex items-center justify-center gap-2 w-full px-4 py-3.5 rounded-xl bg-white border border-brand-border/50 text-sm text-brand-brown font-bold shadow-sm mt-1">
+                  <svg class="w-5 h-5 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                  {{ formatDate(program.tanggalMulai) }} - {{ formatDate(program.tanggalAkhir) }}
                 </div>
               </div>
               
               <!-- Card Biaya -->
-              <div class="bg-brand-orange/5 border border-brand-orange/20 rounded-2xl p-5 hover:bg-brand-orange/10 transition-colors relative overflow-hidden">
+              <div class="bg-brand-orange/5 border border-brand-orange/20 rounded-2xl p-6 hover:bg-brand-orange/10 transition-colors relative overflow-hidden">
                 <!-- Aksen SVG -->
                 <div class="absolute -right-6 -top-6 text-brand-orange/10 pointer-events-none">
-                  <svg class="w-24 h-24" fill="currentColor" viewBox="0 0 100 100"><path d="M50 0 L55 45 L100 50 L55 55 L50 100 L45 55 L0 50 L45 45 Z" /></svg>
+                  <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 100 100"><path d="M50 0 L55 45 L100 50 L55 55 L50 100 L45 55 L0 50 L45 45 Z" /></svg>
                 </div>
                 
-                <div class="flex items-center gap-2 mb-3 relative z-10">
-                  <div class="w-8 h-8 rounded-full bg-brand-orange text-white flex items-center justify-center shadow-md shadow-brand-orange/20">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <div class="flex items-center gap-3 mb-5 relative z-10">
+                  <div class="w-12 h-12 rounded-full bg-brand-orange text-white flex items-center justify-center shadow-md shadow-brand-orange/20 shrink-0">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                   </div>
-                  <span class="text-xs text-brand-orange uppercase tracking-widest font-bold">Biaya Program</span>
+                  <span class="text-sm text-brand-orange uppercase tracking-widest font-bold">Biaya Program</span>
                 </div>
-                <div class="pl-1 relative z-10 w-full">
+                
+                <div class="relative z-10 w-full">
                   <template v-if="Array.isArray(program.paketHarga) && program.paketHarga.length > 0">
-                    <div class="flex flex-col gap-3 mt-4">
-                      <div v-for="(p, idx) in program.paketHarga" :key="idx" class="flex justify-between items-center gap-2 bg-white/60 p-3 rounded-xl border border-brand-orange/20 shadow-sm backdrop-blur-sm">
-                        <span class="text-sm font-bold text-brand-brown flex-1 break-words">{{ p.nama }}</span>
-                        <div class="flex items-baseline gap-1 shrink-0">
-                          <span class="text-brand-orange text-xs font-bold">Rp</span>
-                          <span class="text-lg md:text-xl font-display font-bold text-brand-orange tracking-tight">{{ p.harga?.toLocaleString('id-ID') }}</span>
+                    <div class="grid grid-cols-1 gap-4" :class="program.paketHarga.length > 1 ? 'sm:grid-cols-2' : ''">
+                      <div v-for="(p, idx) in program.paketHarga" :key="idx" class="flex flex-col gap-2 bg-white/80 p-5 rounded-xl border border-brand-orange/20 shadow-sm backdrop-blur-sm relative overflow-hidden hover:border-brand-orange/50 transition-all hover:-translate-y-1">
+                        <span class="text-sm font-bold text-brand-brown leading-snug">{{ p.nama }}</span>
+                        <div class="flex items-baseline gap-1 mt-auto pt-3 border-t border-brand-orange/10">
+                          <span class="text-brand-orange text-sm font-bold">Rp</span>
+                          <span class="text-2xl font-display font-bold text-brand-orange tracking-tight">{{ p.harga?.toLocaleString('id-ID') }}</span>
                         </div>
                       </div>
                     </div>
                   </template>
                   <template v-else>
-                    <div class="flex items-baseline gap-1 mt-1">
-                      <span class="text-brand-orange font-bold">Rp</span>
-                      <span class="text-3xl md:text-4xl font-display font-bold text-brand-orange tracking-tight">{{ program.harga?.toLocaleString('id-ID') }}</span>
+                    <div class="flex items-center justify-center bg-white/80 w-full px-6 py-6 rounded-2xl border border-brand-orange/20 shadow-sm">
+                      <div class="flex items-baseline gap-2">
+                        <span class="text-brand-orange font-bold text-2xl">Rp</span>
+                        <span class="text-4xl md:text-5xl font-display font-bold text-brand-orange tracking-tight">{{ program.harga?.toLocaleString('id-ID') }}</span>
+                      </div>
                     </div>
                   </template>
                 </div>
               </div>
 
               <!-- Pilihan Jadwal -->
-              <div class="sm:col-span-2 mt-2">
+              <div class="mt-2">
                 <div class="flex items-center gap-3 mb-4">
                   <h3 class="font-display text-xl text-brand-brown">Pilihan Jadwal</h3>
                   <div class="h-px bg-brand-border/50 flex-grow"></div>
@@ -136,62 +210,23 @@
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <template v-if="Array.isArray(program.jadwal)">
-                    <div v-for="(j, idx) in program.jadwal" :key="idx" class="flex items-center gap-3 p-4 rounded-xl border border-brand-border/60 bg-white hover:border-brand-orange/50 hover:shadow-md transition-all group cursor-default">
-                      <div class="w-10 h-10 rounded-full bg-brand-cream flex items-center justify-center shrink-0 group-hover:bg-brand-orange/10 transition-colors">
-                        <svg class="w-5 h-5 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    <div v-for="(j, idx) in program.jadwal" :key="idx" class="flex items-center gap-4 p-4 rounded-xl border border-brand-border/60 bg-white hover:border-brand-orange/50 hover:shadow-md transition-all group cursor-default">
+                      <div class="w-12 h-12 rounded-full bg-brand-cream flex items-center justify-center shrink-0 group-hover:bg-brand-orange/10 transition-colors">
+                        <svg class="w-6 h-6 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                       </div>
-                      <span class="text-sm font-medium text-brand-brown leading-snug">{{ j }}</span>
+                      <span class="text-sm font-bold text-brand-brown leading-snug">{{ j }}</span>
                     </div>
                   </template>
                   <template v-else>
-                    <div class="flex items-center gap-3 p-4 rounded-xl border border-brand-border/60 bg-white hover:border-brand-orange/50 hover:shadow-md transition-all group cursor-default">
-                      <div class="w-10 h-10 rounded-full bg-brand-cream flex items-center justify-center shrink-0">
-                        <svg class="w-5 h-5 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    <div class="flex items-center gap-4 p-4 rounded-xl border border-brand-border/60 bg-white hover:border-brand-orange/50 hover:shadow-md transition-all group cursor-default">
+                      <div class="w-12 h-12 rounded-full bg-brand-cream flex items-center justify-center shrink-0">
+                        <svg class="w-6 h-6 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                       </div>
-                      <span class="text-sm font-medium text-brand-brown leading-snug">{{ program.jadwal }}</span>
+                      <span class="text-sm font-bold text-brand-brown leading-snug">{{ program.jadwal }}</span>
                     </div>
                   </template>
                 </div>
               </div>
-            </div>
-          </div>
-          
-          <!-- Deadline Banner -->
-          <div v-if="program.deadlineDaftar && isRegistrationOpen" class="bg-brand-cream/50 border border-brand-orange/30 rounded-2xl p-5 flex items-start gap-4">
-            <div class="w-10 h-10 rounded-full bg-brand-orange/10 flex items-center justify-center text-brand-orange shrink-0">
-              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            </div>
-            <div>
-              <p class="text-sm font-bold text-brand-brown">Batas Pendaftaran</p>
-              <p class="text-sm text-brand-muted mt-0.5">Segera daftar sebelum <span class="font-bold text-brand-orange">{{ formatDate(program.deadlineDaftar) }}</span> untuk mengamankan kursi Anda.</p>
-            </div>
-          </div>
-
-          <!-- Description -->
-          <div class="space-y-4">
-            <h2 class="font-display text-2xl text-brand-brown">Tentang Program</h2>
-            <div class="prose prose-brand max-w-none text-brand-muted leading-relaxed" v-html="program.deskripsi"></div>
-          </div>
-
-          <!-- Kitab Wajib Section -->
-          <div v-if="kitabWajib.length > 0" class="pt-6">
-            <div class="flex items-center gap-3 mb-6">
-              <h2 class="font-display text-2xl text-brand-brown">Kitab Referensi Utama</h2>
-              <span class="px-3 py-1 bg-brand-orange/10 text-brand-orange text-xs font-bold uppercase tracking-widest rounded-full">Wajib</span>
-            </div>
-            
-            <div class="grid grid-cols-1 gap-4">
-              <NuxtLink v-for="k in kitabWajib" :key="k.id" :to="`/kitab/${k.slug || k.id}`" class="group flex items-start gap-4 p-4 rounded-[20px] border border-brand-border/50 hover:border-brand-orange hover:shadow-lg transition-all bg-white">
-                <div class="w-20 h-24 bg-brand-cream/30 rounded-xl overflow-hidden shrink-0 border border-brand-border/30">
-                  <img v-if="k.gambarUrl" :src="k.gambarUrl" :alt="k.judul" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                  <div v-else class="w-full h-full flex items-center justify-center text-brand-orange/30 font-serif text-3xl">ن</div>
-                </div>
-                <div>
-                  <h3 class="font-bold text-brand-brown group-hover:text-brand-orange transition-colors line-clamp-2 leading-snug">{{ k.judul }}</h3>
-                  <p class="text-xs text-brand-muted uppercase tracking-widest mt-1.5 mb-2">{{ k.penulis }}</p>
-                  <p class="text-sm font-bold text-brand-brown">Rp {{ k.harga?.toLocaleString('id-ID') }}</p>
-                </div>
-              </NuxtLink>
             </div>
           </div>
           

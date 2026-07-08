@@ -4,13 +4,13 @@ Portal web resmi untuk Pendaftaran Program Pembelajaran dan Pembelian Kitab Maha
 
 ## 🚀 Fitur Utama
 
-- **Pendaftaran Program & Pembelian Kitab:** Integrasi form pendaftaran program dan pembelian kitab dalam satu alur (Checkout) maupun terpisah.
+- **Konfigurasi Program Dinamis:** Dukungan pengaturan multi-jadwal, paket harga bertingkat (Reguler, Premium, dll), serta pembatasan target gender (Ikhwan/Akhwat) dan mode belajar (Offline/Online).
+- **Pendaftaran Program & Pembelian Kitab:** Integrasi form pendaftaran dengan alur langkah-demi-langkah (Wizard) yang rapi, mencakup pembelian kitab wajib maupun opsional.
 - **Pembayaran Otomatis:** Terintegrasi dengan **Midtrans (Snap API)** untuk memproses pembayaran secara *real-time* (E-Wallet, Virtual Account, Qris, dll).
-- **Perhitungan Ongkos Kirim Dinamis:** Sistem perhitungan ongkos kirim berdasarkan zona wilayah, termasuk opsi "Ambil Sendiri di Kantor" (Rp 0).
-- **Pelacakan Pengiriman (Resi):** Sistem pelacakan pengiriman kitab. Admin dapat menginput nomor resi dan sistem akan otomatis mengirimkan email notifikasi ke peserta.
-- **Notifikasi Email Otomatis:** Mengirim kuitansi (Invoice) Lunas, serta informasi pengiriman barang langsung ke email peserta menggunakan **Nodemailer**.
-- **Dashboard Admin (CMS):** Area khusus pengurus untuk mengelola data pendaftaran, pesanan kitab, program baru, ongkos kirim, dan meng-ekspor data ke format Excel.
-- **Optimasi SEO & Performa:** Dukungan meta tag Open Graph (OG), pembuatan sitemap otomatis, rendering sisi server (SSR) yang cepat, serta *image optimization*.
+- **Perhitungan Ongkos Kirim:** Sistem perhitungan ongkos kirim berdasarkan zona wilayah, termasuk opsi "Ambil Sendiri di Kantor" (Rp 0).
+- **Automasi & Notifikasi Email:** Mengirim kuitansi (Invoice) lunas, informasi pengiriman barang, dan tautan Grup WhatsApp otomatis (disesuaikan dengan gender peserta) via **Nodemailer**.
+- **Dashboard Admin (CMS):** Area khusus pengurus untuk mengelola data pendaftaran, pesanan kitab, pembuatan program dengan *Rich Text Editor* (TinyMCE), serta ekspor data ke Excel.
+- **Optimasi SEO & Performa:** Dukungan meta tag Open Graph (OG), rendering sisi server (SSR) yang cepat, serta responsif di segala perangkat.
 
 ## 🛠 Teknologi yang Digunakan
 
