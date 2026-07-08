@@ -13,30 +13,45 @@
     <div class="bg-white rounded-[30px] border border-brand-border/50 shadow-sm overflow-hidden relative">
       
       <!-- Toolbar: Pencarian & Filter -->
-      <div class="p-6 border-b border-brand-border/50 bg-gray-50/50 flex flex-col sm:flex-row gap-4 justify-between items-center">
-        <div class="relative w-full sm:w-72">
-          <svg class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-brand-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-          <input 
-            type="text" 
-            v-model="searchQuery" 
-            placeholder="Cari nama atau invoice..." 
-            class="w-full pl-11 pr-4 py-3 rounded-full border-2 border-brand-border/50 bg-white focus:outline-none focus:border-brand-orange transition-colors text-brand-brown font-medium text-sm"
-          />
-        </div>
+      <div class="p-6 border-b border-brand-border/50 bg-gray-50/50 flex flex-col gap-4">
         
-        <div class="flex flex-wrap gap-2 w-full sm:w-auto">
-          <select v-model="filterStatus" class="w-full sm:w-auto px-6 py-3 rounded-full border-2 border-brand-border/50 bg-white focus:outline-none focus:border-brand-orange text-brand-brown font-medium cursor-pointer text-sm appearance-none">
+        <!-- Baris Atas: Pencarian & Ekspor -->
+        <div class="flex flex-col sm:flex-row justify-between gap-4 items-center">
+          <div class="relative w-full sm:w-80">
+            <svg class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-brand-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            <input 
+              type="text" 
+              v-model="searchQuery" 
+              placeholder="Cari nama atau invoice..." 
+              class="w-full pl-11 pr-4 py-2.5 rounded-full border border-brand-border/50 bg-white focus:outline-none focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 transition-all text-brand-brown font-medium text-sm shadow-sm"
+            />
+          </div>
+          
+          <button @click="exportToExcel" class="w-full sm:w-auto shrink-0 flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-emerald-500 text-white font-bold tracking-widest text-xs uppercase hover:bg-emerald-600 transition-colors shadow-sm">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+            Ekspor Excel
+          </button>
+        </div>
+
+        <!-- Baris Bawah: Filter Data -->
+        <div class="flex flex-wrap items-center gap-3 bg-brand-cream/30 p-3 rounded-xl border border-brand-border/50 shadow-sm">
+          <div class="flex items-center gap-2 text-brand-muted pl-2 pr-1 w-full md:w-auto pb-2 md:pb-0 border-b md:border-b-0 border-brand-border/50 md:border-transparent mb-1 md:mb-0">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
+            <span class="text-xs font-bold uppercase tracking-widest">Filter Data</span>
+          </div>
+          
+          <select v-if="availableBulan.length > 0" v-model="filterBulan" class="flex-1 min-w-[130px] px-4 py-2.5 rounded-lg border border-brand-border/50 bg-white focus:outline-none focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 text-brand-brown font-medium cursor-pointer text-xs appearance-none">
+            <option value="">Semua Bulan</option>
+            <option v-for="b in availableBulan" :key="b" :value="b">{{ formatBulan(b) }}</option>
+          </select>
+          
+          <select v-model="filterStatus" class="flex-1 min-w-[130px] px-4 py-2.5 rounded-lg border border-brand-border/50 bg-white focus:outline-none focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 text-brand-brown font-medium cursor-pointer text-xs appearance-none">
             <option value="">Semua Status</option>
             <option value="pending">Menunggu</option>
             <option value="success">Lunas</option>
             <option value="expire">Kedaluwarsa</option>
             <option value="failed">Gagal</option>
           </select>
-          
-          <button @click="exportToExcel" class="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-emerald-500 text-white font-bold tracking-widest text-xs uppercase hover:bg-emerald-600 transition-colors shadow-sm">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-            Ekspor Excel
-          </button>
         </div>
       </div>
 
@@ -143,6 +158,7 @@ const isLoading = ref(true);
 // States for Filter & Pagination
 const searchQuery = ref('');
 const filterStatus = ref('');
+const filterBulan = ref('');
 const currentPage = ref(1);
 const itemsPerPage = 10;
 
@@ -169,6 +185,27 @@ const formatDate = (timestamp: any) => {
   return new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium', timeStyle: 'short' }).format(date);
 };
 
+const availableBulan = computed(() => {
+  const bulans = new Set<string>();
+  pendaftaranList.value.forEach(p => {
+    if (p.createdAt) {
+      const date = p.createdAt.toDate ? p.createdAt.toDate() : new Date(p.createdAt);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      bulans.add(`${year}-${month}`);
+    }
+  });
+  return Array.from(bulans).sort().reverse();
+});
+
+const formatBulan = (val: string) => {
+  if (!val) return '';
+  const [year, month] = val.split('-');
+  if (!year || !month) return val;
+  const date = new Date(parseInt(year), parseInt(month) - 1);
+  return new Intl.DateTimeFormat('id-ID', { month: 'long', year: 'numeric' }).format(date);
+};
+
 // Computed properties for processing data
 const filteredData = computed(() => {
   let result = pendaftaranList.value;
@@ -183,6 +220,16 @@ const filteredData = computed(() => {
 
   if (filterStatus.value) {
     result = result.filter(p => p.statusPembayaran === filterStatus.value);
+  }
+
+  if (filterBulan.value) {
+    result = result.filter(p => {
+      if (!p.createdAt) return false;
+      const date = p.createdAt.toDate ? p.createdAt.toDate() : new Date(p.createdAt);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      return `${year}-${month}` === filterBulan.value;
+    });
   }
 
   return result;
@@ -226,7 +273,7 @@ const exportToExcel = () => {
 };
 
 // Reset page when filter changes
-watch([searchQuery, filterStatus], () => {
+watch([searchQuery, filterStatus, filterBulan], () => {
   currentPage.value = 1;
 });
 

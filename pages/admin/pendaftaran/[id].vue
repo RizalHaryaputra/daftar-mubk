@@ -142,6 +142,10 @@
               <span>Ongkos Kirim</span>
               <span class="font-medium">Rp {{ (item.rincianBiaya?.ongkir || 0).toLocaleString('id-ID') }}</span>
             </div>
+            <div v-if="item.rincianBiaya?.donasi" class="flex justify-between items-center text-white/80 text-sm">
+              <span>Donasi / Infaq</span>
+              <span class="font-medium">Rp {{ item.rincianBiaya.donasi.toLocaleString('id-ID') }}</span>
+            </div>
           </div>
           
           <div class="pt-4 border-t border-white/20 flex justify-between items-center">

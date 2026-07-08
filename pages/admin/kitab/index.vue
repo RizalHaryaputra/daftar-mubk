@@ -16,24 +16,34 @@
     <div class="bg-white rounded-[30px] border border-brand-border/50 shadow-sm overflow-hidden relative">
       
       <!-- Toolbar: Pencarian & Filter -->
-      <div class="p-6 border-b border-brand-border/50 bg-gray-50/50 flex flex-col sm:flex-row gap-4 justify-between items-center">
-        <div class="relative w-full sm:w-72">
-          <svg class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-brand-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-          <input 
-            type="text" 
-            v-model="searchQuery" 
-            placeholder="Cari judul atau penulis kitab..." 
-            class="w-full pl-11 pr-4 py-3 rounded-full border-2 border-brand-border/50 bg-white focus:outline-none focus:border-brand-orange transition-colors text-brand-brown font-medium text-sm"
-          />
+      <div class="p-6 border-b border-brand-border/50 bg-gray-50/50 flex flex-col gap-4">
+        
+        <!-- Baris Atas: Pencarian -->
+        <div class="flex flex-col sm:flex-row justify-between gap-4 items-center">
+          <div class="relative w-full sm:w-80">
+            <svg class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-brand-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            <input 
+              type="text" 
+              v-model="searchQuery" 
+              placeholder="Cari judul atau penulis kitab..." 
+              class="w-full pl-11 pr-4 py-2.5 rounded-full border border-brand-border/50 bg-white focus:outline-none focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 transition-all text-brand-brown font-medium text-sm shadow-sm"
+            />
+          </div>
         </div>
         
-        <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-          <select v-model="filterStatus" class="w-full sm:w-auto px-6 py-3 border-2 border-brand-border/50 rounded-full text-sm focus:outline-none focus:border-brand-orange transition-colors font-medium text-brand-brown bg-white appearance-none cursor-pointer">
+        <!-- Baris Bawah: Filter Data -->
+        <div class="flex flex-wrap items-center gap-3 bg-brand-cream/30 p-3 rounded-xl border border-brand-border/50 shadow-sm">
+          <div class="flex items-center gap-2 text-brand-muted pl-2 pr-1 w-full md:w-auto pb-2 md:pb-0 border-b md:border-b-0 border-brand-border/50 md:border-transparent mb-1 md:mb-0">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
+            <span class="text-xs font-bold uppercase tracking-widest">Filter Data</span>
+          </div>
+
+          <select v-model="filterStatus" class="flex-1 min-w-[130px] px-4 py-2.5 rounded-lg border border-brand-border/50 bg-white focus:outline-none focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 text-brand-brown font-medium cursor-pointer text-xs appearance-none">
             <option value="">Semua Status</option>
             <option value="aktif">Aktif</option>
             <option value="nonaktif">Nonaktif</option>
           </select>
-          <select v-model="filterStandalone" class="w-full sm:w-auto px-6 py-3 border-2 border-brand-border/50 rounded-full text-sm focus:outline-none focus:border-brand-orange transition-colors font-medium text-brand-brown bg-white appearance-none cursor-pointer">
+          <select v-model="filterStandalone" class="flex-1 min-w-[130px] px-4 py-2.5 rounded-lg border border-brand-border/50 bg-white focus:outline-none focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/20 text-brand-brown font-medium cursor-pointer text-xs appearance-none">
             <option value="">Semua Tipe</option>
             <option value="true">Standalone</option>
             <option value="false">Tidak Standalone</option>
