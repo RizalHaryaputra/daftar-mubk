@@ -23,6 +23,34 @@
       
       <!-- Kolom Kiri: Data Peserta & Alamat -->
       <div class="lg:col-span-2 space-y-6">
+        <!-- Card Informasi Program -->
+        <div class="bg-white rounded-[30px] border border-brand-border/50 p-8 shadow-sm relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-brand-orange/10 rounded-bl-full -z-10"></div>
+          <h2 class="font-display text-xl text-brand-brown mb-6 flex items-center gap-2">
+            <svg class="w-5 h-5 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
+            Informasi Program
+          </h2>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Program yang Diikuti</p>
+              <p class="font-medium text-brand-brown">{{ item.programNama || item.dataProgram?.nama || 'Nama Program Tidak Tersedia' }}</p>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Paket Pilihan</p>
+              <p class="font-medium text-brand-brown">{{ item.rincianBiaya?.namaPaket || 'Reguler' }}</p>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Pilihan Jadwal</p>
+              <p class="font-medium text-brand-orange">{{ item.jadwalPilihan || '-' }}</p>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Mode Belajar</p>
+              <p class="font-medium text-brand-brown capitalize">{{ item.modeBelajar || '-' }}</p>
+            </div>
+          </div>
+        </div>
+
         <!-- Card Data Peserta -->
         <div class="bg-white rounded-[30px] border border-brand-border/50 p-8 shadow-sm relative overflow-hidden">
           <div class="absolute top-0 right-0 w-32 h-32 bg-brand-cream/30 rounded-bl-full -z-10"></div>
@@ -52,14 +80,6 @@
             <div>
               <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Email</p>
               <p class="font-medium text-brand-brown">{{ item.dataPeserta?.email || '-' }}</p>
-            </div>
-            <div>
-              <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Program yang Diikuti</p>
-              <p class="font-medium text-brand-brown">{{ item.programNama || item.dataProgram?.nama || 'Nama Program Tidak Tersedia' }}</p>
-            </div>
-            <div>
-              <p class="text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Pilihan Jadwal</p>
-              <p class="font-medium text-brand-orange">{{ item.jadwalPilihan || '-' }}</p>
             </div>
             
             <div v-if="item.dataPeserta?.tempatLahir && item.dataPeserta?.tempatLahir !== '-'">
@@ -131,7 +151,7 @@
           
           <div class="space-y-3 mb-6">
             <div class="flex justify-between items-center text-white/80 text-sm">
-              <span>Biaya Program</span>
+              <span>Biaya Program ({{ item.rincianBiaya?.namaPaket || 'Reguler' }})</span>
               <span class="font-medium">Rp {{ (item.rincianBiaya?.biayaProgram ?? item.rincianBiaya?.program ?? 0).toLocaleString('id-ID') }}</span>
             </div>
             <div class="flex justify-between items-center text-white/80 text-sm">

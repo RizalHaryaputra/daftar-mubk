@@ -6,7 +6,7 @@ import { sendInvoiceEmail } from '~/server/utils/mailer';
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
 
-  const { programId, programNama, jadwalPilihan, dataPeserta, kitabDibeli, ongkir, rincianBiaya } = body;
+  const { programId, programNama, jadwalPilihan, modeBelajar, dataPeserta, kitabDibeli, ongkir, rincianBiaya } = body;
 
   const db = getFirestoreDb();
 
@@ -69,6 +69,7 @@ export default defineEventHandler(async (event) => {
     programId: programId ?? null,
     programNama: programNama ?? null,
     jadwalPilihan: jadwalPilihan ?? null,
+    modeBelajar: modeBelajar ?? null,
     dataPeserta: {
       ...dataPeserta,
       alamatPengiriman: kitabDibeli?.length > 0 ? (dataPeserta.alamatPengiriman ?? null) : null
