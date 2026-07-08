@@ -44,12 +44,22 @@ export default defineEventHandler(async (event) => {
   // ===== 2. Generate Kode Invoice =====
   const kodeInvoice = generateInvoiceCode();
 
-  // Ambil linkGrupWa dari collection program jika ada
+  // Ambil linkGrupWa dari collection program jika ada, sesuaikan dengan jenis kelamin
   let linkGrupWa = null;
   if (programId) {
     const programSnap = await db.collection('programs').doc(programId).get();
     if (programSnap.exists) {
-      linkGrupWa = programSnap.data()?.linkGrupWa || null;
+      const progData = programSnap.data();
+      const jk = dataPeserta?.jenisKelamin?.toLowerCase() || '';
+      
+      if (jk === 'laki-laki' && progData?.linkGrupWaLaki) {
+        linkGrupWa = progData.linkGrupWaLaki;
+      } else if (jk === 'perempuan' && progData?.linkGrupWaPerempuan) {
+        linkGrupWa = progData.linkGrupWaPerempuan;
+      } else {
+        // Fallback ke linkGrupWa umum jika tidak spesifik atau spesifiknya kosong
+        linkGrupWa = progData?.linkGrupWa || null;
+      }
     }
   }
 
@@ -69,8 +79,10 @@ export default defineEventHandler(async (event) => {
       : { zona: null, nominal: 0 },
     rincianBiaya: {
       biayaProgram: rincianBiaya?.biayaProgram ?? 0,
+      namaPaket: rincianBiaya?.namaPaket ?? 'Reguler',
       totalHargaKitab: rincianBiaya?.totalHargaKitab ?? 0,
       ongkir: rincianBiaya?.ongkir ?? 0,
+      donasi: rincianBiaya?.donasi ?? 0,
       total: rincianBiaya?.total ?? 0
     },
     linkGrupWa,
@@ -99,7 +111,16 @@ export default defineEventHandler(async (event) => {
       id: programId ?? 'program',
       price: rincianBiaya.biayaProgram,
       quantity: 1,
-      name: programNama ?? 'Program MUBK'
+      name: `${programNama ?? 'Program MUBK'} (${rincianBiaya.namaPaket ?? 'Reguler'})`
+    });
+  }
+
+  if (rincianBiaya?.donasi > 0) {
+    itemDetails.push({
+      id: 'donasi_sukarela',
+      price: rincianBiaya.donasi,
+      quantity: 1,
+      name: 'Donasi / Infaq Sukarela'
     });
   }
 

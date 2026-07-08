@@ -119,6 +119,20 @@
                 </div>
               </div>
 
+              <!-- Pilihan Paket Harga -->
+              <div v-if="selectedProgram && Array.isArray(selectedProgram.paketHarga) && selectedProgram.paketHarga.length > 1" class="flex flex-col gap-3 pb-6 border-b border-brand-border/30">
+                <label class="text-sm font-bold text-brand-brown uppercase tracking-wider">Pilih Paket Pendaftaran <span class="text-brand-orange">*</span></label>
+                <div class="flex flex-col gap-3">
+                  <label v-for="(paketOpsi, idx) in selectedProgram.paketHarga" :key="idx" class="flex items-center justify-between gap-3 text-sm cursor-pointer group bg-brand-cream/30 p-4 rounded-xl border border-brand-border/50 hover:border-brand-orange transition-colors">
+                    <div class="flex items-center gap-3">
+                      <input type="radio" v-model="form.paketHargaPilihan" :value="paketOpsi" class="w-5 h-5 text-brand-orange focus:ring-brand-orange border-brand-border" />
+                      <span class="group-hover:text-brand-orange transition-colors font-medium text-brand-brown">{{ paketOpsi.nama }}</span>
+                    </div>
+                    <span class="font-bold text-brand-orange">Rp {{ paketOpsi.harga?.toLocaleString('id-ID') }}</span>
+                  </label>
+                </div>
+              </div>
+
               <div class="flex flex-col gap-2">
                 <label class="text-sm font-bold text-brand-brown uppercase tracking-wider">Nama Lengkap <span class="text-brand-orange">*</span></label>
                 <input type="text" v-model="form.dataPeserta.namaLengkap" :required="currentStep === 1" placeholder="Fulan bin Fulan" class="input-field" />
@@ -289,16 +303,34 @@
               </div>
             </div>
             
-            <div v-else class="bg-brand-cream/30 border border-brand-border rounded-[30px] p-8 md:p-10 text-center text-brand-muted">
-              Tidak ada kitab yang dibeli. Anda dapat melanjutkan ke ringkasan biaya.
+            <div v-else class="bg-white border border-brand-border rounded-[30px] p-8 md:p-10 text-center text-brand-muted shadow-sm">
+              Tidak ada kitab yang dibeli.
             </div>
+            
           </div>
         </div>
 
         <!-- ============================== -->
         <!-- STEP 4: RINGKASAN BIAYA        -->
         <!-- ============================== -->
-        <div v-show="currentStep === 4">
+        <div v-show="currentStep === 4" class="space-y-6">
+          
+          <!-- DONASI SUKARELA -->
+          <div class="bg-white border border-brand-border rounded-[30px] p-8 md:p-10 shadow-sm">
+            <h2 class="font-display text-2xl text-brand-brown border-b border-brand-border/50 pb-4 mb-4 flex items-center gap-2">
+              <svg class="w-6 h-6 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+              Donasi / Infaq Sukarela <span class="text-brand-muted text-lg font-sans normal-case italic">(Opsional)</span>
+            </h2>
+            <p class="text-sm text-brand-muted mb-6 leading-relaxed">Jika Anda berkenan, Anda dapat menyertakan infaq untuk mendukung kegiatan dakwah dan operasional program kami. Berapapun nilainya sangat berarti.</p>
+            
+            <div class="flex flex-col gap-2">
+              <div class="relative w-full">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-brand-brown font-bold text-sm">Rp</span>
+                <input type="number" min="0" v-model="form.donasi" placeholder="0" class="w-full pl-12 pr-5 py-4 text-sm rounded-xl border border-brand-border/50 bg-brand-cream/30 focus:outline-none focus:border-brand-orange focus:bg-white transition-colors text-brand-brown font-medium" />
+              </div>
+            </div>
+          </div>
+
           <div class="bg-white shadow-xl border border-brand-border/50 rounded-[30px] p-8 md:p-10 relative overflow-hidden">
             <!-- Decorative accent -->
             <div class="absolute -right-10 -top-10 w-32 h-32 bg-brand-orange/5 rounded-full blur-2xl pointer-events-none"></div>
@@ -311,8 +343,9 @@
                   <p class="font-bold text-brand-brown">Program</p>
                   <p class="text-brand-muted text-sm">{{ selectedProgram.nama }}</p>
                   <p v-if="form.jadwalPilihan" class="text-brand-orange text-xs mt-1">Jadwal: {{ form.jadwalPilihan }}</p>
+                  <p v-if="form.paketHargaPilihan && selectedProgram.paketHarga && selectedProgram.paketHarga.length > 1" class="text-brand-orange text-xs mt-1">Paket: {{ form.paketHargaPilihan.nama }}</p>
                 </div>
-                <span class="font-bold text-brand-brown whitespace-nowrap">Rp {{ selectedProgram.harga?.toLocaleString('id-ID') }}</span>
+                <span class="font-bold text-brand-brown whitespace-nowrap">Rp {{ (form.paketHargaPilihan?.harga ?? selectedProgram.harga ?? 0).toLocaleString('id-ID') }}</span>
               </div>
               
               <div v-if="semuaKitabDibeli.length > 0" class="pb-4 border-b border-brand-border/50 border-dashed space-y-3">
@@ -321,6 +354,11 @@
                   <span class="text-brand-muted line-clamp-1 pr-4">- {{ k.judul }}</span>
                   <span class="font-medium text-brand-brown whitespace-nowrap">Rp {{ k.harga?.toLocaleString('id-ID') }}</span>
                 </div>
+              </div>
+              
+              <div v-if="form.donasi > 0" class="flex justify-between items-center text-sm md:text-base pb-4 border-b border-brand-border/50 border-dashed">
+                <p class="font-bold text-brand-brown">Donasi / Infaq Sukarela</p>
+                <span class="font-bold text-brand-brown">Rp {{ form.donasi.toLocaleString('id-ID') }}</span>
               </div>
               
               <div v-if="semuaKitabDibeli.length > 0 && form.ongkir.zona" class="flex justify-between items-center text-sm md:text-base pb-4">
@@ -379,7 +417,7 @@
         </div>
 
         <!-- Pending Invoice Info (Midtrans closed) -->
-        <div v-if="pendingInvoice" class="bg-brand-cream/40 text-brand-brown p-6 rounded-[20px] text-center border border-brand-orange/30 mt-4 shadow-sm">
+        <div v-if="pendingInvoice" class="bg-white text-brand-brown p-6 rounded-[20px] text-center border border-brand-orange/30 mt-4 shadow-sm">
           <div class="w-12 h-12 bg-brand-orange/10 rounded-full flex items-center justify-center mx-auto mb-3 text-brand-orange">
             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           </div>
@@ -440,6 +478,8 @@ const form = ref({
     alamatPengiriman: null as string | null
   },
   jadwalPilihan: '',
+  paketHargaPilihan: null as any,
+  donasi: 0,
   ongkir: {
     zona: '',
     nominal: 0
@@ -462,9 +502,13 @@ const nominalOngkir = computed(() => {
 });
 
 const totalBayar = computed(() => {
-  const biayaProgram = selectedProgram.value?.harga ?? 0;
+  let biayaProgram = selectedProgram.value?.harga ?? 0;
+  if (form.value.paketHargaPilihan) {
+    biayaProgram = form.value.paketHargaPilihan.harga;
+  }
   const totalKitab = semuaKitabDibeli.value.reduce((acc, k) => acc + (k.harga ?? 0), 0);
-  return biayaProgram + totalKitab + nominalOngkir.value;
+  const donasi = Number(form.value.donasi) || 0;
+  return biayaProgram + totalKitab + nominalOngkir.value + donasi;
 });
 
 // Load data on mount
@@ -512,6 +556,15 @@ onMounted(async () => {
         }
       } else if (typeof selectedProgram.value.jadwal === 'string') {
         form.value.jadwalPilihan = selectedProgram.value.jadwal;
+      }
+
+      // Auto-select paket harga jika ada
+      if (Array.isArray(selectedProgram.value.paketHarga) && selectedProgram.value.paketHarga.length > 0) {
+        if (selectedProgram.value.paketHarga.length === 1) {
+          form.value.paketHargaPilihan = selectedProgram.value.paketHarga[0];
+        }
+      } else {
+        form.value.paketHargaPilihan = { nama: 'Reguler', harga: selectedProgram.value.harga ?? 0 };
       }
 
       // Fetch kitab wajib program
@@ -637,9 +690,11 @@ const submitForm = async () => {
       ? { zona: form.value.ongkir.zona, nominal: nominalOngkir.value }
       : { zona: null, nominal: 0 },
     rincianBiaya: {
-      biayaProgram: selectedProgram.value?.harga ?? 0,
-      totalHargaKitab: semuaKitabDibeli.value.reduce((acc, k) => acc + k.harga, 0),
+      biayaProgram: form.value.paketHargaPilihan?.harga ?? selectedProgram.value.harga ?? 0,
+      namaPaket: form.value.paketHargaPilihan?.nama ?? 'Reguler',
+      totalHargaKitab: semuaKitabDibeli.value.reduce((acc, k) => acc + (k.harga ?? 0), 0),
       ongkir: nominalOngkir.value,
+      donasi: Number(form.value.donasi) || 0,
       total: totalBayar.value
     }
   };
