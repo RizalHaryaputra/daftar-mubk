@@ -25,6 +25,16 @@
         </div>
         
         <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+          <select v-if="availablePrograms.length > 0" v-model="filterProgram" class="w-full sm:w-auto px-6 py-3 rounded-full border-2 border-brand-border/50 bg-white focus:outline-none focus:border-brand-orange text-brand-brown font-medium cursor-pointer text-sm appearance-none">
+            <option value="">Semua Program</option>
+            <option v-for="p in availablePrograms" :key="p.id" :value="p.id">{{ p.nama }}</option>
+          </select>
+          
+          <select v-if="availableBulan.length > 0" v-model="filterBulan" class="w-full sm:w-auto px-6 py-3 rounded-full border-2 border-brand-border/50 bg-white focus:outline-none focus:border-brand-orange text-brand-brown font-medium cursor-pointer text-sm appearance-none">
+            <option value="">Semua Bulan</option>
+            <option v-for="b in availableBulan" :key="b" :value="b">{{ formatBulan(b) }}</option>
+          </select>
+
           <select v-if="availablePeriodes.length > 0" v-model="filterPeriode" class="w-full sm:w-auto px-6 py-3 rounded-full border-2 border-brand-border/50 bg-white focus:outline-none focus:border-brand-orange text-brand-brown font-medium cursor-pointer text-sm appearance-none">
             <option value="">Semua Periode</option>
             <option v-for="p in availablePeriodes" :key="p" :value="p">{{ p }}</option>
@@ -144,6 +154,8 @@ const isLoading = ref(true);
 const searchQuery = ref('');
 const filterStatus = ref('');
 const filterPeriode = ref('');
+const filterProgram = ref('');
+const filterBulan = ref('');
 const currentPage = ref(1);
 const itemsPerPage = 10;
 
@@ -205,6 +217,20 @@ const filteredData = computed(() => {
     result = result.filter(p => p.enrichedPeriode === filterPeriode.value);
   }
 
+  if (filterProgram.value) {
+    result = result.filter(p => p.programId === filterProgram.value);
+  }
+
+  if (filterBulan.value) {
+    result = result.filter(p => {
+      if (!p.createdAt) return false;
+      const date = p.createdAt.toDate ? p.createdAt.toDate() : new Date(p.createdAt);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      return `${year}-${month}` === filterBulan.value;
+    });
+  }
+
   return result;
 });
 
@@ -215,6 +241,36 @@ const availablePeriodes = computed(() => {
   });
   return Array.from(periodes).sort();
 });
+
+const availablePrograms = computed(() => {
+  const progs = new Map<string, string>();
+  pendaftaranList.value.forEach(p => {
+    const nama = p.programNama || p.dataProgram?.nama;
+    if (nama && p.programId) progs.set(p.programId, nama);
+  });
+  return Array.from(progs.entries()).map(([id, nama]) => ({ id, nama })).sort((a, b) => a.nama.localeCompare(b.nama));
+});
+
+const availableBulan = computed(() => {
+  const bulans = new Set<string>();
+  pendaftaranList.value.forEach(p => {
+    if (p.createdAt) {
+      const date = p.createdAt.toDate ? p.createdAt.toDate() : new Date(p.createdAt);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      bulans.add(`${year}-${month}`);
+    }
+  });
+  return Array.from(bulans).sort().reverse();
+});
+
+const formatBulan = (val: string) => {
+  if (!val) return '';
+  const [year, month] = val.split('-');
+  if (!year || !month) return val;
+  const date = new Date(parseInt(year), parseInt(month) - 1);
+  return new Intl.DateTimeFormat('id-ID', { month: 'long', year: 'numeric' }).format(date);
+};
 
 const exportToExcel = () => {
   if (filteredData.value.length === 0) {
@@ -237,8 +293,10 @@ const exportToExcel = () => {
     'Periode': p.enrichedPeriode || '-',
     'Pilihan Jadwal': p.jadwalPilihan || '-',
     'Biaya Program': p.rincianBiaya?.biayaProgram || 0,
+    'Nama Paket Program': p.rincianBiaya?.namaPaket || '-',
     'Total Kitab': p.rincianBiaya?.totalHargaKitab || 0,
     'Ongkos Kirim': p.rincianBiaya?.ongkir || 0,
+    'Donasi': p.rincianBiaya?.donasi || 0,
     'Total Bayar': p.rincianBiaya?.total || 0,
     'Status Pembayaran': p.statusPembayaran?.toUpperCase() || '-',
     'Status Pengiriman': p.statusPengiriman?.replace('_', ' ').toUpperCase() || '-',

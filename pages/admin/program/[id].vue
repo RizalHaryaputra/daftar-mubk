@@ -80,6 +80,7 @@ const handleSave = async (formData: any) => {
       jadwal: formData.jadwal,
       durasi: formData.durasi,
       harga: Number(formData.harga),
+      paketHarga: formData.paketHarga,
       periode: formData.periode || '',
       status: formData.status,
       gambarUrl: formData.gambarUrl || null,

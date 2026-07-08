@@ -46,8 +46,8 @@
         </ClientOnly>
       </div>
 
-      <!-- Durasi, Harga, Periode -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Durasi, Periode -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="flex flex-col gap-2">
           <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Periode <span class="text-brand-orange">*</span></label>
           <input v-model="form.periode" required class="input-field" placeholder="Contoh: Gel. 1 / Batch 2" />
@@ -56,9 +56,34 @@
           <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Durasi Program <span class="text-brand-orange">*</span></label>
           <input v-model="form.durasi" required class="input-field" placeholder="Contoh: 3 bulan (12 pekan)" />
         </div>
-        <div class="flex flex-col gap-2">
-          <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Harga Pendaftaran (Rp) <span class="text-brand-orange">*</span></label>
-          <input type="number" v-model="form.harga" required class="input-field" placeholder="0" />
+      </div>
+
+      <!-- Opsi Paket Harga -->
+      <div class="p-6 border-2 border-brand-border/50 rounded-[20px] space-y-5 bg-brand-cream/10">
+        <div class="flex items-center justify-between border-b border-brand-border/30 pb-4">
+          <label class="text-xs font-bold text-brand-brown uppercase tracking-widest">Opsi Paket Harga <span class="text-brand-orange">*</span></label>
+          <button type="button" @click="form.paketHarga.push({nama: '', harga: 0})" class="text-brand-orange hover:text-orange-700 focus:outline-none flex items-center gap-1.5 font-bold text-xs uppercase tracking-widest transition-colors bg-white px-4 py-2 rounded-full border-2 border-brand-orange/30 hover:border-brand-orange hover:bg-brand-orange/5 shadow-sm">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" /></svg>
+            Tambah Paket
+          </button>
+        </div>
+        
+        <div class="space-y-4">
+          <div v-for="(p, index) in form.paketHarga" :key="index" class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <div class="w-10 h-12 hidden sm:flex items-center justify-center bg-white rounded-xl border-2 border-brand-border/50 text-brand-muted font-bold text-sm shrink-0 shadow-sm">
+              {{ index + 1 }}
+            </div>
+            <input v-model="p.nama" required class="input-field flex-1" placeholder="Nama Paket (misal: Reguler)" />
+            <div class="relative flex-1 w-full sm:w-auto">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-brand-muted font-bold text-sm">Rp</span>
+              <input type="number" v-model="p.harga" required class="input-field w-full !pl-12" placeholder="0" />
+            </div>
+            
+            <button type="button" v-if="form.paketHarga.length > 1" @click="form.paketHarga.splice(index, 1)" class="w-full sm:w-12 h-12 flex-shrink-0 flex items-center justify-center text-brand-muted bg-white border-2 border-brand-border/50 hover:border-red-500 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all focus:outline-none hover:shadow-md" title="Hapus paket">
+              <span class="sm:hidden font-bold mr-2 text-xs uppercase tracking-widest">Hapus Paket</span>
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -238,7 +263,9 @@ const defaultForm = () => ({
   deskripsiSingkat: '',
   jadwal: [''],
   durasi: '',
-  harga: 0, status: 'aktif', gambarUrl: '', periode: '', linkGrupWa: '', linkGrupWaLaki: '', linkGrupWaPerempuan: '',
+  harga: 0, 
+  paketHarga: [{ nama: 'Reguler', harga: 0 }],
+  status: 'aktif', gambarUrl: '', periode: '', linkGrupWa: '', linkGrupWaLaki: '', linkGrupWaPerempuan: '',
   tanggalMulaiStr: '', tanggalAkhirStr: '', deadlineDaftarStr: '',
   wajibBeliKitab: false, kitabWajibIdsStr: ''
 });
@@ -263,6 +290,7 @@ const populateForm = () => {
       jadwal: jadwalArr,
       durasi: item.durasi ?? '',
       harga: item.harga ?? 0,
+      paketHarga: (item.paketHarga && item.paketHarga.length > 0) ? [...item.paketHarga] : [{ nama: 'Reguler', harga: item.harga ?? 0 }],
       status: item.status ?? 'aktif',
       gambarUrl: item.gambarUrl ?? '',
       periode: item.periode ?? '',
@@ -321,6 +349,11 @@ const onSubmit = () => {
   // Convert selected checkboxes back to comma-separated string for compatibility with parent components
   form.value.kitabWajibIdsStr = selectedKitabIds.value.join(',');
   
+  // Clean up empty paket strings and sync default harga
+  form.value.paketHarga = form.value.paketHarga.filter((p: any) => p.nama.trim() !== '');
+  if (form.value.paketHarga.length === 0) form.value.paketHarga = [{ nama: 'Reguler', harga: 0 }];
+  form.value.harga = Number(form.value.paketHarga[0]?.harga || 0);
+
   // Clean up empty jadwal strings
   form.value.jadwal = form.value.jadwal.filter((j: string) => j.trim() !== '');
   if (form.value.jadwal.length === 0) form.value.jadwal = [''];

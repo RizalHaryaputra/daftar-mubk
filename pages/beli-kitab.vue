@@ -161,6 +161,22 @@
           </div>
         </div>
 
+        <!-- DONASI SUKARELA -->
+        <div class="bg-white shadow-sm border border-brand-border/50 rounded-[30px] p-8 md:p-10 relative overflow-hidden mt-8">
+          <h2 class="font-display text-2xl text-brand-brown border-b border-brand-border/50 pb-4 mb-4 flex items-center gap-2">
+            <svg class="w-6 h-6 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+            Donasi / Infaq Sukarela <span class="text-brand-muted text-lg font-sans normal-case italic">(Opsional)</span>
+          </h2>
+          <p class="text-sm text-brand-muted mb-6 leading-relaxed">Jika Anda berkenan, Anda dapat menyertakan infaq untuk mendukung kegiatan dakwah dan operasional program kami. Berapapun nilainya sangat berarti.</p>
+          
+          <div class="flex flex-col gap-2">
+            <div class="relative w-full">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-brand-brown font-bold text-sm">Rp</span>
+              <input type="number" min="0" v-model="form.donasi" placeholder="0" class="input-field w-full !pl-12" />
+            </div>
+          </div>
+        </div>
+
         <!-- Ringkasan Biaya & Submit -->
         <div class="bg-white shadow-xl border border-brand-border/50 rounded-[30px] p-8 md:p-10 relative overflow-hidden">
           <!-- Decorative accent -->
@@ -180,13 +196,18 @@
               </div>
             </div>
             
-            <div class="flex justify-between items-center text-sm md:text-base pb-4">
+            <div class="flex justify-between items-center text-sm md:text-base pb-4 border-b border-brand-border/50 border-dashed">
               <div>
                 <p class="font-bold text-brand-brown">Ongkos Kirim</p>
                 <p v-if="form.ongkir.zona" class="text-brand-muted text-sm capitalize">Zona: {{ form.ongkir.zona.replace('_', ' ') }}</p>
                 <p v-else class="text-red-500 text-xs mt-1 italic">Pilih zona ongkir di atas</p>
               </div>
               <span class="font-bold text-brand-brown">Rp {{ nominalOngkir.toLocaleString('id-ID') }}</span>
+            </div>
+
+            <div v-if="form.donasi > 0" class="flex justify-between items-center text-sm md:text-base pb-4">
+              <p class="font-bold text-brand-brown">Donasi / Infaq Sukarela</p>
+              <span class="font-bold text-brand-brown">Rp {{ form.donasi.toLocaleString('id-ID') }}</span>
             </div>
           </div>
 
@@ -205,7 +226,7 @@
           </div>
 
           <!-- Pending Invoice Info (Midtrans closed) -->
-          <div v-if="pendingInvoice" class="bg-brand-cream/40 text-brand-brown p-6 rounded-[20px] text-center border border-brand-orange/30 mt-6 shadow-sm">
+          <div v-if="pendingInvoice" class="bg-white text-brand-brown p-6 rounded-[20px] text-center border border-brand-orange/30 mt-6 shadow-sm">
             <div class="w-12 h-12 bg-brand-orange/10 rounded-full flex items-center justify-center mx-auto mb-3 text-brand-orange">
               <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             </div>
@@ -261,7 +282,8 @@ const form = ref({
   ongkir: {
     zona: '',
     nominal: 0
-  }
+  },
+  donasi: 0
 });
 
 const semuaKitabDibeli = computed(() => {
@@ -288,7 +310,7 @@ const nominalOngkir = computed(() => {
 
 const totalBayar = computed(() => {
   const totalKitab = semuaKitabDibeli.value.reduce((acc, k) => acc + ((k.harga ?? 0) * (k.qty ?? 1)), 0);
-  return totalKitab + nominalOngkir.value;
+  return totalKitab + nominalOngkir.value + (form.value.donasi || 0);
 });
 
 onMounted(async () => {
@@ -381,6 +403,7 @@ const submitForm = async () => {
       biayaProgram: 0,
       totalHargaKitab: semuaKitabDibeli.value.reduce((acc, k) => acc + ((k.harga ?? 0) * (k.qty ?? 1)), 0),
       ongkir: nominalOngkir.value,
+      donasi: form.value.donasi || 0,
       total: totalBayar.value
     }
   };

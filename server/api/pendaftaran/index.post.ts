@@ -79,8 +79,10 @@ export default defineEventHandler(async (event) => {
       : { zona: null, nominal: 0 },
     rincianBiaya: {
       biayaProgram: rincianBiaya?.biayaProgram ?? 0,
+      namaPaket: rincianBiaya?.namaPaket ?? 'Reguler',
       totalHargaKitab: rincianBiaya?.totalHargaKitab ?? 0,
       ongkir: rincianBiaya?.ongkir ?? 0,
+      donasi: rincianBiaya?.donasi ?? 0,
       total: rincianBiaya?.total ?? 0
     },
     linkGrupWa,
@@ -109,7 +111,16 @@ export default defineEventHandler(async (event) => {
       id: programId ?? 'program',
       price: rincianBiaya.biayaProgram,
       quantity: 1,
-      name: programNama ?? 'Program MUBK'
+      name: `${programNama ?? 'Program MUBK'} (${rincianBiaya.namaPaket ?? 'Reguler'})`
+    });
+  }
+
+  if (rincianBiaya?.donasi > 0) {
+    itemDetails.push({
+      id: 'donasi_sukarela',
+      price: rincianBiaya.donasi,
+      quantity: 1,
+      name: 'Donasi / Infaq Sukarela'
     });
   }
 

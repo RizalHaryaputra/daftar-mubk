@@ -106,11 +106,24 @@
                   </div>
                   <span class="text-xs text-brand-orange uppercase tracking-widest font-bold">Biaya Program</span>
                 </div>
-                <div class="pl-1 relative z-10">
-                  <div class="flex items-baseline gap-1">
-                    <span class="text-brand-orange font-bold">Rp</span>
-                    <span class="text-3xl md:text-4xl font-display font-bold text-brand-orange tracking-tight">{{ program.harga?.toLocaleString('id-ID') }}</span>
-                  </div>
+                <div class="pl-1 relative z-10 w-full">
+                  <template v-if="Array.isArray(program.paketHarga) && program.paketHarga.length > 0">
+                    <div class="flex flex-col gap-3 mt-4">
+                      <div v-for="(p, idx) in program.paketHarga" :key="idx" class="flex justify-between items-center gap-2 bg-white/60 p-3 rounded-xl border border-brand-orange/20 shadow-sm backdrop-blur-sm">
+                        <span class="text-sm font-bold text-brand-brown flex-1 break-words">{{ p.nama }}</span>
+                        <div class="flex items-baseline gap-1 shrink-0">
+                          <span class="text-brand-orange text-xs font-bold">Rp</span>
+                          <span class="text-lg md:text-xl font-display font-bold text-brand-orange tracking-tight">{{ p.harga?.toLocaleString('id-ID') }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div class="flex items-baseline gap-1 mt-1">
+                      <span class="text-brand-orange font-bold">Rp</span>
+                      <span class="text-3xl md:text-4xl font-display font-bold text-brand-orange tracking-tight">{{ program.harga?.toLocaleString('id-ID') }}</span>
+                    </div>
+                  </template>
                 </div>
               </div>
 
