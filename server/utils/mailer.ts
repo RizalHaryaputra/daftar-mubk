@@ -16,6 +16,18 @@ export interface EmailItemDetail {
   quantity: number;
 }
 
+const getContactFooterHtml = (extraNote = '') => `
+  <div style="background-color: #f5f5f5; padding: 20px; text-align: center; border-top: 1px solid #eee;">
+    <p style="margin: 0; font-size: 14px; color: #555;">
+      Ada pertanyaan? Hubungi <strong>Narahubung YPIA Academy</strong>:<br>
+      <a href="https://wa.me/6281392658080" style="color: #25D366; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 6px;">
+        <span style="font-size: 16px;">+62 813-9265-8080</span> (WhatsApp)
+      </a>
+    </p>
+    ${extraNote ? `<p style="margin: 16px 0 0; font-size: 12px; color: #888;">${extraNote}</p>` : ''}
+  </div>
+`;
+
 export interface ConfirmationEmailOptions {
   to: string;
   namaLengkap: string;
@@ -91,17 +103,17 @@ export const sendConfirmationEmail = async (opts: ConfirmationEmailOptions) => {
           </div>
         </div>
         
-        <div style="background-color: #f5f5f5; padding: 20px; text-align: center; border-top: 1px solid #eee;">
-          <p style="margin: 0; font-size: 12px; color: #888;">Simpan email ini sebagai bukti pembayaran yang sah.</p>
-        </div>
+        ${getContactFooterHtml('Simpan email ini sebagai bukti pembayaran yang sah.')}
       </div>
     </div>
   `;
 
+  const subjectTitle = opts.tipePesanan === 'kitab' ? 'Pembelian' : 'Pendaftaran';
+
   await transporter.sendMail({
     from: `"MUBK Yogyakarta" <${process.env.EMAIL_USER}>`,
     to: opts.to,
-    subject: `✅ Pendaftaran Berhasil — ${opts.kodeInvoice}`,
+    subject: `✅ ${subjectTitle} Berhasil — ${opts.kodeInvoice}`,
     html
   });
 };
@@ -161,9 +173,7 @@ export const sendInvoiceEmail = async (opts: InvoiceEmailOptions) => {
           </div>
         </div>
         
-        <div style="background-color: #f5f5f5; padding: 20px; text-align: center; border-top: 1px solid #eee;">
-          <p style="margin: 0; font-size: 12px; color: #888;">Tautan pembayaran memiliki batas waktu kedaluwarsa. Jangan bagikan tautan ini ke orang lain.</p>
-        </div>
+        ${getContactFooterHtml('Tautan pembayaran memiliki batas waktu kedaluwarsa. Jangan bagikan tautan ini ke orang lain.')}
       </div>
     </div>
   `;
@@ -284,6 +294,7 @@ export const sendFailedEmail = async (opts: InvoiceEmailOptions) => {
             </a>
           </div>
         </div>
+        ${getContactFooterHtml()}
       </div>
     </div>
   `;
@@ -338,10 +349,11 @@ export const sendResiEmail = async (opts: ResiEmailOptions) => {
             </a>
           </div>
 
-          <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #eee; text-align: center;">
+          <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #eee; text-align: center; margin-bottom: 24px;">
             <p style="margin: 0; font-size: 13px; color: #888; line-height: 1.5;">Status pelacakan mungkin membutuhkan waktu hingga 24 jam untuk diperbarui oleh pihak ekspedisi.<br>Anda juga dapat mengecek status pesanan melalui <a href="${appUrl}/cek-status?invoice=${opts.kodeInvoice}" style="color: #F5720A; text-decoration: none; font-weight: bold;">website kami</a>.</p>
           </div>
         </div>
+        ${getContactFooterHtml()}
       </div>
     </div>
   `;
