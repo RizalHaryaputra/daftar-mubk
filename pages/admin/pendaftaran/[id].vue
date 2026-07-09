@@ -6,8 +6,22 @@
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
         Kembali ke Daftar Pendaftaran
       </NuxtLink>
-      <h1 class="font-display text-3xl text-brand-brown">Detail Pendaftaran</h1>
-      <p class="text-brand-muted mt-2">Kelola informasi peserta, tagihan, dan status pengiriman untuk invoice <span class="font-bold text-brand-brown uppercase">#{{ id }}</span></p>
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 class="font-display text-3xl text-brand-brown">Detail Pendaftaran</h1>
+          <p class="text-brand-muted mt-2">Kelola informasi peserta, tagihan, dan status pengiriman untuk invoice <span class="font-bold text-brand-brown uppercase">#{{ id }}</span></p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button @click="openEditModal" class="px-4 py-2 bg-white text-brand-orange rounded-full font-bold text-sm hover:bg-brand-orange hover:text-white transition-colors flex items-center gap-2 shadow-sm border border-brand-border/50">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+            Edit Data
+          </button>
+          <button @click="isDeleteModalOpen = true" class="px-4 py-2 bg-white text-red-500 rounded-full font-bold text-sm hover:bg-red-500 hover:text-white transition-colors flex items-center gap-2 shadow-sm border border-red-100">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+            Hapus
+          </button>
+        </div>
+      </div>
     </div>
 
     <div v-if="isLoading" class="bg-white p-10 rounded-[30px] border border-brand-border/50 text-center">
@@ -263,13 +277,88 @@
 
       </div>
     </div>
+
+    <!-- Edit Modal -->
+    <Teleport to="body">
+      <div v-if="isEditModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-brown/50 backdrop-blur-sm">
+      <div class="bg-white rounded-[30px] p-8 max-w-2xl w-full shadow-xl max-h-[90vh] overflow-y-auto">
+        <h2 class="text-2xl font-display text-brand-brown mb-6">Edit Data Pendaftaran</h2>
+        
+        <div class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Nama Lengkap</label>
+              <input type="text" v-model="editData.namaLengkap" class="w-full px-4 py-3 rounded-xl border border-brand-border/50 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange outline-none bg-brand-cream/10">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Nomor WhatsApp</label>
+              <input type="text" v-model="editData.noWa" class="w-full px-4 py-3 rounded-xl border border-brand-border/50 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange outline-none bg-brand-cream/10">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Email</label>
+              <input type="email" v-model="editData.email" class="w-full px-4 py-3 rounded-xl border border-brand-border/50 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange outline-none bg-brand-cream/10">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Domisili</label>
+              <input type="text" v-model="editData.domisili" class="w-full px-4 py-3 rounded-xl border border-brand-border/50 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange outline-none bg-brand-cream/10">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Tempat Lahir</label>
+              <input type="text" v-model="editData.tempatLahir" class="w-full px-4 py-3 rounded-xl border border-brand-border/50 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange outline-none bg-brand-cream/10">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Tanggal Lahir</label>
+              <input type="date" v-model="editData.tanggalLahir" class="w-full px-4 py-3 rounded-xl border border-brand-border/50 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange outline-none bg-brand-cream/10">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Pekerjaan</label>
+              <input type="text" v-model="editData.pekerjaan" class="w-full px-4 py-3 rounded-xl border border-brand-border/50 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange outline-none bg-brand-cream/10">
+            </div>
+          </div>
+          
+          <div class="pt-4 border-t border-brand-border/50 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Jadwal Pilihan</label>
+              <input type="text" v-model="editData.jadwalPilihan" class="w-full px-4 py-3 rounded-xl border border-brand-border/50 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange outline-none bg-brand-cream/10">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-brand-muted uppercase tracking-widest mb-1">Mode Belajar</label>
+              <select v-model="editData.modeBelajar" class="w-full px-4 py-3 rounded-xl border border-brand-border/50 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange outline-none bg-brand-cream/10">
+                <option value="offline">Offline (Tatap Muka)</option>
+                <option value="online">Online</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="flex justify-end gap-3 pt-6">
+            <button @click="isEditModalOpen = false" class="px-6 py-3 rounded-xl font-bold text-brand-muted bg-gray-100 hover:bg-gray-200 transition">Batal</button>
+            <button @click="simpanEdit" :disabled="isSavingEdit" class="px-6 py-3 rounded-xl font-bold text-white bg-brand-orange hover:bg-brand-orange/90 transition disabled:opacity-50 flex items-center gap-2">
+              <span v-if="isSavingEdit" class="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
+              {{ isSavingEdit ? 'Menyimpan...' : 'Simpan Perubahan' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    </Teleport>
+    
+    <!-- Delete Confirmation Modal -->
+    <ModalConfirm 
+      :is-open="isDeleteModalOpen"
+      title="Hapus Data Pendaftaran?"
+      message="Apakah Anda yakin ingin menghapus data pendaftaran ini? Aksi ini tidak dapat dibatalkan."
+      confirm-text="Ya, Hapus"
+      variant="danger"
+      @confirm="hapusData"
+      @cancel="isDeleteModalOpen = false"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { useRoute, useRouter } from 'vue-router';
+import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
 import { useNuxtApp } from '#imports';
 import { useToast } from '~/composables/useToast';
@@ -277,6 +366,7 @@ import { useToast } from '~/composables/useToast';
 definePageMeta({ layout: 'admin', middleware: ['admin-auth'] });
 
 const route = useRoute();
+const router = useRouter();
 const { $db } = useNuxtApp();
 const db = $db as Firestore;
 const { showToast } = useToast();
@@ -285,6 +375,80 @@ const id = route.params.id as string;
 const isLoading = ref(true);
 const isUpdating = ref(false);
 const item = ref<any>(null);
+
+const isEditModalOpen = ref(false);
+const isSavingEdit = ref(false);
+const editData = ref<any>({});
+
+const openEditModal = () => {
+  editData.value = {
+    namaLengkap: item.value.dataPeserta?.namaLengkap || '',
+    email: item.value.dataPeserta?.email || '',
+    noWa: item.value.dataPeserta?.noWa || '',
+    domisili: item.value.dataPeserta?.domisili || '',
+    tempatLahir: item.value.dataPeserta?.tempatLahir || '',
+    tanggalLahir: item.value.dataPeserta?.tanggalLahir || '',
+    pekerjaan: item.value.dataPeserta?.pekerjaan || '',
+    jadwalPilihan: item.value.jadwalPilihan || '',
+    modeBelajar: item.value.modeBelajar || ''
+  };
+  isEditModalOpen.value = true;
+};
+
+const simpanEdit = async () => {
+  isSavingEdit.value = true;
+  try {
+    const docRef = doc(db, 'pendaftaran', id);
+    await updateDoc(docRef, {
+      'dataPeserta.namaLengkap': editData.value.namaLengkap,
+      'dataPeserta.email': editData.value.email,
+      'dataPeserta.noWa': editData.value.noWa,
+      'dataPeserta.domisili': editData.value.domisili,
+      'dataPeserta.tempatLahir': editData.value.tempatLahir,
+      'dataPeserta.tanggalLahir': editData.value.tanggalLahir,
+      'dataPeserta.pekerjaan': editData.value.pekerjaan,
+      jadwalPilihan: editData.value.jadwalPilihan,
+      modeBelajar: editData.value.modeBelajar,
+      updatedAt: new Date()
+    });
+    
+    // Update local state
+    if (item.value.dataPeserta) {
+      item.value.dataPeserta.namaLengkap = editData.value.namaLengkap;
+      item.value.dataPeserta.email = editData.value.email;
+      item.value.dataPeserta.noWa = editData.value.noWa;
+      item.value.dataPeserta.domisili = editData.value.domisili;
+      item.value.dataPeserta.tempatLahir = editData.value.tempatLahir;
+      item.value.dataPeserta.tanggalLahir = editData.value.tanggalLahir;
+      item.value.dataPeserta.pekerjaan = editData.value.pekerjaan;
+    }
+    item.value.jadwalPilihan = editData.value.jadwalPilihan;
+    item.value.modeBelajar = editData.value.modeBelajar;
+
+    showToast('Data berhasil diperbarui!', 'success');
+    isEditModalOpen.value = false;
+  } catch (err) {
+    console.error('Failed to update data', err);
+    showToast('Gagal menyimpan data', 'error');
+  } finally {
+    isSavingEdit.value = false;
+  }
+};
+
+const isDeleteModalOpen = ref(false);
+
+const hapusData = async () => {
+  try {
+    await deleteDoc(doc(db, 'pendaftaran', id));
+    showToast('Data pendaftaran berhasil dihapus.', 'success');
+    router.push('/admin/pendaftaran');
+  } catch (err) {
+    console.error('Failed to delete data', err);
+    showToast('Gagal menghapus data.', 'error');
+  } finally {
+    isDeleteModalOpen.value = false;
+  }
+};
 
 onMounted(async () => {
   try {
