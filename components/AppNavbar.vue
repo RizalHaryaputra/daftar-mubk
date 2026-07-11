@@ -82,13 +82,17 @@ const isMobileMenuOpen = ref(false);
 const isScrolled = ref(false);
 const route = useRoute();
 
+const fullWidthPages = ['/hubungi-kami', '/syarat-ketentuan', '/kebijakan-privasi'];
+
 const handleScroll = () => {
-  // Hanya jalankan efek dinamis ini di halaman beranda
   if (route.path === '/') {
+    // Landing page: mulai gelap, jadi cream setelah scroll melewati hero
     isScrolled.value = window.scrollY > 760;
+  } else if (fullWidthPages.includes(route.path)) {
+    // Halaman baru: mulai gelap (hero cream), jadi cream setelah scroll ke dark section
+    isScrolled.value = window.scrollY > 300;
   } else {
-    // Di halaman lain, bisa dibuat selalu cream atau selalu gelap. 
-    // Kita biarkan selalu gelap sesuai desain awal.
+    // Halaman lain: selalu gelap
     isScrolled.value = false;
   }
 };
