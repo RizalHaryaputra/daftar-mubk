@@ -68,10 +68,9 @@ onMounted(async () => {
         <div>
           <h4 class="font-bold text-xs uppercase tracking-widest mb-6 opacity-80">Bantuan</h4>
           <ul class="space-y-4">
-            <li><a href="#" class="text-sm font-thin opacity-90 hover:opacity-100 transition-opacity">FAQ</a></li>
-            <li><a href="#" class="text-sm font-thin opacity-90 hover:opacity-100 transition-opacity">Hubungi Kami</a></li>
-            <li><a href="#" class="text-sm font-thin opacity-90 hover:opacity-100 transition-opacity">Panduan Belajar</a></li>
-            <li><a href="#" class="text-sm font-thin opacity-90 hover:opacity-100 transition-opacity">Syarat & Ketentuan</a></li>
+            <li><NuxtLink to="/hubungi-kami" class="text-sm font-thin opacity-90 hover:opacity-100 transition-opacity">Hubungi Kami</NuxtLink></li>
+            <li><NuxtLink to="/syarat-ketentuan" class="text-sm font-thin opacity-90 hover:opacity-100 transition-opacity">Syarat &amp; Ketentuan</NuxtLink></li>
+            <li><NuxtLink to="/kebijakan-privasi" class="text-sm font-thin opacity-90 hover:opacity-100 transition-opacity">Kebijakan Privasi</NuxtLink></li>
           </ul>
         </div>
       </div>

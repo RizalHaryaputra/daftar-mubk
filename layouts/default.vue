@@ -13,6 +13,7 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
-// Cek apakah halaman saat ini adalah beranda (landing page)
-const isLandingPage = computed(() => route.path === '/')
+// Halaman yang menggunakan full-width layout (tanpa max-w-5xl)
+const fullWidthPages = ['/', '/hubungi-kami', '/syarat-ketentuan', '/kebijakan-privasi']
+const isLandingPage = computed(() => fullWidthPages.includes(route.path))
 </script>

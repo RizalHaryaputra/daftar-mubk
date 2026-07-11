@@ -35,31 +35,37 @@
             Daftar Kitab
           </h2>
           <div class="space-y-4">
-            <div v-for="k in semuaKitabDibeli" :key="k.id" class="flex items-center gap-4 p-4 border border-brand-border/30 rounded-2xl bg-brand-cream/10">
-              <div class="w-16 h-20 bg-brand-cream/50 rounded-lg overflow-hidden flex-shrink-0 border border-brand-border/30 flex items-center justify-center">
-                <img v-if="k.gambarUrl" :src="k.gambarUrl" :alt="k.judul" class="w-full h-full object-cover" />
-                <svg v-else class="w-8 h-8 text-brand-orange/50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-              </div>
-              <div class="flex-grow">
-                <h3 class="font-bold text-brand-brown">{{ k.judul }}</h3>
-                <p class="text-sm text-brand-muted">Rp {{ k.harga?.toLocaleString('id-ID') }} / pcs</p>
+            <div v-for="k in semuaKitabDibeli" :key="k.id" class="flex flex-col sm:flex-row sm:items-center gap-4 p-4 border border-brand-border/30 rounded-2xl bg-brand-cream/10">
+              <!-- Cover Image & Info -->
+              <div class="flex items-center gap-4 flex-grow w-full">
+                <div class="w-16 h-20 bg-brand-cream/50 rounded-lg overflow-hidden flex-shrink-0 border border-brand-border/30 flex items-center justify-center">
+                  <img v-if="k.gambarUrl" :src="k.gambarUrl" :alt="k.judul" class="w-full h-full object-cover" />
+                  <svg v-else class="w-8 h-8 text-brand-orange/50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                </div>
+                <div class="flex-grow">
+                  <h3 class="font-bold text-brand-brown leading-snug">{{ k.judul }}</h3>
+                  <p class="text-sm text-brand-muted">Rp {{ k.harga?.toLocaleString('id-ID') }} / pcs</p>
+                </div>
               </div>
               
-              <!-- Qty Controls -->
-              <div class="flex items-center gap-2 bg-white rounded-full border border-brand-border/50 p-1">
-                <button type="button" @click="updateQty(k.id, -1)" class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-brand-cream text-brand-orange transition-colors">
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" /></svg>
-                </button>
-                <span class="font-bold text-sm w-4 text-center text-brand-brown">{{ k.qty }}</span>
-                <button type="button" @click="updateQty(k.id, 1)" class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-brand-cream text-brand-orange transition-colors">
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+              <!-- Qty Controls & Action -->
+              <div class="flex items-center gap-3 justify-between sm:justify-end w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-brand-border/20">
+                <!-- Qty Controls -->
+                <div class="flex items-center gap-2 bg-white rounded-full border border-brand-border/50 p-1 flex-shrink-0">
+                  <button type="button" @click="updateQty(k.id, -1)" class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-brand-cream text-brand-orange transition-colors">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" /></svg>
+                  </button>
+                  <span class="font-bold text-sm w-4 text-center text-brand-brown">{{ k.qty }}</span>
+                  <button type="button" @click="updateQty(k.id, 1)" class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-brand-cream text-brand-orange transition-colors">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                  </button>
+                </div>
+
+                <!-- Allow deleting kitab if it's not the last one -->
+                <button type="button" @click="removeKitab(k.id)" v-if="semuaKitabDibeli.length > 1" class="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-100 transition-colors flex-shrink-0">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                 </button>
               </div>
-
-              <!-- Allow deleting kitab if it's not the last one -->
-              <button type="button" @click="removeKitab(k.id)" v-if="semuaKitabDibeli.length > 1" class="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-100 transition-colors">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-              </button>
             </div>
             
             <div class="pt-4 mt-4 border-t border-brand-border/30 border-dashed">
