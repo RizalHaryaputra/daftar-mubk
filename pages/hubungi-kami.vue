@@ -61,7 +61,7 @@
               </svg>
             </div>
             <p class="text-white/40 text-xs font-bold uppercase tracking-widest mb-2">Email</p>
-            <h3 class="text-white font-display text-xl mb-1">ypia.academy@gmail.com</h3>
+            <h3 class="text-white font-display text-xl mb-1">mahadumar.ypia@gmail.com</h3>
             <p class="text-white/50 text-sm">Respon dalam 1×24 jam kerja</p>
           </div>
 
@@ -75,7 +75,7 @@
             </div>
             <p class="text-white/40 text-xs font-bold uppercase tracking-widest mb-2">Lokasi</p>
             <h3 class="text-white font-display text-xl mb-1">Ma'had 'Umar bin Khattab</h3>
-            <p class="text-white/50 text-sm leading-relaxed">Jl. Ringroad Selatan, Banguntapan,<br/>Bantul, Yogyakarta</p>
+            <p class="text-white/50 text-sm leading-relaxed">Jl. Pogung Rejo No.412, RT.14/RW.51, Pogung Kidul, Sinduadi, Kec. Mlati, Kabupaten Sleman, Daerah Istimewa Yogyakarta 55284</p>
           </div>
         </div>
       </section>

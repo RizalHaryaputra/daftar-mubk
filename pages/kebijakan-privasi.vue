@@ -21,7 +21,7 @@
           <p class="text-brand-muted text-base leading-relaxed">
             Data Anda adalah amanah yang kami jaga dengan penuh tanggung jawab.
           </p>
-          <p class="text-brand-muted/60 text-sm mt-3">Terakhir diperbarui: Juli 2025</p>
+          <p class="text-brand-muted/60 text-sm mt-3">Terakhir diperbarui: Juli 2026</p>
         </div>
       </section>
     </div>

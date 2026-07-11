@@ -21,7 +21,7 @@
           <p class="text-brand-muted text-base leading-relaxed">
             Berlaku untuk seluruh layanan Ma'had 'Umar bin Khattab &mdash; YPIA Academy.
           </p>
-          <p class="text-brand-muted/60 text-sm mt-3">Terakhir diperbarui: Juli 2025</p>
+          <p class="text-brand-muted/60 text-sm mt-3">Terakhir diperbarui: Juli 2026</p>
         </div>
       </section>
     </div>
