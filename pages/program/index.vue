@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-12 pb-20 pt-8">
     <!-- Header Area -->
-    <div class="text-center max-w-2xl mx-auto px-4">
+    <div class="gsap-header text-center max-w-2xl mx-auto px-4">
       <h1 class="font-display text-4xl md:text-5xl text-brand-brown mb-4 font-bold tracking-tight">
         Program <span class="text-brand-orange italic">Pilihan</span>
       </h1>
@@ -12,7 +12,7 @@
     </div>
 
     <!-- Search Bar -->
-    <div class="max-w-md mx-auto px-4">
+    <div class="gsap-search max-w-md mx-auto px-4">
       <div class="relative">
         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-brand-orange">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
@@ -41,7 +41,9 @@
     <!-- State Data -->
     <div v-else-if="filteredPrograms.length > 0" class="max-w-6xl mx-auto px-4">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <CardProgram v-for="program in paginatedPrograms" :key="program.id" :program="program" />
+        <div v-for="program in paginatedPrograms" :key="program.id" class="gsap-program-card">
+          <CardProgram :program="program" />
+        </div>
       </div>
 
       <!-- Pagination UI -->
@@ -86,10 +88,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch, nextTick } from 'vue';
 import { useNuxtApp } from '#imports';
 import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
+import { gsap } from 'gsap';
 
 const { $db } = useNuxtApp();
 const db = $db as Firestore;
@@ -123,7 +126,44 @@ const paginatedPrograms = computed(() => {
   return filteredPrograms.value.slice(start, end);
 });
 
+const animateHeader = async () => {
+  if (!import.meta.client) return;
+  await nextTick();
+  gsap.killTweensOf('.gsap-header, .gsap-search');
+  gsap.fromTo(
+    '.gsap-header',
+    { opacity: 0, y: 20 },
+    { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', clearProps: 'transform' }
+  );
+  gsap.fromTo(
+    '.gsap-search',
+    { opacity: 0, y: 15 },
+    { opacity: 1, y: 0, duration: 0.5, delay: 0.1, ease: 'power2.out', clearProps: 'transform' }
+  );
+};
+
+const animateCards = async () => {
+  if (!import.meta.client) return;
+  await nextTick();
+  const cards = document.querySelectorAll('.gsap-program-card');
+  if (cards.length > 0) {
+    gsap.killTweensOf(cards);
+    gsap.fromTo(
+      cards,
+      { opacity: 0, y: 20 },
+      { opacity: 1, y: 0, duration: 0.5, stagger: 0.06, ease: 'power2.out', clearProps: 'transform' }
+    );
+  }
+};
+
+watch(paginatedPrograms, () => {
+  animateCards();
+});
+
 onMounted(async () => {
+  await nextTick();
+  animateHeader();
+
   try {
     const q = query(
       collection(db, 'programs'),
@@ -142,6 +182,7 @@ onMounted(async () => {
     error.value = true;
   } finally {
     isLoading.value = false;
+    animateCards();
   }
 });
 </script>

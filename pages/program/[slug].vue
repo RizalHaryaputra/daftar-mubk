@@ -30,7 +30,7 @@
     <!-- Main Content -->
     <template v-else-if="program">
       <!-- Back Navigation -->
-      <div>
+      <div class="gsap-back">
         <NuxtLink to="/program" class="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-brand-muted hover:text-brand-orange transition-colors">
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
           Kembali ke Daftar Program
@@ -39,7 +39,7 @@
 
       <div class="grid grid-cols-1 md:grid-cols-12 gap-10">
         <!-- Image Area (Left) -->
-        <div class="md:col-span-4 lg:col-span-5">
+        <div class="gsap-left-card md:col-span-4 lg:col-span-5">
           <div class="bg-white border border-brand-border/50 rounded-[30px] p-4 shadow-xl sticky top-24 relative overflow-hidden group">
             
             <div class="relative rounded-[25px] overflow-hidden w-full aspect-[4/5]">
@@ -67,10 +67,10 @@
         </div>
         
         <!-- Info Area (Right) -->
-        <div class="md:col-span-8 lg:col-span-7 bg-white rounded-[30px] border border-brand-border/50 p-8 md:p-10 shadow-sm space-y-10">
+        <div class="gsap-right-info md:col-span-8 lg:col-span-7 bg-white rounded-[30px] border border-brand-border/50 p-8 md:p-10 shadow-sm space-y-10">
           
           <!-- Header Info -->
-          <div>
+          <div class="gsap-detail-header">
             <h1 class="font-display text-4xl md:text-5xl lg:text-6xl text-brand-brown mb-6 leading-tight">{{ program.nama }}</h1>
             
             <!-- Deadline Banner -->
@@ -85,13 +85,13 @@
             </div>
 
             <!-- Description -->
-            <div class="space-y-4 mb-10">
+            <div class="gsap-detail-desc space-y-4 mb-10">
               <h2 class="font-display text-2xl text-brand-brown">Tentang Program</h2>
               <div class="prose prose-brand max-w-none text-brand-muted leading-relaxed" v-html="program.deskripsi"></div>
             </div>
 
             <!-- Kitab Wajib Section -->
-            <div v-if="kitabWajib.length > 0" class="mb-10">
+            <div v-if="kitabWajib.length > 0" class="gsap-detail-kitab mb-10">
               <div class="flex items-center gap-3 mb-5">
                 <h2 class="font-display text-2xl text-brand-brown">Kitab Referensi Utama</h2>
                 <span class="px-3 py-1 bg-brand-orange/10 text-brand-orange text-xs font-bold uppercase tracking-widest rounded-full">Wajib</span>
@@ -113,7 +113,7 @@
             </div>
 
             <!-- Premium Quick Stats -->
-            <div class="flex flex-col gap-6 pt-10 border-t border-brand-border/50">
+            <div class="gsap-detail-cost flex flex-col gap-6 pt-10 border-t border-brand-border/50">
               <h2 class="font-display text-2xl text-brand-brown mb-2">Rincian & Biaya Program</h2>
               
               <!-- Badges Konfigurasi -->
@@ -231,7 +231,7 @@
           </div>
           
           <!-- Bottom CTA -->
-          <div class="bg-brand-brown rounded-[30px] p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-8 mt-12 relative overflow-hidden shadow-2xl">
+          <div class="gsap-detail-cta bg-brand-brown rounded-[30px] p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-8 mt-12 relative overflow-hidden shadow-2xl">
             <!-- Decorative SVG -->
             <div class="absolute -right-16 -top-16 text-white/5 pointer-events-none">
               <svg class="w-64 h-64" fill="currentColor" viewBox="0 0 100 100"><path d="M50 0 L55 45 L100 50 L55 55 L50 100 L45 55 L0 50 L45 45 Z" /></svg>
@@ -261,11 +261,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch, nextTick } from 'vue';
 import { useRoute } from 'vue-router';
 import { useNuxtApp } from '#imports';
 import { doc, getDoc, collection, query, where, getDocs, limit } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
+import { gsap } from 'gsap';
 
 const route = useRoute();
 const { $db } = useNuxtApp();
@@ -289,6 +290,45 @@ const isRegistrationOpen = computed(() => {
     if (deadline < new Date()) return false;
   }
   return true;
+});
+
+const animateDetailContent = async () => {
+  if (!import.meta.client) return;
+  await nextTick();
+  
+  gsap.killTweensOf('.gsap-back, .gsap-left-card, .gsap-detail-header, .gsap-detail-desc, .gsap-detail-kitab, .gsap-detail-cost, .gsap-detail-cta');
+
+  // Back navigation slide in
+  gsap.fromTo(
+    '.gsap-back',
+    { opacity: 0, x: -12 },
+    { opacity: 1, x: 0, duration: 0.4, ease: 'power2.out', clearProps: 'transform' }
+  );
+
+  // Left card subtle scale entrance
+  gsap.fromTo(
+    '.gsap-left-card',
+    { opacity: 0, y: 15 },
+    { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', clearProps: 'transform' }
+  );
+
+  // Right side content staggered entrance
+  const rightElements = document.querySelectorAll(
+    '.gsap-detail-header, .gsap-detail-desc, .gsap-detail-kitab, .gsap-detail-cost, .gsap-detail-cta'
+  );
+  if (rightElements.length > 0) {
+    gsap.fromTo(
+      rightElements,
+      { opacity: 0, y: 18 },
+      { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: 'power2.out', clearProps: 'transform' }
+    );
+  }
+};
+
+watch(isLoading, (newVal) => {
+  if (!newVal && program.value) {
+    animateDetailContent();
+  }
 });
 
 onMounted(async () => {
@@ -329,6 +369,7 @@ onMounted(async () => {
     error.value = true;
   } finally {
     isLoading.value = false;
+    animateDetailContent();
   }
 });
 </script>
