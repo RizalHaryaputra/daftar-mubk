@@ -305,12 +305,12 @@ const initGsapStaticAnimations = () => {
 
   gsap.registerPlugin(ScrollTrigger);
 
-  // Hero Entrance Timeline
+  // Hero Entrance Timeline - Instant load animation
   const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-  tl.from('.gsap-hero-title', { y: 45, opacity: 0, duration: 1 })
-    .from('.gsap-hero-sub', { y: 25, opacity: 0, duration: 0.8 }, '-=0.6')
-    .from('.gsap-hero-img', { scale: 0.93, opacity: 0, duration: 0.9 }, '-=0.5')
-    .from('.gsap-hero-cta', { y: 20, scale: 0.85, opacity: 0, duration: 0.6, ease: 'back.out(1.7)' }, '-=0.4');
+  tl.fromTo('.gsap-hero-title', { y: 45, opacity: 0 }, { y: 0, opacity: 1, duration: 1 })
+    .fromTo('.gsap-hero-sub', { y: 25, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 }, '-=0.6')
+    .fromTo('.gsap-hero-img', { scale: 0.93, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.9 }, '-=0.5')
+    .fromTo('.gsap-hero-cta', { y: 20, scale: 0.85, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.6, ease: 'back.out(1.7)' }, '-=0.4');
 
   // Stats Card Reveal
   gsap.fromTo(
@@ -473,6 +473,10 @@ watch(isLoading, (newVal) => {
 });
 
 onMounted(async () => {
+  // Jalankan animasi Hero & elemen statis SEGERA begitu halaman diakses / direfresh
+  await nextTick();
+  initGsapStaticAnimations();
+
   try {
     // Ambil program aktif, lalu urutkan di client untuk menghindari error Composite Index Firestore
     const qPrograms = query(
@@ -511,9 +515,6 @@ onMounted(async () => {
     isLoading.value = false;
     animateDynamicElements();
   }
-
-  await nextTick();
-  initGsapStaticAnimations();
 });
 </script>
 
