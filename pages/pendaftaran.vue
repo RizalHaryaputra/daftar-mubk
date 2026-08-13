@@ -6,13 +6,13 @@
     </div>
 
     <!-- Loading program info -->
-    <div v-if="isLoadingData" class="bg-white/50 border border-brand-border/50 rounded-[30px] p-10 animate-pulse space-y-4">
+    <div v-if="isLoadingData" class="gsap-loading-skeleton bg-white/50 border border-brand-border/50 rounded-[30px] p-10 animate-pulse space-y-4">
       <div class="h-4 bg-brand-cream rounded w-1/3"></div>
       <div class="h-8 bg-brand-cream rounded w-2/3"></div>
     </div>
 
     <!-- Error / Empty State -->
-    <div v-else-if="dataError" class="bg-white/60 p-10 md:p-14 rounded-[40px] text-center border border-brand-border/50 max-w-2xl mx-auto shadow-sm">
+    <div v-else-if="dataError" class="gsap-empty-state bg-white/60 p-10 md:p-14 rounded-[40px] text-center border border-brand-border/50 max-w-2xl mx-auto shadow-sm">
       <div class="w-20 h-20 bg-brand-orange/10 rounded-full flex items-center justify-center mx-auto mb-6 text-brand-orange">
         <svg v-if="!route.query.programId" class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
         <svg v-else class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
@@ -642,7 +642,28 @@ onMounted(async () => {
     console.error('Failed to load form data:', e);
     dataError.value = 'Terjadi kesalahan saat memuat data. Silakan muat ulang halaman.';
   } finally {
-    isLoadingData.value = false;
+    // Fade out loading skeleton before swapping state
+    if (import.meta.client) {
+      const skeleton = document.querySelector('.gsap-loading-skeleton');
+      if (skeleton) {
+        await new Promise<void>((resolve) => {
+          gsap.to(skeleton, {
+            opacity: 0,
+            y: -10,
+            duration: 0.25,
+            ease: 'power2.in',
+            onComplete: () => {
+              isLoadingData.value = false;
+              resolve();
+            }
+          });
+        });
+      } else {
+        isLoadingData.value = false;
+      }
+    } else {
+      isLoadingData.value = false;
+    }
     animateInitialLoad();
   }
 });
@@ -666,7 +687,7 @@ const animateStepContent = async () => {
 const animateInitialLoad = async () => {
   if (!import.meta.client) return;
   await nextTick();
-  gsap.killTweensOf('.gsap-pendaftaran-header, .gsap-wizard-bar, .gsap-program-banner, .gsap-action-buttons');
+  gsap.killTweensOf('.gsap-pendaftaran-header, .gsap-wizard-bar, .gsap-program-banner, .gsap-action-buttons, .gsap-empty-state');
   
   gsap.fromTo(
     '.gsap-pendaftaran-header',
@@ -674,6 +695,18 @@ const animateInitialLoad = async () => {
     { opacity: 1, y: 0, duration: 0.65, delay: 0.2, ease: 'power2.out', clearProps: 'transform' }
   );
 
+  // Empty state ("Pilih Program Dahulu")
+  const emptyState = document.querySelector('.gsap-empty-state');
+  if (emptyState) {
+    gsap.fromTo(
+      emptyState,
+      { opacity: 0, y: 25, scale: 0.97 },
+      { opacity: 1, y: 0, scale: 1, duration: 0.6, delay: 0.3, ease: 'power2.out', clearProps: 'transform' }
+    );
+    return;
+  }
+
+  // Wizard form state
   gsap.fromTo(
     '.gsap-wizard-bar, .gsap-program-banner',
     { opacity: 0, y: 15 },

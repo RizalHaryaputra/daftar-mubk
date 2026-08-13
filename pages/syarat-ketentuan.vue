@@ -190,7 +190,7 @@ import { onMounted, nextTick } from 'vue';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-definePageMeta({ layout: 'default' });
+
 
 onMounted(async () => {
   if (!import.meta.client) return;

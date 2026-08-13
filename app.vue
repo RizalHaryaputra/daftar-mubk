@@ -61,13 +61,16 @@ useSeoMeta({
 .page-leave-active,
 .layout-enter-active,
 .layout-leave-active {
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .page-enter-from,
+.layout-enter-from {
+  opacity: 0;
+  transform: translateY(12px);
+}
 .page-leave-to,
-.layout-enter-from,
 .layout-leave-to {
   opacity: 0;
-  transform: translateY(10px);
+  transform: translateY(-8px);
 }
 </style>

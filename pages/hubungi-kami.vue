@@ -113,7 +113,7 @@
 import { onMounted, nextTick } from 'vue';
 import { gsap } from 'gsap';
 
-definePageMeta({ layout: 'default' });
+
 
 onMounted(async () => {
   if (!import.meta.client) return;
