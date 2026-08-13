@@ -32,7 +32,7 @@
     <!-- Main Content -->
     <template v-else-if="kitab">
       <!-- Back Navigation -->
-      <div>
+      <div class="gsap-back">
         <NuxtLink to="/kitab" class="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-brand-muted hover:text-brand-orange transition-colors">
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
           Kembali ke Daftar Kitab
@@ -42,7 +42,7 @@
       <div class="grid grid-cols-1 md:grid-cols-12 gap-10">
         
         <!-- Left: Image Area -->
-        <div class="md:col-span-4 lg:col-span-5">
+        <div class="gsap-left-card md:col-span-4 lg:col-span-5">
           <div class="bg-white border border-brand-border/50 rounded-[30px] p-4 shadow-xl sticky top-24 relative overflow-hidden group">
             
             <div class="relative rounded-[25px] overflow-hidden w-full aspect-[3/4]">
@@ -64,23 +64,25 @@
         </div>
         
         <!-- Right: Info Area -->
-        <div class="md:col-span-8 lg:col-span-7 bg-white rounded-[30px] border border-brand-border/50 p-8 md:p-10 shadow-sm flex flex-col justify-between">
+        <div class="gsap-right-info md:col-span-8 lg:col-span-7 bg-white rounded-[30px] border border-brand-border/50 p-8 md:p-10 shadow-sm flex flex-col justify-between">
           
           <div>
             <!-- Kategori -->
-            <div class="inline-block px-4 py-1.5 bg-brand-orange/10 text-brand-orange rounded-full text-xs font-bold uppercase tracking-widest mb-4">
-              {{ kitab.kategori || 'Kitab' }}
+            <div class="gsap-detail-header">
+              <div class="inline-block px-4 py-1.5 bg-brand-orange/10 text-brand-orange rounded-full text-xs font-bold uppercase tracking-widest mb-4">
+                {{ kitab.kategori || 'Kitab' }}
+              </div>
+              
+              <!-- Judul & Penulis -->
+              <h1 class="font-display text-4xl md:text-5xl lg:text-6xl text-brand-brown mb-4 leading-tight">{{ kitab.judul }}</h1>
+              <p class="text-brand-muted text-sm md:text-base mb-10 flex items-center gap-2">
+                <svg class="w-5 h-5 text-brand-orange/60" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                Ditulis oleh <span class="font-bold text-brand-brown">{{ kitab.penulis }}</span>
+              </p>
             </div>
             
-            <!-- Judul & Penulis -->
-            <h1 class="font-display text-4xl md:text-5xl lg:text-6xl text-brand-brown mb-4 leading-tight">{{ kitab.judul }}</h1>
-            <p class="text-brand-muted text-sm md:text-base mb-10 flex items-center gap-2">
-              <svg class="w-5 h-5 text-brand-orange/60" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-              Ditulis oleh <span class="font-bold text-brand-brown">{{ kitab.penulis }}</span>
-            </p>
-            
             <!-- Harga -->
-            <div class="mb-10 pb-10 border-b border-brand-border/50">
+            <div class="gsap-detail-price mb-10 pb-10 border-b border-brand-border/50">
               <p class="text-xs text-brand-muted uppercase tracking-widest font-bold mb-2">Harga</p>
               <div class="text-4xl md:text-5xl font-display text-brand-orange">
                 Rp {{ kitab.harga?.toLocaleString('id-ID') }}
@@ -88,7 +90,7 @@
             </div>
             
             <!-- Deskripsi -->
-            <div class="space-y-4 mb-12">
+            <div class="gsap-detail-desc space-y-4 mb-12">
               <h2 class="font-display text-2xl text-brand-brown flex items-center gap-2">
                 <svg class="w-6 h-6 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 Deskripsi Kitab
@@ -98,7 +100,7 @@
           </div>
           
           <!-- Actions -->
-          <div class="pt-8 mt-auto flex flex-col sm:flex-row items-center gap-4">
+          <div class="gsap-detail-action pt-8 mt-auto flex flex-col sm:flex-row items-center gap-4">
             <template v-if="kitab.bisaStandalone && kitab.status === 'aktif'">
               <NuxtLink 
                 :to="`/pendaftaran?kitabId=${kitab.id}`" 
@@ -123,11 +125,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch, nextTick } from 'vue';
 import { useRoute } from 'vue-router';
 import { useNuxtApp } from '#imports';
 import { doc, getDoc, collection, query, where, getDocs, limit } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
+import { gsap } from 'gsap';
 
 const route = useRoute();
 const { $db } = useNuxtApp();
@@ -136,6 +139,45 @@ const db = $db as Firestore;
 const kitab = ref<any>(null);
 const isLoading = ref(true);
 const error = ref(false);
+
+const animateDetailContent = async () => {
+  if (!import.meta.client) return;
+  await nextTick();
+  
+  gsap.killTweensOf('.gsap-back, .gsap-left-card, .gsap-detail-header, .gsap-detail-price, .gsap-detail-desc, .gsap-detail-action');
+
+  // Back navigation slide in
+  gsap.fromTo(
+    '.gsap-back',
+    { opacity: 0, x: -12 },
+    { opacity: 1, x: 0, duration: 0.4, ease: 'power2.out', clearProps: 'transform' }
+  );
+
+  // Left cover image entrance
+  gsap.fromTo(
+    '.gsap-left-card',
+    { opacity: 0, y: 15 },
+    { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', clearProps: 'transform' }
+  );
+
+  // Right side content staggered entrance
+  const rightElements = document.querySelectorAll(
+    '.gsap-detail-header, .gsap-detail-price, .gsap-detail-desc, .gsap-detail-action'
+  );
+  if (rightElements.length > 0) {
+    gsap.fromTo(
+      rightElements,
+      { opacity: 0, y: 18 },
+      { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: 'power2.out', clearProps: 'transform' }
+    );
+  }
+};
+
+watch(isLoading, (newVal) => {
+  if (!newVal && kitab.value) {
+    animateDetailContent();
+  }
+});
 
 onMounted(async () => {
   try {
@@ -164,6 +206,7 @@ onMounted(async () => {
     error.value = true;
   } finally {
     isLoading.value = false;
+    animateDetailContent();
   }
 });
 </script>
