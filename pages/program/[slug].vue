@@ -40,7 +40,7 @@
       <div class="grid grid-cols-1 md:grid-cols-12 gap-10">
         <!-- Image Area (Left) -->
         <div class="gsap-left-card md:col-span-4 lg:col-span-5">
-          <div class="bg-white border border-brand-border/50 rounded-[30px] p-4 shadow-xl sticky top-24 relative overflow-hidden group">
+          <div class="bg-white border border-brand-border/50 rounded-[30px] p-4 shadow-xl sticky top-28 md:top-32 relative overflow-hidden group">
             
             <div class="relative rounded-[25px] overflow-hidden w-full aspect-[4/5]">
               <div class="absolute inset-0 bg-gradient-to-t from-brand-brown/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-10"></div>
