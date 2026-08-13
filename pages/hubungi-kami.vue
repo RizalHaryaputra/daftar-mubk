@@ -10,7 +10,7 @@
             <path d="M50 0 L55 45 L100 50 L55 55 L50 100 L45 55 L0 50 L45 45 Z" />
           </svg>
         </div>
-        <div class="max-w-2xl mx-auto z-10">
+        <div class="gsap-contact-hero max-w-2xl mx-auto z-10">
           <div class="inline-flex items-center gap-2 bg-brand-orange/10 border border-brand-orange/20 rounded-full px-4 py-1.5 mb-6">
             <div class="w-2 h-2 rounded-full bg-brand-orange"></div>
             <span class="text-brand-orange text-xs font-bold uppercase tracking-widest">Narahubung</span>
@@ -37,7 +37,7 @@
             href="https://wa.me/6281392658080"
             target="_blank"
             rel="noopener noreferrer"
-            class="group bg-white/5 border border-white/10 hover:border-green-500/50 rounded-[28px] p-8 flex flex-col items-start transition-all duration-300 hover:bg-white/10 hover:-translate-y-1"
+            class="gsap-contact-card group bg-white/5 border border-white/10 hover:border-green-500/50 rounded-[28px] p-8 flex flex-col items-start transition-all duration-300 hover:bg-white/10 hover:-translate-y-1"
           >
             <div class="w-14 h-14 bg-green-500/10 border border-green-500/20 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-green-500 group-hover:border-green-500 transition-all duration-300">
               <svg class="w-7 h-7 text-green-400 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24">
@@ -54,7 +54,7 @@
           </a>
 
           <!-- Email -->
-          <div class="bg-white/5 border border-white/10 rounded-[28px] p-8 flex flex-col items-start">
+          <div class="gsap-contact-card bg-white/5 border border-white/10 rounded-[28px] p-8 flex flex-col items-start">
             <div class="w-14 h-14 bg-brand-orange/10 border border-brand-orange/20 rounded-2xl flex items-center justify-center mb-6">
               <svg class="w-7 h-7 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -66,7 +66,7 @@
           </div>
 
           <!-- Lokasi -->
-          <div class="bg-white/5 border border-white/10 rounded-[28px] p-8 flex flex-col items-start">
+          <div class="gsap-contact-card bg-white/5 border border-white/10 rounded-[28px] p-8 flex flex-col items-start">
             <div class="w-14 h-14 bg-brand-orange/10 border border-brand-orange/20 rounded-2xl flex items-center justify-center mb-6">
               <svg class="w-7 h-7 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -82,7 +82,7 @@
 
       <!-- CTA WA -->
       <section class="px-6 pb-8 max-w-5xl mx-auto">
-        <div class="bg-brand-brown border border-white/10 rounded-[30px] p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
+        <div class="gsap-contact-cta bg-brand-brown border border-white/10 rounded-[30px] p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
           <div class="absolute top-0 right-0 text-white/5 pointer-events-none">
             <svg width="200" height="200" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0l2 10 10 2-10 2-2 10-2-10-10-2 10-2z"/></svg>
           </div>
@@ -110,7 +110,35 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ layout: 'default' });
+import { onMounted, nextTick } from 'vue';
+import { gsap } from 'gsap';
+
+
+
+onMounted(async () => {
+  if (!import.meta.client) return;
+  await nextTick();
+
+  gsap.killTweensOf('.gsap-contact-hero, .gsap-contact-card, .gsap-contact-cta');
+
+  gsap.fromTo(
+    '.gsap-contact-hero',
+    { opacity: 0, y: 20 },
+    { opacity: 1, y: 0, duration: 0.65, delay: 0.2, ease: 'power2.out', clearProps: 'transform' }
+  );
+
+  gsap.fromTo(
+    '.gsap-contact-card',
+    { opacity: 0, y: 25 },
+    { opacity: 1, y: 0, duration: 0.55, delay: 0.25, stagger: 0.12, ease: 'power2.out', clearProps: 'transform' }
+  );
+
+  gsap.fromTo(
+    '.gsap-contact-cta',
+    { opacity: 0, y: 20, scale: 0.97 },
+    { opacity: 1, y: 0, scale: 1, duration: 0.6, delay: 0.35, ease: 'power2.out', clearProps: 'transform' }
+  );
+});
 </script>
 
 <style scoped>

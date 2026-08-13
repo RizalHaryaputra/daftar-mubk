@@ -44,14 +44,7 @@
         </div>
       </div>
 
-      <div v-if="isLoading" class="p-10 text-center text-brand-muted">
-        <div class="animate-pulse flex flex-col items-center gap-3">
-          <div class="w-10 h-10 rounded-full border-2 border-brand-orange border-t-transparent animate-spin"></div>
-          <span class="font-medium">Memuat data program...</span>
-        </div>
-      </div>
-      
-      <div v-else-if="programs.length === 0" class="p-16 text-center">
+      <div v-if="!isLoading && programs.length === 0" class="p-16 text-center">
         <div class="w-20 h-20 bg-brand-orange/10 rounded-full flex items-center justify-center mx-auto mb-6 text-brand-orange">
           <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
         </div>
@@ -59,7 +52,7 @@
         <p class="text-brand-muted">Silakan klik tombol "Tambah Program" di atas untuk membuat program pertama Anda.</p>
       </div>
 
-      <div v-else-if="paginatedPrograms.length === 0" class="p-16 text-center text-brand-muted">
+      <div v-else-if="paginatedPrograms.length === 0 && !isLoading" class="p-16 text-center text-brand-muted">
         <p>Tidak ada program yang cocok dengan kriteria pencarian Anda.</p>
       </div>
 
@@ -75,7 +68,17 @@
               <th class="p-6 text-right">Aksi</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-brand-border/50">
+          <tbody v-if="isLoading" class="divide-y divide-brand-border/50">
+            <tr v-for="n in 5" :key="n" class="animate-pulse">
+              <td class="p-6"><div class="h-5 bg-brand-cream/80 rounded w-44 mb-1.5"></div><div class="h-3 bg-brand-cream/40 rounded w-24"></div></td>
+              <td class="p-6"><div class="h-7 bg-brand-cream/80 rounded-lg w-48"></div></td>
+              <td class="p-6"><div class="h-4 bg-brand-cream/80 rounded w-24"></div></td>
+              <td class="p-6"><div class="h-5 bg-brand-cream/80 rounded-md w-20"></div></td>
+              <td class="p-6"><div class="h-6 bg-brand-cream/80 rounded-full w-16"></div></td>
+              <td class="p-6 text-right"><div class="h-8 bg-brand-cream/80 rounded-full w-16 ml-auto"></div></td>
+            </tr>
+          </tbody>
+          <tbody v-else class="divide-y divide-brand-border/50">
             <tr v-for="item in paginatedPrograms" :key="item.id" class="hover:bg-brand-cream/20 transition-colors">
               <td class="p-6">
                 <p class="font-bold text-brand-brown text-base">{{ item.nama }}</p>

@@ -1,18 +1,18 @@
 <template>
   <div class="max-w-4xl mx-auto space-y-8 pb-20 pt-8 px-4">
-    <div class="text-center mb-8">
+    <div class="gsap-pendaftaran-header text-center mb-8">
       <h1 class="font-display text-4xl md:text-5xl text-brand-brown mb-4 font-bold tracking-tight">Formulir <span class="text-brand-orange italic">Pendaftaran</span></h1>
       <p class="text-brand-muted md:text-lg leading-relaxed">Lengkapi data diri Anda dengan teliti untuk proses pendaftaran ke Ma'had 'Umar bin Khattab.</p>
     </div>
 
     <!-- Loading program info -->
-    <div v-if="isLoadingData" class="bg-white/50 border border-brand-border/50 rounded-[30px] p-10 animate-pulse space-y-4">
+    <div v-if="isLoadingData" class="gsap-loading-skeleton bg-white/50 border border-brand-border/50 rounded-[30px] p-10 animate-pulse space-y-4">
       <div class="h-4 bg-brand-cream rounded w-1/3"></div>
       <div class="h-8 bg-brand-cream rounded w-2/3"></div>
     </div>
 
     <!-- Error / Empty State -->
-    <div v-else-if="dataError" class="bg-white/60 p-10 md:p-14 rounded-[40px] text-center border border-brand-border/50 max-w-2xl mx-auto shadow-sm">
+    <div v-else-if="dataError" class="gsap-empty-state bg-white/60 p-10 md:p-14 rounded-[40px] text-center border border-brand-border/50 max-w-2xl mx-auto shadow-sm">
       <div class="w-20 h-20 bg-brand-orange/10 rounded-full flex items-center justify-center mx-auto mb-6 text-brand-orange">
         <svg v-if="!route.query.programId" class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
         <svg v-else class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
@@ -32,7 +32,7 @@
 
     <template v-else>
       <!-- Wizard Progress Bar (Premium Pill Design) -->
-      <div class="mb-10 bg-white border border-brand-border/50 rounded-full p-2 flex max-w-3xl mx-auto shadow-sm">
+      <div class="gsap-wizard-bar mb-10 bg-white border border-brand-border/50 rounded-full p-2 flex max-w-3xl mx-auto shadow-sm">
         <div class="relative flex w-full">
           
           <!-- Sliding active indicator -->
@@ -86,7 +86,7 @@
       </div>
 
       <!-- Info Program Terpilih (Show in all steps to remind user) -->
-      <div v-if="selectedProgram" class="bg-brand-brown text-white rounded-[30px] p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xl mb-10">
+      <div v-if="selectedProgram" class="gsap-program-banner bg-brand-brown text-white rounded-[30px] p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xl mb-10">
         <div>
           <p class="text-xs text-brand-orange uppercase tracking-widest font-bold mb-1">Program Pilihan</p>
           <p class="font-display text-2xl mb-1">{{ selectedProgram.nama }}</p>
@@ -103,7 +103,7 @@
         <!-- ============================== -->
         <!-- STEP 1: PILIHAN PROGRAM        -->
         <!-- ============================== -->
-        <div v-show="currentStep === 1">
+        <div v-show="currentStep === 1" class="gsap-step-content">
           <div class="bg-white border border-brand-border rounded-[30px] p-8 md:p-10 shadow-sm">
             <h2 class="font-display text-2xl text-brand-brown border-b border-brand-border/50 pb-4 mb-8">Pilihan Program</h2>
 
@@ -151,11 +151,10 @@
               </div>
             </div>
           </div>
-
         <!-- ============================== -->
         <!-- STEP 2: DATA DIRI              -->
         <!-- ============================== -->
-        <div v-show="currentStep === 2">
+        <div v-show="currentStep === 2" class="gsap-step-content">
           <div class="bg-white border border-brand-border rounded-[30px] p-8 md:p-10 shadow-sm">
             <h2 class="font-display text-2xl text-brand-brown border-b border-brand-border/50 pb-4 mb-8">Data Diri</h2>
 
@@ -244,7 +243,7 @@
         <!-- ============================== -->
         <!-- STEP 3: KITAB & PENGIRIMAN     -->
         <!-- ============================== -->
-        <div v-show="currentStep === 3">
+        <div v-show="currentStep === 3" class="gsap-step-content space-y-10">
           <div class="space-y-10">
             <!-- KITAB WAJIB PROGRAM -->
             <div v-if="kitabWajibProgram.length > 0" class="bg-white border border-brand-border rounded-[30px] p-8 md:p-10 shadow-sm relative overflow-hidden">
@@ -337,7 +336,7 @@
         <!-- ============================== -->
         <!-- STEP 4: RINGKASAN BIAYA        -->
         <!-- ============================== -->
-        <div v-show="currentStep === 4" class="space-y-6">
+        <div v-show="currentStep === 4" class="gsap-step-content space-y-6">
           
           <!-- DONASI SUKARELA -->
           <div class="bg-white border border-brand-border rounded-[30px] p-8 md:p-10 shadow-sm">
@@ -407,7 +406,7 @@
         </div>
 
         <!-- Wizard Navigation Buttons -->
-        <div class="flex flex-col sm:flex-row gap-4 pt-4">
+        <div class="gsap-action-buttons flex flex-col sm:flex-row gap-4 pt-4">
           <button 
             type="button" 
             v-if="currentStep > 1" 
@@ -458,11 +457,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watch, nextTick } from 'vue';
 import { useRoute } from 'vue-router';
 import { useNuxtApp } from '#imports';
 import { doc, getDoc, getDocs, collection, query, where } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
+import { gsap } from 'gsap';
 
 const route = useRoute();
 const { $db } = useNuxtApp();
@@ -642,8 +642,88 @@ onMounted(async () => {
     console.error('Failed to load form data:', e);
     dataError.value = 'Terjadi kesalahan saat memuat data. Silakan muat ulang halaman.';
   } finally {
-    isLoadingData.value = false;
+    // Fade out loading skeleton before swapping state
+    if (import.meta.client) {
+      const skeleton = document.querySelector('.gsap-loading-skeleton');
+      if (skeleton) {
+        await new Promise<void>((resolve) => {
+          gsap.to(skeleton, {
+            opacity: 0,
+            y: -10,
+            duration: 0.25,
+            ease: 'power2.in',
+            onComplete: () => {
+              isLoadingData.value = false;
+              resolve();
+            }
+          });
+        });
+      } else {
+        isLoadingData.value = false;
+      }
+    } else {
+      isLoadingData.value = false;
+    }
+    animateInitialLoad();
   }
+});
+
+const animateStepContent = async () => {
+  if (!import.meta.client) return;
+  await nextTick();
+  gsap.killTweensOf('.gsap-step-content');
+  const stepEls = document.querySelectorAll('.gsap-step-content');
+  stepEls.forEach(el => {
+    if ((el as HTMLElement).style.display !== 'none') {
+      gsap.fromTo(
+        el,
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out', clearProps: 'transform' }
+      );
+    }
+  });
+};
+
+const animateInitialLoad = async () => {
+  if (!import.meta.client) return;
+  await nextTick();
+  gsap.killTweensOf('.gsap-pendaftaran-header, .gsap-wizard-bar, .gsap-program-banner, .gsap-action-buttons, .gsap-empty-state');
+  
+  gsap.fromTo(
+    '.gsap-pendaftaran-header',
+    { opacity: 0, y: 20 },
+    { opacity: 1, y: 0, duration: 0.65, delay: 0.2, ease: 'power2.out', clearProps: 'transform' }
+  );
+
+  // Empty state ("Pilih Program Dahulu")
+  const emptyState = document.querySelector('.gsap-empty-state');
+  if (emptyState) {
+    gsap.fromTo(
+      emptyState,
+      { opacity: 0, y: 25, scale: 0.97 },
+      { opacity: 1, y: 0, scale: 1, duration: 0.6, delay: 0.3, ease: 'power2.out', clearProps: 'transform' }
+    );
+    return;
+  }
+
+  // Wizard form state
+  gsap.fromTo(
+    '.gsap-wizard-bar, .gsap-program-banner',
+    { opacity: 0, y: 15 },
+    { opacity: 1, y: 0, duration: 0.55, delay: 0.25, stagger: 0.1, ease: 'power2.out', clearProps: 'transform' }
+  );
+
+  animateStepContent();
+
+  gsap.fromTo(
+    '.gsap-action-buttons',
+    { opacity: 0, y: 15 },
+    { opacity: 1, y: 0, duration: 0.55, delay: 0.35, ease: 'power2.out', clearProps: 'transform' }
+  );
+};
+
+watch(currentStep, () => {
+  animateStepContent();
 });
 
 // Sync ongkir nominal ke form

@@ -13,19 +13,19 @@
       </div>
 
       <div class="max-w-4xl mx-auto z-10">
-        <h1 class="font-display text-4xl md:text-6xl lg:text-7xl text-brand-brown leading-tight tracking-tight mb-6">
+        <h1 class="gsap-hero-title font-display text-4xl md:text-6xl lg:text-7xl text-brand-brown leading-tight tracking-tight mb-6">
           Belajar Bahasa Arab<br>
           <span class="italic font-light">Bersama</span> <span class="font-semibold text-brand-orange">Ahlinya</span>
         </h1>
-        <p class="text-brand-muted max-w-lg mx-auto text-sm md:text-base leading-relaxed mb-10">
+        <p class="gsap-hero-sub text-brand-muted max-w-lg mx-auto text-sm md:text-base leading-relaxed mb-10">
           Program intensif terstruktur, dari pemula hingga mahir, menggunakan pendekatan modern dan kitab-kitab pilihan para ulama.
         </p>
         
-        <div class="relative inline-block">
+        <div class="gsap-hero-img relative inline-block">
           <img src="https://images.unsplash.com/photo-1717540614323-153cb6b593c7?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NjJ8fGtpdGFifGVufDB8fDB8fHww" alt="Belajar Bahasa Arab" class="w-full max-w-[600px] h-[300px] md:h-[400px] object-cover rounded-[30px] md:rounded-[40px] shadow-xl border-4 border-white" />
           
           <!-- Floating button ala Creatix -->
-          <div class="absolute -bottom-6 left-1/2 transform -translate-x-1/2 flex gap-3 bg-white p-2 rounded-full shadow-lg border border-brand-border">
+          <div class="gsap-hero-cta absolute -bottom-6 left-1/2 transform -translate-x-1/2 flex gap-3 bg-white p-2 rounded-full shadow-lg border border-brand-border">
             <NuxtLink to="/pendaftaran" class="bg-brand-orange text-white px-6 py-3 rounded-full text-sm font-medium hover:bg-orange-600 transition-colors whitespace-nowrap">
               Daftar Sekarang
             </NuxtLink>
@@ -42,20 +42,20 @@
     <div class="bg-brand-deeper pb-20">
       <!-- 2. STATS SECTION (Dark) -->
       <section class="px-6 py-16 md:py-24 max-w-6xl mx-auto">
-        <div class="bg-white/5 border border-white/10 rounded-[40px] p-8 md:p-14 shadow-2xl relative overflow-hidden backdrop-blur-md">
+        <div class="gsap-stats-card bg-white/5 border border-white/10 rounded-[40px] p-8 md:p-14 shadow-2xl relative overflow-hidden backdrop-blur-md">
           <div class="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none"></div>
           
           <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center md:text-left divide-x-0 md:divide-x divide-white/10 relative z-10">
             <div class="px-4">
-              <p class="font-display text-4xl md:text-5xl text-brand-orange mb-2">12<span class="text-white">+</span></p>
+              <p class="font-display text-4xl md:text-5xl text-brand-orange mb-2"><span class="gsap-stat-num" data-target="12">12</span><span class="text-white">+</span></p>
               <p class="text-white/60 text-sm font-medium uppercase tracking-wider">Program Pilihan</p>
             </div>
             <div class="px-4">
-              <p class="font-display text-4xl md:text-5xl text-brand-orange mb-2">8<span class="text-white">+</span></p>
+              <p class="font-display text-4xl md:text-5xl text-brand-orange mb-2"><span class="gsap-stat-num" data-target="8">8</span><span class="text-white">+</span></p>
               <p class="text-white/60 text-sm font-medium uppercase tracking-wider">Tahun Pengalaman</p>
             </div>
             <div class="px-4">
-              <p class="font-display text-4xl md:text-5xl text-brand-orange mb-2">500<span class="text-white">+</span></p>
+              <p class="font-display text-4xl md:text-5xl text-brand-orange mb-2"><span class="gsap-stat-num" data-target="500">500</span><span class="text-white">+</span></p>
               <p class="text-white/60 text-sm font-medium uppercase tracking-wider">Alumni Sukses</p>
             </div>
             <div class="px-4">
@@ -67,9 +67,9 @@
       </section>
 
     <!-- 3. ABOUT / METHODOLOGY SECTION -->
-    <section class="px-6 py-12 max-w-6xl mx-auto">
+    <section class="gsap-about-section px-6 py-12 max-w-6xl mx-auto">
       <div class="flex flex-col md:flex-row gap-12 items-center">
-        <div class="md:w-1/2">
+        <div class="gsap-about-left md:w-1/2">
           <h2 class="font-display text-3xl md:text-5xl text-white leading-tight mb-6">
             Merubah Niat Menjadi <br><span class="text-brand-orange">Pemahaman Nyata</span>
           </h2>
@@ -81,7 +81,7 @@
             Lembaga Bahasa Arab
           </div>
         </div>
-        <div class="md:w-1/2 space-y-6">
+        <div class="gsap-about-right md:w-1/2 space-y-6">
           <p class="text-white/70 text-sm md:text-base leading-relaxed border-l-2 border-brand-orange/30 pl-4">
             Kami mungkin bukan yang terbesar, namun dedikasi kami tidak terbatas. Dengan pendekatan yang terstruktur dan interaktif, kami mengubah konsep bahasa Arab yang rumit menjadi pemahaman yang melekat dan mudah diaplikasikan.
           </p>
@@ -117,7 +117,7 @@
                 :key="prog.id"
                 :to="`/program/${prog.slug || prog.id}`"
                 @mouseenter="hoveredProgram = prog"
-                class="group flex items-center justify-between p-5 rounded-xl border transition-all cursor-pointer block"
+                class="gsap-program-item group flex items-center justify-between p-5 rounded-xl border transition-all cursor-pointer block"
                 :class="hoveredProgram?.id === prog.id ? 'border-brand-orange bg-white/5' : 'border-white/10 hover:border-white/30'"
               >
                 <div class="flex items-center gap-4">
@@ -172,26 +172,26 @@
     </section>
 
     <!-- CARA DAFTAR -->
-    <section class="px-6 py-12 max-w-6xl mx-auto">
+    <section class="gsap-steps-section px-6 py-12 max-w-6xl mx-auto">
       <div class="bg-brand-brown border border-white/10 rounded-[30px] p-8 md:p-12 relative overflow-hidden shadow-2xl">
         <h2 class="font-display text-2xl text-white mb-8 text-center md:text-left">Alur Pendaftaran</h2>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8 relative z-10">
-          <div class="text-center md:text-left">
+          <div class="gsap-step-item text-center md:text-left">
             <div class="w-12 h-12 rounded-full bg-brand-orange text-brand-deeper font-bold text-xl flex items-center justify-center mb-4 mx-auto md:mx-0">1</div>
             <h4 class="text-white font-medium mb-2">Pilih Program</h4>
             <p class="text-white/60 text-sm leading-relaxed">Pilih program yang sesuai dengan tingkat kemampuan Anda.</p>
           </div>
-          <div class="text-center md:text-left">
+          <div class="gsap-step-item text-center md:text-left">
             <div class="w-12 h-12 rounded-full bg-white/5 text-white font-bold text-xl flex items-center justify-center mb-4 mx-auto md:mx-0 border border-white/10 hover:border-brand-orange transition-colors">2</div>
             <h4 class="text-white font-medium mb-2">Isi Formulir</h4>
             <p class="text-white/60 text-sm leading-relaxed">Lengkapi biodata diri dan pilih kitab pengiriman.</p>
           </div>
-          <div class="text-center md:text-left">
+          <div class="gsap-step-item text-center md:text-left">
             <div class="w-12 h-12 rounded-full bg-white/5 text-white font-bold text-xl flex items-center justify-center mb-4 mx-auto md:mx-0 border border-white/10 hover:border-brand-orange transition-colors">3</div>
             <h4 class="text-white font-medium mb-2">Pembayaran</h4>
             <p class="text-white/60 text-sm leading-relaxed">Selesaikan pembayaran secara online dengan aman.</p>
           </div>
-          <div class="text-center md:text-left">
+          <div class="gsap-step-item text-center md:text-left">
             <div class="w-12 h-12 rounded-full bg-white/5 text-white font-bold text-xl flex items-center justify-center mb-4 mx-auto md:mx-0 border border-white/10 hover:border-brand-orange transition-colors">4</div>
             <h4 class="text-white font-medium mb-2">Mulai Belajar</h4>
             <p class="text-white/60 text-sm leading-relaxed">Tunggu konfirmasi admin dan bergabung di kelas.</p>
@@ -229,7 +229,7 @@
     </div>
 
     <!-- 6. KITAB PILIHAN -->
-    <section class="px-6 py-12 max-w-6xl mx-auto">
+    <section class="gsap-kitab-section px-6 py-12 max-w-6xl mx-auto">
       <div class="flex items-center justify-between mb-8">
         <h2 class="font-display text-3xl text-white">Kitab <span class="bg-white/10 px-4 py-1 rounded-full text-brand-orange italic border border-white/10">Pilihan</span></h2>
         <NuxtLink to="/kitab" class="text-white/50 hover:text-white transition-colors text-sm bg-white/5 border border-white/10 px-5 py-2.5 rounded-full hover:bg-white/10">Lihat Semua</NuxtLink>
@@ -240,7 +240,7 @@
       </div>
       <div v-else-if="kitabs.length === 0" class="text-white/50 text-center py-10">Belum ada kitab pilihan.</div>
       <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <NuxtLink :to="`/kitab/${kitab.slug || kitab.id}`" v-for="kitab in kitabs" :key="kitab.id" class="bg-white rounded-[24px] p-6 text-center border-4 border-transparent hover:border-brand-orange/20 flex flex-col items-center group relative hover:-translate-y-2 transition-all duration-300 shadow-xl">
+        <NuxtLink :to="`/kitab/${kitab.slug || kitab.id}`" v-for="kitab in kitabs" :key="kitab.id" class="gsap-kitab-card bg-white rounded-[24px] p-6 text-center border-4 border-transparent hover:border-brand-orange/20 flex flex-col items-center group relative hover:-translate-y-2 transition-all duration-300 shadow-xl">
           <div class="w-16 h-16 rounded-full bg-brand-cream flex items-center justify-center mb-5 text-brand-orange border-2 border-brand-orange/20 relative group-hover:scale-110 transition-transform">
             <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
             <div class="absolute -top-1 -right-1 w-4 h-4 bg-brand-orange rounded-full border-2 border-white"></div>
@@ -264,7 +264,7 @@
         <svg width="250" height="250" md:width="350" md:height="350" viewBox="0 0 24 24" fill="currentColor" class="w-64 h-64 md:w-96 md:h-96"><path d="M12 0l2 10 10 2-10 2-2 10-2-10-10-2 10-2z"/></svg>
       </div>
 
-      <div class="max-w-4xl mx-auto text-center space-y-8 relative z-10">
+      <div class="gsap-cta-box max-w-4xl mx-auto text-center space-y-8 relative z-10">
         <h2 class="font-display text-4xl md:text-6xl text-white leading-tight">
           Siap memulai <br><span class="text-brand-orange italic">perjalanan</span> bahasa Arab Anda?
         </h2>
@@ -285,11 +285,12 @@
 
 <script setup lang="ts">
 
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch, nextTick } from 'vue';
 import { useNuxtApp } from '#imports';
 import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
-
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 const { $db } = useNuxtApp();
 const db = $db as Firestore;
@@ -299,7 +300,183 @@ const hoveredProgram = ref<any>(null);
 const kitabs = ref<any[]>([]);
 const isLoading = ref(true);
 
+const initGsapStaticAnimations = () => {
+  if (!import.meta.client) return;
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Hero Entrance Timeline - Instant load animation with slight delay for route transition
+  const tl = gsap.timeline({ defaults: { ease: 'power3.out' }, delay: 0.25 });
+  tl.fromTo('.gsap-hero-title', { y: 35, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9 })
+    .fromTo('.gsap-hero-sub', { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, '-=0.5')
+    .fromTo('.gsap-hero-img', { scale: 0.95, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.8 }, '-=0.5')
+    .fromTo('.gsap-hero-cta', { y: 15, scale: 0.9, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.5, ease: 'back.out(1.5)' }, '-=0.3');
+
+  // Stats Card Reveal
+  gsap.fromTo(
+    '.gsap-stats-card',
+    { opacity: 0, y: 40 },
+    {
+      opacity: 1,
+      y: 0,
+      duration: 1,
+      ease: 'power3.out',
+      scrollTrigger: {
+        trigger: '.gsap-stats-card',
+        start: 'top 85%',
+        once: true
+      }
+    }
+  );
+
+  // Numbers Counter Animation
+  document.querySelectorAll('.gsap-stat-num').forEach((el) => {
+    const target = parseFloat(el.getAttribute('data-target') || '0');
+    const obj = { val: 0 };
+    gsap.to(obj, {
+      val: target,
+      duration: 2,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: el,
+        start: 'top 90%',
+        once: true
+      },
+      onUpdate: () => {
+        el.textContent = Math.floor(obj.val).toString();
+      }
+    });
+  });
+
+  // About Section
+  gsap.fromTo(
+    '.gsap-about-left',
+    { opacity: 0, x: -40 },
+    {
+      opacity: 1,
+      x: 0,
+      duration: 1,
+      ease: 'power3.out',
+      scrollTrigger: {
+        trigger: '.gsap-about-section',
+        start: 'top 80%',
+        once: true
+      }
+    }
+  );
+
+  gsap.fromTo(
+    '.gsap-about-right',
+    { opacity: 0, x: 40 },
+    {
+      opacity: 1,
+      x: 0,
+      duration: 1,
+      ease: 'power3.out',
+      scrollTrigger: {
+        trigger: '.gsap-about-section',
+        start: 'top 80%',
+        once: true
+      }
+    }
+  );
+
+  // Alur Pendaftaran Steps
+  gsap.fromTo(
+    '.gsap-step-item',
+    { opacity: 0, y: 35 },
+    {
+      opacity: 1,
+      y: 0,
+      duration: 0.8,
+      stagger: 0.15,
+      ease: 'power3.out',
+      scrollTrigger: {
+        trigger: '.gsap-steps-section',
+        start: 'top 80%',
+        once: true
+      }
+    }
+  );
+
+  // Footer CTA Box
+  gsap.fromTo(
+    '.gsap-cta-box',
+    { opacity: 0, scale: 0.9 },
+    {
+      opacity: 1,
+      scale: 1,
+      duration: 1,
+      ease: 'back.out(1.4)',
+      scrollTrigger: {
+        trigger: '.gsap-cta-box',
+        start: 'top 85%',
+        once: true
+      }
+    }
+  );
+};
+
+const animateDynamicElements = async () => {
+  if (!import.meta.client) return;
+  await nextTick();
+  
+  setTimeout(() => {
+    ScrollTrigger.refresh();
+
+    const programItems = document.querySelectorAll('.gsap-program-item');
+    if (programItems.length > 0) {
+      gsap.fromTo(
+        programItems,
+        { opacity: 0, x: -25 },
+        {
+          opacity: 1,
+          x: 0,
+          duration: 0.6,
+          stagger: 0.1,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: '.gsap-program-item',
+            start: 'top 90%',
+            once: true
+          }
+        }
+      );
+    }
+
+    const kitabCards = document.querySelectorAll('.gsap-kitab-card');
+    if (kitabCards.length > 0) {
+      gsap.fromTo(
+        kitabCards,
+        { opacity: 0, y: 35 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          stagger: 0.1,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: '.gsap-kitab-section',
+            start: 'top 85%',
+            once: true
+          }
+        }
+      );
+    }
+  }, 100);
+};
+
+watch(isLoading, (newVal) => {
+  if (!newVal) {
+    animateDynamicElements();
+  }
+});
+
 onMounted(async () => {
+  // Jalankan animasi Hero & elemen statis SEGERA begitu halaman diakses / direfresh
+  await nextTick();
+  initGsapStaticAnimations();
+
   try {
     // Ambil program aktif, lalu urutkan di client untuk menghindari error Composite Index Firestore
     const qPrograms = query(
@@ -336,6 +513,7 @@ onMounted(async () => {
     console.error('Error fetching data for landing page:', error);
   } finally {
     isLoading.value = false;
+    animateDynamicElements();
   }
 });
 </script>

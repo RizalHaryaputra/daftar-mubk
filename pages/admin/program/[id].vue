@@ -9,10 +9,24 @@
       <p class="text-brand-muted mt-2">Perbarui data program belajar.</p>
     </div>
 
-    <div v-if="isLoading" class="bg-white p-10 rounded-[30px] border border-brand-border/50 text-center shadow-sm">
-      <div class="animate-pulse flex flex-col items-center gap-3">
-        <div class="w-10 h-10 rounded-full border-2 border-brand-orange border-t-transparent animate-spin"></div>
-        <span class="text-brand-muted font-medium">Memuat data program...</span>
+    <div v-if="isLoading" class="bg-white p-8 md:p-10 rounded-[30px] border border-brand-border/50 space-y-6 shadow-sm animate-pulse">
+      <div class="space-y-3">
+        <div class="h-4 bg-brand-cream/80 rounded w-1/4"></div>
+        <div class="h-10 bg-brand-cream/40 rounded-xl w-full"></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="space-y-3">
+          <div class="h-4 bg-brand-cream/80 rounded w-1/3"></div>
+          <div class="h-10 bg-brand-cream/40 rounded-xl w-full"></div>
+        </div>
+        <div class="space-y-3">
+          <div class="h-4 bg-brand-cream/80 rounded w-1/3"></div>
+          <div class="h-10 bg-brand-cream/40 rounded-xl w-full"></div>
+        </div>
+      </div>
+      <div class="space-y-3">
+        <div class="h-4 bg-brand-cream/80 rounded w-1/4"></div>
+        <div class="h-24 bg-brand-cream/40 rounded-xl w-full"></div>
       </div>
     </div>
     

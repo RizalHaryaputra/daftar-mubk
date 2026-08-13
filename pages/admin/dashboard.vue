@@ -16,7 +16,7 @@
         </div>
         <p class="text-xs text-brand-muted uppercase tracking-widest font-bold mb-2 relative z-10">Total Pendaftar</p>
         <p class="text-5xl font-display text-brand-brown relative z-10">
-          <span v-if="isLoading" class="animate-pulse opacity-50">...</span>
+          <span v-if="isLoading" class="inline-block h-10 w-20 bg-brand-cream/80 rounded-xl animate-pulse my-1"></span>
           <span v-else>{{ stats.total }}</span>
         </p>
       </div>
@@ -28,7 +28,7 @@
         </div>
         <p class="text-xs text-brand-muted uppercase tracking-widest font-bold mb-2 relative z-10">Total Pembelian Kitab</p>
         <p class="text-5xl font-display text-brand-brown relative z-10">
-          <span v-if="isLoading" class="animate-pulse opacity-50">...</span>
+          <span v-if="isLoading" class="inline-block h-10 w-20 bg-brand-cream/80 rounded-xl animate-pulse my-1"></span>
           <span v-else>{{ stats.totalKitab }}</span>
         </p>
       </div>
@@ -40,7 +40,7 @@
         </div>
         <p class="text-xs text-brand-muted uppercase tracking-widest font-bold mb-2 relative z-10">Menunggu Pembayaran</p>
         <p class="text-5xl font-display text-amber-600 relative z-10">
-          <span v-if="isLoading" class="animate-pulse opacity-50">...</span>
+          <span v-if="isLoading" class="inline-block h-10 w-20 bg-amber-100/80 rounded-xl animate-pulse my-1"></span>
           <span v-else>{{ stats.pending }}</span>
         </p>
       </div>
@@ -52,7 +52,7 @@
         </div>
         <p class="text-xs text-white/70 uppercase tracking-widest font-bold mb-2 relative z-10">Kitab Perlu Dikirim</p>
         <p class="text-5xl font-display text-brand-orange relative z-10">
-          <span v-if="isLoading" class="animate-pulse opacity-50">...</span>
+          <span v-if="isLoading" class="inline-block h-10 w-20 bg-white/20 rounded-xl animate-pulse my-1"></span>
           <span v-else>{{ stats.toShip }}</span>
         </p>
       </div>
@@ -67,10 +67,10 @@
           <svg class="w-5 h-5 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
           Tren Pendaftaran (30 Hari Terakhir)
         </h2>
-        <div class="h-[300px] w-full flex items-center justify-center bg-gray-50/50 rounded-2xl relative">
-          <div v-if="isLoading" class="flex flex-col items-center">
-            <div class="w-8 h-8 rounded-full border-2 border-brand-orange border-t-transparent animate-spin mb-2"></div>
-            <span class="text-xs font-bold text-brand-muted uppercase tracking-widest animate-pulse">Menghitung data...</span>
+        <div class="h-[300px] w-full flex items-center justify-center bg-gray-50/50 rounded-2xl relative overflow-hidden">
+          <div v-if="isLoading" class="w-full h-full p-6 animate-pulse flex flex-col justify-between">
+            <div class="h-4 bg-brand-cream/80 rounded w-1/3"></div>
+            <div class="h-48 bg-brand-cream/40 rounded-xl w-full"></div>
           </div>
           <ClientOnly v-else>
             <Line :data="lineChartData" :options="lineChartOptions" />
@@ -84,10 +84,9 @@
           <svg class="w-5 h-5 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg>
           Distribusi Program
         </h2>
-        <div class="h-[300px] w-full flex items-center justify-center bg-gray-50/50 rounded-2xl relative">
-          <div v-if="isLoading" class="flex flex-col items-center">
-            <div class="w-8 h-8 rounded-full border-2 border-brand-orange border-t-transparent animate-spin mb-2"></div>
-            <span class="text-xs font-bold text-brand-muted uppercase tracking-widest animate-pulse">Menghitung data...</span>
+        <div class="h-[300px] w-full flex items-center justify-center bg-gray-50/50 rounded-2xl relative overflow-hidden">
+          <div v-if="isLoading" class="w-full h-full p-6 animate-pulse flex flex-col items-center justify-center gap-4">
+            <div class="w-36 h-36 rounded-full border-8 border-brand-cream/80 border-t-brand-orange/40"></div>
           </div>
           <div v-else-if="doughnutChartData.datasets[0].data.length === 0" class="text-brand-muted text-sm text-center">
             Belum ada data pendaftar.
@@ -117,16 +116,16 @@
               <th class="p-6 text-right">Status</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-brand-border/50">
-            <tr v-if="isLoading">
-              <td class="p-16 text-center text-brand-muted" colspan="4">
-                <div class="animate-pulse flex flex-col items-center gap-2">
-                  <div class="w-8 h-8 rounded-full border-2 border-brand-orange border-t-transparent animate-spin"></div>
-                  <span class="font-bold tracking-widest uppercase text-xs">Memuat data...</span>
-                </div>
-              </td>
+          <tbody v-if="isLoading" class="divide-y divide-brand-border/50">
+            <tr v-for="n in 4" :key="n" class="animate-pulse">
+              <td class="p-6"><div class="h-4 bg-brand-cream/80 rounded w-24 mb-1"></div><div class="h-3 bg-brand-cream/40 rounded w-16"></div></td>
+              <td class="p-6"><div class="h-4 bg-brand-cream/80 rounded w-36 mb-1"></div><div class="h-3 bg-brand-cream/40 rounded w-24"></div></td>
+              <td class="p-6"><div class="h-4 bg-brand-cream/80 rounded w-20"></div></td>
+              <td class="p-6 text-right"><div class="h-6 bg-brand-cream/80 rounded-full w-20 ml-auto"></div></td>
             </tr>
-            <tr v-else-if="recent.length === 0">
+          </tbody>
+          <tbody v-else class="divide-y divide-brand-border/50">
+            <tr v-if="recent.length === 0">
               <td class="p-16 text-center text-brand-muted" colspan="4">Belum ada transaksi masuk.</td>
             </tr>
             <tr v-for="item in recent" :key="item.id" class="hover:bg-brand-cream/20 transition-colors">

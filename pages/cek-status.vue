@@ -1,13 +1,13 @@
 <template>
   <div class="max-w-2xl mx-auto pb-20 pt-8 px-4 space-y-8">
     
-    <div class="text-center mb-12">
+    <div class="gsap-cek-header text-center mb-12">
       <h1 class="font-display text-4xl md:text-5xl text-brand-brown mb-4 font-bold tracking-tight">Cek Status <span class="text-brand-orange italic">Transaksi</span></h1>
       <p class="text-brand-muted md:text-lg leading-relaxed max-w-md mx-auto">Masukkan kode invoice Anda (contoh: MUBK-YYYYMMDD-XXXX) untuk melacak status pendaftaran program atau pembelian kitab Anda.</p>
     </div>
 
     <!-- Form Cari -->
-    <div class="bg-white border border-brand-border/50 shadow-xl rounded-[40px] p-8 md:p-12 relative overflow-hidden group">
+    <div class="gsap-form-card bg-white border border-brand-border/50 shadow-xl rounded-[40px] p-8 md:p-12 relative overflow-hidden group">
       <!-- Decorative element -->
       <div class="absolute -right-20 -top-20 w-48 h-48 bg-brand-orange/5 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -36,12 +36,12 @@
     </div>
 
     <!-- Hasil Pencarian -->
-    <div v-if="result" class="bg-white border border-brand-border/50 shadow-xl rounded-[40px] p-8 md:p-12 space-y-8 animate-fade-in relative overflow-hidden">
+    <div v-if="result" class="gsap-result-card bg-white border border-brand-border/50 shadow-xl rounded-[40px] p-8 md:p-12 space-y-8 relative overflow-hidden">
       <!-- Decorative element -->
       <div class="absolute -left-20 -bottom-20 w-64 h-64 bg-brand-brown/5 rounded-full blur-3xl pointer-events-none"></div>
 
       <!-- Header & Status Utama -->
-      <div class="text-center pb-8 border-b border-brand-border/50 relative z-10">
+      <div class="gsap-res-item text-center pb-8 border-b border-brand-border/50 relative z-10">
         <div class="inline-block p-4 rounded-full bg-brand-cream/50 mb-4 border border-brand-border/30">
           <svg class="w-8 h-8 text-brand-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
         </div>
@@ -53,7 +53,7 @@
       </div>
 
       <!-- Rincian Pendaftaran -->
-      <div class="space-y-4 text-sm relative z-10">
+      <div class="gsap-res-item space-y-4 text-sm relative z-10">
         <div class="flex justify-between items-center py-2 border-b border-brand-border/30 border-dashed">
           <span class="text-brand-muted">Kode Invoice</span>
           <span class="font-bold text-brand-brown bg-brand-cream px-3 py-1 rounded-md tracking-wider">{{ result.kodeInvoice }}</span>
@@ -96,7 +96,7 @@
       </div>
 
       <!-- Total -->
-      <div class="pt-6 flex justify-between items-end relative z-10">
+      <div class="gsap-res-item pt-6 flex justify-between items-end relative z-10">
         <div>
           <span class="text-xs font-bold uppercase tracking-widest text-brand-muted">Total Pembayaran</span>
         </div>
@@ -106,7 +106,7 @@
       </div>
 
       <!-- CTA sesuai status -->
-      <div v-if="result.statusPembayaran === 'pending'" class="pt-6 border-t border-brand-border/50 space-y-4 relative z-10">
+      <div v-if="result.statusPembayaran === 'pending'" class="gsap-res-item pt-6 border-t border-brand-border/50 space-y-4 relative z-10">
         <div class="p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-3">
           <svg class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           <p class="text-sm text-amber-800 leading-relaxed">
@@ -118,7 +118,7 @@
         </AppButton>
       </div>
 
-      <div v-else-if="result.statusPembayaran === 'success'" class="pt-6 border-t border-brand-border/50 relative z-10 space-y-4">
+      <div v-else-if="result.statusPembayaran === 'success'" class="gsap-res-item pt-6 border-t border-brand-border/50 relative z-10 space-y-4">
         <div class="p-4 bg-green-50 border border-green-200 rounded-2xl flex items-start gap-3">
           <div class="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center shrink-0">
             <svg class="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
@@ -154,7 +154,7 @@
         </div>
       </div>
 
-      <div v-else-if="result.statusPembayaran === 'expire' || result.statusPembayaran === 'failed'" class="pt-6 border-t border-brand-border/50 relative z-10">
+      <div v-else-if="result.statusPembayaran === 'expire' || result.statusPembayaran === 'failed'" class="gsap-res-item pt-6 border-t border-brand-border/50 relative z-10">
         <div class="p-4 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-3">
           <svg class="w-5 h-5 text-red-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           <p class="text-sm text-red-800 leading-relaxed">
@@ -168,8 +168,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch, nextTick } from 'vue';
 import { useRoute } from 'vue-router';
+import { gsap } from 'gsap';
 
 const route = useRoute();
 const invoiceCode = ref('');
@@ -178,8 +179,52 @@ const isLoading = ref(false);
 const isResuming = ref(false);
 const error = ref('');
 
+const animateHeaderAndForm = async () => {
+  if (!import.meta.client) return;
+  await nextTick();
+  gsap.killTweensOf('.gsap-cek-header, .gsap-form-card');
+  gsap.fromTo(
+    '.gsap-cek-header',
+    { opacity: 0, y: 20 },
+    { opacity: 1, y: 0, duration: 0.65, delay: 0.2, ease: 'power2.out', clearProps: 'transform' }
+  );
+  gsap.fromTo(
+    '.gsap-form-card',
+    { opacity: 0, y: 20 },
+    { opacity: 1, y: 0, duration: 0.65, delay: 0.3, ease: 'power2.out', clearProps: 'transform' }
+  );
+};
+
+const animateResult = async () => {
+  if (!import.meta.client || !result.value) return;
+  await nextTick();
+  gsap.killTweensOf('.gsap-result-card, .gsap-res-item');
+  gsap.fromTo(
+    '.gsap-result-card',
+    { opacity: 0, y: 20, scale: 0.98 },
+    { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: 'power2.out', clearProps: 'transform' }
+  );
+  const items = document.querySelectorAll('.gsap-res-item');
+  if (items.length > 0) {
+    gsap.fromTo(
+      items,
+      { opacity: 0, y: 15 },
+      { opacity: 1, y: 0, duration: 0.45, stagger: 0.08, ease: 'power2.out', clearProps: 'transform' }
+    );
+  }
+};
+
+watch(result, (newVal) => {
+  if (newVal) {
+    animateResult();
+  }
+});
+
 // Jika ada query param invoice, langsung cari
-onMounted(() => {
+onMounted(async () => {
+  await nextTick();
+  animateHeaderAndForm();
+
   const qInvoice = route.query.invoice as string;
   if (qInvoice) {
     invoiceCode.value = qInvoice.toUpperCase();
