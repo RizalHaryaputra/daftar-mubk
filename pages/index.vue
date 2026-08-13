@@ -305,12 +305,12 @@ const initGsapStaticAnimations = () => {
 
   gsap.registerPlugin(ScrollTrigger);
 
-  // Hero Entrance Timeline - Instant load animation
-  const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-  tl.fromTo('.gsap-hero-title', { y: 45, opacity: 0 }, { y: 0, opacity: 1, duration: 1 })
-    .fromTo('.gsap-hero-sub', { y: 25, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8 }, '-=0.6')
-    .fromTo('.gsap-hero-img', { scale: 0.93, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.9 }, '-=0.5')
-    .fromTo('.gsap-hero-cta', { y: 20, scale: 0.85, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.6, ease: 'back.out(1.7)' }, '-=0.4');
+  // Hero Entrance Timeline - Instant load animation with slight delay for route transition
+  const tl = gsap.timeline({ defaults: { ease: 'power3.out' }, delay: 0.25 });
+  tl.fromTo('.gsap-hero-title', { y: 35, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9 })
+    .fromTo('.gsap-hero-sub', { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, '-=0.5')
+    .fromTo('.gsap-hero-img', { scale: 0.95, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.8 }, '-=0.5')
+    .fromTo('.gsap-hero-cta', { y: 15, scale: 0.9, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.5, ease: 'back.out(1.5)' }, '-=0.3');
 
   // Stats Card Reveal
   gsap.fromTo(

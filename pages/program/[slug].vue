@@ -302,14 +302,14 @@ const animateDetailContent = async () => {
   gsap.fromTo(
     '.gsap-back',
     { opacity: 0, x: -12 },
-    { opacity: 1, x: 0, duration: 0.4, ease: 'power2.out', clearProps: 'transform' }
+    { opacity: 1, x: 0, duration: 0.5, delay: 0.2, ease: 'power2.out', clearProps: 'transform' }
   );
 
   // Left card subtle scale entrance
   gsap.fromTo(
     '.gsap-left-card',
     { opacity: 0, y: 15 },
-    { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', clearProps: 'transform' }
+    { opacity: 1, y: 0, duration: 0.65, delay: 0.2, ease: 'power2.out', clearProps: 'transform' }
   );
 
   // Right side content staggered entrance
@@ -320,7 +320,7 @@ const animateDetailContent = async () => {
     gsap.fromTo(
       rightElements,
       { opacity: 0, y: 18 },
-      { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: 'power2.out', clearProps: 'transform' }
+      { opacity: 1, y: 0, duration: 0.55, delay: 0.25, stagger: 0.08, ease: 'power2.out', clearProps: 'transform' }
     );
   }
 };

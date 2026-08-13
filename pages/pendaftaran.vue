@@ -671,13 +671,13 @@ const animateInitialLoad = async () => {
   gsap.fromTo(
     '.gsap-pendaftaran-header',
     { opacity: 0, y: 20 },
-    { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', clearProps: 'transform' }
+    { opacity: 1, y: 0, duration: 0.65, delay: 0.2, ease: 'power2.out', clearProps: 'transform' }
   );
 
   gsap.fromTo(
     '.gsap-wizard-bar, .gsap-program-banner',
     { opacity: 0, y: 15 },
-    { opacity: 1, y: 0, duration: 0.5, stagger: 0.1, ease: 'power2.out', clearProps: 'transform' }
+    { opacity: 1, y: 0, duration: 0.55, delay: 0.25, stagger: 0.1, ease: 'power2.out', clearProps: 'transform' }
   );
 
   animateStepContent();
@@ -685,7 +685,7 @@ const animateInitialLoad = async () => {
   gsap.fromTo(
     '.gsap-action-buttons',
     { opacity: 0, y: 15 },
-    { opacity: 1, y: 0, duration: 0.5, delay: 0.15, ease: 'power2.out', clearProps: 'transform' }
+    { opacity: 1, y: 0, duration: 0.55, delay: 0.35, ease: 'power2.out', clearProps: 'transform' }
   );
 };
 

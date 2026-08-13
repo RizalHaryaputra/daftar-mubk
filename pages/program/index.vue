@@ -133,16 +133,16 @@ const animateHeader = async () => {
   gsap.fromTo(
     '.gsap-header',
     { opacity: 0, y: 20 },
-    { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', clearProps: 'transform' }
+    { opacity: 1, y: 0, duration: 0.7, delay: 0.2, ease: 'power2.out', clearProps: 'transform' }
   );
   gsap.fromTo(
     '.gsap-search',
     { opacity: 0, y: 15 },
-    { opacity: 1, y: 0, duration: 0.5, delay: 0.1, ease: 'power2.out', clearProps: 'transform' }
+    { opacity: 1, y: 0, duration: 0.6, delay: 0.3, ease: 'power2.out', clearProps: 'transform' }
   );
 };
 
-const animateCards = async () => {
+const animateCards = async (isInitial = false) => {
   if (!import.meta.client) return;
   await nextTick();
   const cards = document.querySelectorAll('.gsap-program-card');
@@ -151,13 +151,13 @@ const animateCards = async () => {
     gsap.fromTo(
       cards,
       { opacity: 0, y: 20 },
-      { opacity: 1, y: 0, duration: 0.5, stagger: 0.06, ease: 'power2.out', clearProps: 'transform' }
+      { opacity: 1, y: 0, duration: 0.55, delay: isInitial ? 0.25 : 0, stagger: 0.08, ease: 'power2.out', clearProps: 'transform' }
     );
   }
 };
 
 watch(paginatedPrograms, () => {
-  animateCards();
+  animateCards(false);
 });
 
 onMounted(async () => {
