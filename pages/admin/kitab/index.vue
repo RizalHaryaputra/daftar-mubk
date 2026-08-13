@@ -50,11 +50,6 @@
           </select>
         </div>
       </div>
-      <div v-if="isLoading" class="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
-        <div class="w-10 h-10 rounded-full border-4 border-brand-cream border-t-brand-orange animate-spin mb-4"></div>
-        <span class="text-sm font-bold text-brand-brown tracking-widest uppercase animate-pulse">Memuat Data...</span>
-      </div>
-
       <div class="overflow-x-auto">
         <table class="w-full text-left text-sm whitespace-nowrap">
           <thead class="bg-gray-50/50 border-b border-brand-border/50 text-brand-muted font-bold tracking-widest uppercase text-xs">
@@ -66,8 +61,25 @@
               <th class="p-6 text-right">Aksi</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-brand-border/50">
-            <tr v-if="paginatedData.length === 0 && !isLoading">
+          <tbody v-if="isLoading" class="divide-y divide-brand-border/50">
+            <tr v-for="n in 5" :key="n" class="animate-pulse">
+              <td class="p-6">
+                <div class="flex items-center gap-4">
+                  <div class="w-12 h-16 rounded-lg bg-brand-cream/80 flex-shrink-0"></div>
+                  <div class="space-y-2">
+                    <div class="h-4 bg-brand-cream/80 rounded w-36"></div>
+                    <div class="h-3 bg-brand-cream/40 rounded w-20"></div>
+                  </div>
+                </div>
+              </td>
+              <td class="p-6"><div class="h-4 bg-brand-cream/80 rounded w-28"></div></td>
+              <td class="p-6"><div class="h-4 bg-brand-cream/80 rounded w-24"></div></td>
+              <td class="p-6"><div class="h-6 bg-brand-cream/80 rounded-full w-16"></div></td>
+              <td class="p-6 text-right"><div class="h-8 bg-brand-cream/80 rounded-full w-16 ml-auto"></div></td>
+            </tr>
+          </tbody>
+          <tbody v-else class="divide-y divide-brand-border/50">
+            <tr v-if="paginatedData.length === 0">
               <td colspan="5" class="p-16 text-center text-brand-muted">
                 Tidak ada kitab yang cocok dengan kriteria pencarian Anda.
               </td>

@@ -24,9 +24,25 @@
       </div>
     </div>
 
-    <div v-if="isLoading" class="bg-white p-10 rounded-[30px] border border-brand-border/50 text-center">
-      <div class="w-10 h-10 rounded-full border-4 border-brand-cream border-t-brand-orange animate-spin mx-auto mb-4"></div>
-      <p class="text-brand-muted animate-pulse">Memuat data pendaftaran...</p>
+    <div v-if="isLoading" class="bg-white p-8 md:p-10 rounded-[30px] border border-brand-border/50 space-y-6 animate-pulse">
+      <div class="flex items-center justify-between border-b border-brand-border/30 pb-4">
+        <div class="h-6 bg-brand-cream/80 rounded-md w-48"></div>
+        <div class="h-6 bg-brand-cream/80 rounded-full w-24"></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="space-y-3">
+          <div class="h-4 bg-brand-cream/80 rounded w-1/3"></div>
+          <div class="h-10 bg-brand-cream/40 rounded-xl w-full"></div>
+        </div>
+        <div class="space-y-3">
+          <div class="h-4 bg-brand-cream/80 rounded w-1/3"></div>
+          <div class="h-10 bg-brand-cream/40 rounded-xl w-full"></div>
+        </div>
+      </div>
+      <div class="space-y-3">
+        <div class="h-4 bg-brand-cream/80 rounded w-1/4"></div>
+        <div class="h-20 bg-brand-cream/40 rounded-xl w-full"></div>
+      </div>
     </div>
     
     <div v-else-if="!item" class="bg-white p-10 rounded-[30px] border border-brand-border/50 text-center">
