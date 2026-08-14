@@ -2,8 +2,18 @@ import { generateInvoiceCode } from '../../../utils/generateInvoiceCode';
 import { getFirestoreDb } from '~/server/utils/firebase';
 import { createSnapTransaction } from '~/server/utils/midtrans';
 import { sendInvoiceEmail } from '~/server/utils/mailer';
+import { enforceRateLimit, getClientIp } from '~/server/utils/rateLimiter';
 
 export default defineEventHandler(async (event) => {
+  // ===== 0. Anti-Spam: IP Rate Limiting =====
+  const clientIp = getClientIp(event);
+  enforceRateLimit(event, clientIp, {
+    keyPrefix: 'pendaftaran_ip',
+    maxRequests: 5,
+    windowSeconds: 300,
+    customMessage: 'Terlalu banyak permintaan pendaftaran dari jaringan Anda. Silakan coba kembali dalam beberapa menit.'
+  });
+
   const body = await readBody(event);
   const { programId, jadwalPilihan, modeBelajar, dataPeserta, kitabDibeli, ongkir, rincianBiaya } = body;
 
@@ -29,6 +39,14 @@ export default defineEventHandler(async (event) => {
     email: dataPeserta.email.trim().toLowerCase(),
     noWa: dataPeserta.noWa.trim()
   };
+
+  // Anti-Spam: Email Throttle
+  enforceRateLimit(event, cleanedPeserta.email, {
+    keyPrefix: 'pendaftaran_email',
+    maxRequests: 3,
+    windowSeconds: 180,
+    customMessage: 'Terlalu banyak percobaan pendaftaran dengan email ini. Silakan tunggu 3 menit sebelum mencoba lagi.'
+  });
 
   // ===== 2. Validasi Duplikat Transaksi =====
   // Cek jika email + programId sudah terdaftar dengan status success atau pending

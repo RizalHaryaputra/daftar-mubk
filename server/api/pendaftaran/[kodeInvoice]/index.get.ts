@@ -1,8 +1,18 @@
 import { getFirestoreDb } from '../../../utils/firebase';
 import { checkTransactionStatus } from '../../../utils/midtrans';
 import { sendConfirmationEmail, sendAdminNotificationEmail, sendFailedEmail } from '../../../utils/mailer';
+import { enforceRateLimit, getClientIp } from '../../../utils/rateLimiter';
 
 export default defineEventHandler(async (event) => {
+  // Anti-Spam: Rate Limit Cek Status
+  const clientIp = getClientIp(event);
+  enforceRateLimit(event, clientIp, {
+    keyPrefix: 'cek_status_ip',
+    maxRequests: 30,
+    windowSeconds: 60,
+    customMessage: 'Terlalu banyak permintaan pengecekan status. Silakan tunggu sebentar.'
+  });
+
   const kodeInvoice = getRouterParam(event, 'kodeInvoice');
   if (!kodeInvoice) {
     throw createError({ statusCode: 400, statusMessage: 'Kode invoice tidak valid' });

@@ -1,7 +1,17 @@
 import { getFirestoreDb } from '../../../utils/firebase';
 import { createSnapTransaction } from '../../../utils/midtrans';
+import { enforceRateLimit, getClientIp } from '../../../utils/rateLimiter';
 
 export default defineEventHandler(async (event) => {
+  // Anti-Spam: Rate Limit Resume Payment
+  const clientIp = getClientIp(event);
+  enforceRateLimit(event, clientIp, {
+    keyPrefix: 'resume_payment_ip',
+    maxRequests: 10,
+    windowSeconds: 60,
+    customMessage: 'Terlalu banyak permintaan pembayaran. Silakan tunggu sebentar.'
+  });
+
   const kodeInvoice = getRouterParam(event, 'kodeInvoice') as string;
   const db = getFirestoreDb();
   
