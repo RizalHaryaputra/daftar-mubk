@@ -5,16 +5,36 @@ import { sendInvoiceEmail } from '~/server/utils/mailer';
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
-
-  const { programId, programNama, jadwalPilihan, modeBelajar, dataPeserta, kitabDibeli, ongkir, rincianBiaya } = body;
+  const { programId, jadwalPilihan, modeBelajar, dataPeserta, kitabDibeli, ongkir, rincianBiaya } = body;
 
   const db = getFirestoreDb();
 
-  // ===== 1. Validasi Duplikat =====
+  // ===== 1. Validasi Data Peserta =====
+  if (!dataPeserta?.namaLengkap || typeof dataPeserta.namaLengkap !== 'string' || !dataPeserta.namaLengkap.trim()) {
+    throw createError({ statusCode: 400, message: 'Nama lengkap peserta wajib diisi.' });
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!dataPeserta?.email || !emailRegex.test(dataPeserta.email.trim())) {
+    throw createError({ statusCode: 400, message: 'Format alamat email tidak valid.' });
+  }
+
+  if (!dataPeserta?.noWa || typeof dataPeserta.noWa !== 'string' || dataPeserta.noWa.trim().length < 8) {
+    throw createError({ statusCode: 400, message: 'Nomor WhatsApp wajib diisi dengan benar.' });
+  }
+
+  const cleanedPeserta = {
+    ...dataPeserta,
+    namaLengkap: dataPeserta.namaLengkap.trim(),
+    email: dataPeserta.email.trim().toLowerCase(),
+    noWa: dataPeserta.noWa.trim()
+  };
+
+  // ===== 2. Validasi Duplikat Transaksi =====
   // Cek jika email + programId sudah terdaftar dengan status success atau pending
-  if (programId && dataPeserta?.email) {
+  if (programId && cleanedPeserta.email) {
     const existingSnap = await db.collection('pendaftaran')
-      .where('dataPeserta.email', '==', dataPeserta.email)
+      .where('dataPeserta.email', '==', cleanedPeserta.email)
       .where('programId', '==', programId)
       .get();
 
@@ -41,54 +61,171 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // ===== 2. Generate Kode Invoice =====
-  const kodeInvoice = generateInvoiceCode();
+  // ===== 3. Backend Price Guard: Verifikasi Harga Program =====
+  let verifiedBiayaProgram = 0;
+  let verifiedProgramNama: string | null = null;
+  let verifiedNamaPaket = 'Reguler';
+  let linkGrupWa: string | null = null;
+  let progData: any = null;
 
-  // Ambil linkGrupWa dari collection program jika ada, sesuaikan dengan jenis kelamin
-  let linkGrupWa = null;
   if (programId) {
     const programSnap = await db.collection('programs').doc(programId).get();
-    if (programSnap.exists) {
-      const progData = programSnap.data();
-      const jk = dataPeserta?.jenisKelamin?.toLowerCase() || '';
-      
-      if (jk === 'laki-laki' && progData?.linkGrupWaLaki) {
-        linkGrupWa = progData.linkGrupWaLaki;
-      } else if (jk === 'perempuan' && progData?.linkGrupWaPerempuan) {
-        linkGrupWa = progData.linkGrupWaPerempuan;
+    if (!programSnap.exists) {
+      throw createError({ statusCode: 400, message: 'Program yang dipilih tidak ditemukan.' });
+    }
+
+    progData = programSnap.data();
+    if (progData.status !== 'aktif') {
+      throw createError({ statusCode: 400, message: 'Pendaftaran untuk program ini sedang ditutup.' });
+    }
+
+    // Cek deadline pendaftaran jika diset
+    if (progData.deadlineDaftar) {
+      const deadline = progData.deadlineDaftar.toDate ? progData.deadlineDaftar.toDate() : new Date(progData.deadlineDaftar);
+      if (new Date() > deadline) {
+        throw createError({ statusCode: 400, message: 'Batas waktu pendaftaran untuk program ini telah berakhir.' });
+      }
+    }
+
+    verifiedProgramNama = progData.nama;
+
+    // Verifikasi paket harga jika program memiliki opsi paket
+    if (rincianBiaya?.namaPaket && Array.isArray(progData.paketHarga) && progData.paketHarga.length > 0) {
+      const matchedPaket = progData.paketHarga.find((p: any) => p.nama === rincianBiaya.namaPaket);
+      if (matchedPaket) {
+        verifiedBiayaProgram = Math.round(Number(matchedPaket.harga) || 0);
+        verifiedNamaPaket = matchedPaket.nama;
       } else {
-        // Fallback ke linkGrupWa umum jika tidak spesifik atau spesifiknya kosong
-        linkGrupWa = progData?.linkGrupWa || null;
+        verifiedBiayaProgram = Math.round(Number(progData.harga) || 0);
+      }
+    } else {
+      verifiedBiayaProgram = Math.round(Number(progData.harga) || 0);
+    }
+
+    // Tentukan Link Grup WhatsApp berdasarkan gender
+    const jk = cleanedPeserta.jenisKelamin?.toLowerCase() || '';
+    if (jk === 'laki-laki' && progData.linkGrupWaLaki) {
+      linkGrupWa = progData.linkGrupWaLaki;
+    } else if (jk === 'perempuan' && progData.linkGrupWaPerempuan) {
+      linkGrupWa = progData.linkGrupWaPerempuan;
+    } else {
+      linkGrupWa = progData.linkGrupWa || null;
+    }
+  }
+
+  // ===== 4. Backend Price Guard: Verifikasi Harga Kitab =====
+  const verifiedKitabDibeli: Array<{ kitabId: string; judul: string; harga: number; qty: number }> = [];
+  let verifiedTotalHargaKitab = 0;
+
+  // Pastikan kitab wajib masuk jika program mewajibkan beli kitab
+  const requestedKitabMap = new Map<string, number>();
+  if (Array.isArray(kitabDibeli)) {
+    for (const item of kitabDibeli) {
+      const kId = item.kitabId || item.id;
+      if (kId) {
+        const qty = Math.max(1, Math.floor(Number(item.qty) || 1));
+        requestedKitabMap.set(kId, qty);
       }
     }
   }
 
-  // ===== 3. Simpan ke Firestore =====
+  if (progData?.wajibBeliKitab && Array.isArray(progData.kitabWajibIds)) {
+    for (const wId of progData.kitabWajibIds) {
+      if (!requestedKitabMap.has(wId)) {
+        requestedKitabMap.set(wId, 1);
+      }
+    }
+  }
+
+  if (requestedKitabMap.size > 0) {
+    for (const [kitabId, qty] of requestedKitabMap.entries()) {
+      const kitabSnap = await db.collection('kitabs').doc(kitabId).get();
+      if (!kitabSnap.exists) {
+        throw createError({ statusCode: 400, message: `Kitab dengan ID "${kitabId}" tidak ditemukan.` });
+      }
+      const kData = kitabSnap.data();
+      if (kData?.status !== 'aktif') {
+        throw createError({ statusCode: 400, message: `Kitab "${kData?.judul || kitabId}" sedang tidak aktif/tersedia.` });
+      }
+
+      const realHarga = Math.round(Number(kData.harga) || 0);
+      verifiedKitabDibeli.push({
+        kitabId,
+        judul: kData.judul,
+        harga: realHarga,
+        qty
+      });
+      verifiedTotalHargaKitab += realHarga * qty;
+    }
+  }
+
+  // ===== 5. Backend Price Guard: Verifikasi Ongkir =====
+  let verifiedOngkir = 0;
+  let verifiedZona: string | null = null;
+
+  if (verifiedKitabDibeli.length > 0) {
+    const ongkirSnap = await db.collection('settings').doc('ongkir').get();
+    const ongkirSetting = ongkirSnap.exists ? ongkirSnap.data() : { jogja: 15000, jawa: 25000, luarJawa: 45000 };
+
+    const rawZona = ongkir?.zona;
+    if (rawZona === 'jogja') {
+      verifiedOngkir = Math.round(Number(ongkirSetting?.jogja ?? 15000));
+      verifiedZona = 'jogja';
+    } else if (rawZona === 'jawa') {
+      verifiedOngkir = Math.round(Number(ongkirSetting?.jawa ?? 25000));
+      verifiedZona = 'jawa';
+    } else if (rawZona === 'luar_jawa') {
+      verifiedOngkir = Math.round(Number(ongkirSetting?.luarJawa ?? 45000));
+      verifiedZona = 'luar_jawa';
+    } else if (rawZona === 'ambil_sendiri') {
+      verifiedOngkir = 0;
+      verifiedZona = 'ambil_sendiri';
+    } else {
+      throw createError({ statusCode: 400, message: 'Pilihan zona ongkos kirim tidak valid.' });
+    }
+
+    if (verifiedZona !== 'ambil_sendiri' && (!cleanedPeserta.alamatPengiriman || !cleanedPeserta.alamatPengiriman.trim())) {
+      throw createError({ statusCode: 400, message: 'Alamat pengiriman wajib diisi untuk pengiriman kitab.' });
+    }
+  }
+
+  // ===== 6. Backend Price Guard: Verifikasi Donasi & Total Akhir =====
+  const verifiedDonasi = Math.max(0, Math.round(Number(rincianBiaya?.donasi) || 0));
+  const verifiedTotal = verifiedBiayaProgram + verifiedTotalHargaKitab + verifiedOngkir + verifiedDonasi;
+
+  if (verifiedTotal <= 0) {
+    throw createError({ statusCode: 400, message: 'Total tagihan pembayaran tidak valid.' });
+  }
+
+  // ===== 7. Generate Kode Invoice =====
+  const kodeInvoice = generateInvoiceCode();
+
+  // ===== 8. Simpan ke Firestore dengan Data Terverifikasi =====
   const pendaftaranData = {
     kodeInvoice,
     programId: programId ?? null,
-    programNama: programNama ?? null,
+    programNama: verifiedProgramNama,
     jadwalPilihan: jadwalPilihan ?? null,
     modeBelajar: modeBelajar ?? null,
     dataPeserta: {
-      ...dataPeserta,
-      alamatPengiriman: kitabDibeli?.length > 0 ? (dataPeserta.alamatPengiriman ?? null) : null
+      ...cleanedPeserta,
+      alamatPengiriman: verifiedKitabDibeli.length > 0 ? (cleanedPeserta.alamatPengiriman ?? null) : null
     },
-    kitabDibeli: kitabDibeli ?? [],
-    ongkir: kitabDibeli?.length > 0
-      ? { zona: ongkir?.zona ?? null, nominal: ongkir?.nominal ?? 0 }
+    kitabDibeli: verifiedKitabDibeli,
+    ongkir: verifiedKitabDibeli.length > 0
+      ? { zona: verifiedZona, nominal: verifiedOngkir }
       : { zona: null, nominal: 0 },
     rincianBiaya: {
-      biayaProgram: rincianBiaya?.biayaProgram ?? 0,
-      namaPaket: rincianBiaya?.namaPaket ?? 'Reguler',
-      totalHargaKitab: rincianBiaya?.totalHargaKitab ?? 0,
-      ongkir: rincianBiaya?.ongkir ?? 0,
-      donasi: rincianBiaya?.donasi ?? 0,
-      total: rincianBiaya?.total ?? 0
+      biayaProgram: verifiedBiayaProgram,
+      namaPaket: verifiedNamaPaket,
+      totalHargaKitab: verifiedTotalHargaKitab,
+      ongkir: verifiedOngkir,
+      donasi: verifiedDonasi,
+      total: verifiedTotal
     },
     linkGrupWa,
     statusPembayaran: 'pending',
-    statusPengiriman: kitabDibeli?.length > 0 ? 'belum_dikirim' : '-',
+    statusPengiriman: verifiedKitabDibeli.length > 0 ? 'belum_dikirim' : '-',
     midtrans: {
       orderId: kodeInvoice,
       snapToken: null,
@@ -103,72 +240,71 @@ export default defineEventHandler(async (event) => {
   const docRef = db.collection('pendaftaran').doc(kodeInvoice);
   await docRef.set(pendaftaranData);
 
-  // ===== 4. Create Transaksi Midtrans Snap =====
-  const total = Math.round(rincianBiaya?.total ?? 0);
-  const itemDetails = [];
+  // ===== 9. Create Transaksi Midtrans Snap dengan Item Details Terverifikasi =====
+  const itemDetails: any[] = [];
 
-  if (rincianBiaya?.biayaProgram > 0) {
+  if (verifiedBiayaProgram > 0) {
     itemDetails.push({
       id: programId ?? 'program',
-      price: Math.round(rincianBiaya.biayaProgram),
+      price: verifiedBiayaProgram,
       quantity: 1,
-      name: `${programNama ?? 'Program MUBK'} (${rincianBiaya.namaPaket ?? 'Reguler'})`.substring(0, 50)
+      name: `${verifiedProgramNama ?? 'Program MUBK'} (${verifiedNamaPaket})`.substring(0, 50)
     });
   }
 
-  if (rincianBiaya?.donasi > 0) {
+  if (verifiedDonasi > 0) {
     itemDetails.push({
       id: 'donasi_sukarela',
-      price: Math.round(rincianBiaya.donasi),
+      price: verifiedDonasi,
       quantity: 1,
       name: 'Donasi / Infaq Sukarela'
     });
   }
 
-  for (const kitab of kitabDibeli ?? []) {
+  for (const kitab of verifiedKitabDibeli) {
     itemDetails.push({
       id: kitab.kitabId,
-      price: Math.round(kitab.harga),
-      quantity: kitab.qty ?? 1,
+      price: kitab.harga,
+      quantity: kitab.qty,
       name: kitab.judul.substring(0, 50)
     });
   }
 
-  if (rincianBiaya?.ongkir > 0) {
+  if (verifiedOngkir > 0) {
     itemDetails.push({
       id: 'ongkir',
-      price: Math.round(rincianBiaya.ongkir),
+      price: verifiedOngkir,
       quantity: 1,
-      name: `Ongkos Kirim (${ongkir?.zona})`.substring(0, 50)
+      name: `Ongkos Kirim (${verifiedZona})`.substring(0, 50)
     });
   }
 
-  const snapResult = await createSnapTransaction(kodeInvoice, total, {
-    first_name: dataPeserta?.namaLengkap,
-    email: dataPeserta?.email,
-    phone: dataPeserta?.noWa
+  const snapResult = await createSnapTransaction(kodeInvoice, verifiedTotal, {
+    first_name: cleanedPeserta.namaLengkap,
+    email: cleanedPeserta.email,
+    phone: cleanedPeserta.noWa
   }, itemDetails);
 
-  // ===== 5. Update Snap Token di Firestore =====
+  // ===== 10. Update Snap Token di Firestore =====
   await docRef.update({
     'midtrans.snapToken': snapResult.token,
     updatedAt: new Date()
   });
 
-  // ===== 6. Kirim Email Invoice =====
-  if (dataPeserta?.email) {
+  // ===== 11. Kirim Email Invoice =====
+  if (cleanedPeserta.email) {
     let tipePesanan: 'program' | 'kitab' | 'kombinasi' = 'program';
-    if (programId && (kitabDibeli?.length ?? 0) > 0) tipePesanan = 'kombinasi';
-    else if (!programId && (kitabDibeli?.length ?? 0) > 0) tipePesanan = 'kitab';
+    if (programId && verifiedKitabDibeli.length > 0) tipePesanan = 'kombinasi';
+    else if (!programId && verifiedKitabDibeli.length > 0) tipePesanan = 'kitab';
 
     await sendInvoiceEmail({
-      to: dataPeserta.email,
-      namaLengkap: dataPeserta.namaLengkap,
-      kodeInvoice: kodeInvoice,
-      total: total,
+      to: cleanedPeserta.email,
+      namaLengkap: cleanedPeserta.namaLengkap,
+      kodeInvoice,
+      total: verifiedTotal,
       items: itemDetails,
       tipePesanan
-    }).catch(err => console.error('Gagal kirim email invoice:', err));
+    }).catch(err => console.error('[Pendaftaran API] Gagal kirim email invoice:', err));
   }
 
   return {
