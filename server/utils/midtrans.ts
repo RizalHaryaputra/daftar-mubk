@@ -1,5 +1,26 @@
+import crypto from 'crypto';
 // @ts-expect-error - midtrans-client does not have TypeScript definitions
 import midtransClient from 'midtrans-client';
+
+export const verifyMidtransSignature = (
+  orderId: string,
+  statusCode: string,
+  grossAmount: string,
+  signatureKey: string
+): boolean => {
+  const serverKey = process.env.MIDTRANS_SERVER_KEY || '';
+  if (!serverKey) {
+    console.error('MIDTRANS_SERVER_KEY is not defined in environment variables');
+    return false;
+  }
+
+  const expectedSignature = crypto
+    .createHash('sha512')
+    .update(`${orderId}${statusCode}${grossAmount}${serverKey}`)
+    .digest('hex');
+
+  return expectedSignature === signatureKey;
+};
 
 export const createSnapTransaction = async (orderId: string, grossAmount: number, customerDetails: any, itemDetails?: any[]) => {
   const isProduction = process.env.MIDTRANS_IS_PRODUCTION === 'true';
