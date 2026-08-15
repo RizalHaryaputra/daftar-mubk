@@ -11,7 +11,17 @@
           <h1 class="font-display text-3xl text-brand-brown">Detail Pembelian Kitab</h1>
           <p class="text-brand-muted mt-2">Kelola informasi pembeli, tagihan, dan status pengiriman untuk invoice <span class="font-bold text-brand-brown uppercase">#{{ id }}</span></p>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2">
+          <button 
+            v-if="item && item.ongkir?.zona !== 'ambil_sendiri'"
+            @click="isPrintLabelModalOpen = true" 
+            class="px-4 py-2 bg-brand-orange text-white rounded-full font-bold text-sm hover:bg-orange-600 transition-colors flex items-center gap-2 shadow-sm"
+          >
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            Cetak Label
+          </button>
           <button @click="openEditModal" class="px-4 py-2 bg-white text-brand-orange rounded-full font-bold text-sm hover:bg-brand-orange hover:text-white transition-colors flex items-center gap-2 shadow-sm border border-brand-border/50">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
             Edit Data
@@ -291,6 +301,13 @@
       @confirm="hapusData"
       @cancel="isDeleteModalOpen = false"
     />
+
+    <!-- Shipping Label Print Modal -->
+    <ModalPrintShippingLabel 
+      :is-open="isPrintLabelModalOpen" 
+      :orders="item ? [item] : []" 
+      @close="isPrintLabelModalOpen = false" 
+    />
   </div>
 </template>
 
@@ -316,6 +333,7 @@ const isUpdating = ref(false);
 const item = ref<any>(null);
 
 const isEditModalOpen = ref(false);
+const isPrintLabelModalOpen = ref(false);
 const isSavingEdit = ref(false);
 const editData = ref<any>({});
 
