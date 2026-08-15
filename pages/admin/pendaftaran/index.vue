@@ -71,8 +71,8 @@
             <button 
               @click="openPrintShippingLabels" 
               :disabled="selectedIds.length === 0"
-              class="flex items-center justify-center gap-2 px-5 py-2.5 rounded-full font-bold tracking-wider text-xs uppercase transition-all shadow-sm"
-              :class="selectedIds.length > 0 ? 'bg-brand-orange text-white hover:bg-orange-600 cursor-pointer' : 'bg-gray-200 text-gray-400 cursor-not-allowed border border-gray-300/50'"
+              class="flex items-center justify-center gap-2 px-5 py-2.5 rounded-full font-bold tracking-wider text-xs uppercase transition-all duration-200 shadow-sm"
+              :class="selectedIds.length > 0 ? 'bg-brand-orange text-white hover:bg-orange-600 shadow-brand-orange/20 cursor-pointer hover:-translate-y-0.5' : 'bg-gray-200/80 text-gray-400 cursor-not-allowed border border-gray-300/40'"
             >
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -114,13 +114,29 @@
         </div>
 
         <!-- Banner Seleksi Baris -->
-        <div v-if="selectedIds.length > 0" class="flex items-center justify-between bg-amber-50 border border-amber-200 px-4 py-2.5 rounded-xl text-xs text-brand-brown">
-          <span class="font-bold">
-            <span class="text-brand-orange font-extrabold">{{ selectedIds.length }}</span> pengiriman kitab terpilih untuk dicetak
-          </span>
-          <button @click="selectedIds = []" class="text-brand-muted hover:text-red-500 font-bold uppercase tracking-wider text-[11px]">
-            Batal Pilih
-          </button>
+        <div v-if="selectedIds.length > 0" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-orange-50/90 to-amber-50/90 border border-brand-orange/30 px-5 py-3 rounded-2xl text-xs text-brand-brown shadow-xs transition-all">
+          <div class="flex items-center gap-2.5">
+            <div class="w-6 h-6 rounded-full bg-brand-orange text-white flex items-center justify-center font-bold text-xs shadow-xs">
+              {{ selectedIds.length }}
+            </div>
+            <span class="font-semibold text-brand-brown">
+              pesanan pengiriman kitab dipilih untuk dicetak
+            </span>
+          </div>
+          <div class="flex items-center gap-3">
+            <button 
+              @click="openPrintShippingLabels" 
+              class="px-4 py-1.5 rounded-full bg-brand-orange text-white font-bold text-xs uppercase tracking-wider hover:bg-orange-600 transition-colors shadow-xs"
+            >
+              Cetak Sekarang
+            </button>
+            <button 
+              @click="selectedIds = []" 
+              class="text-brand-muted hover:text-red-500 font-bold uppercase tracking-wider text-[11px] transition-colors"
+            >
+              Batal Pilih
+            </button>
+          </div>
         </div>
       </div>
 
@@ -128,15 +144,27 @@
         <table class="w-full text-left text-sm">
           <thead class="bg-gray-50/50 border-b border-brand-border/50 text-brand-muted font-bold tracking-widest uppercase text-xs">
             <tr>
-              <th class="p-4 w-10 text-center">
-                <input 
-                  type="checkbox" 
-                  :checked="isAllSelected" 
-                  :disabled="shippablePaginatedData.length === 0"
-                  @change="toggleSelectAll" 
-                  class="rounded border-gray-300 text-brand-orange focus:ring-brand-orange cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
-                  :title="shippablePaginatedData.length === 0 ? 'Tidak ada data pengiriman kitab di halaman ini' : 'Pilih semua pengiriman di halaman ini'"
-                />
+              <th class="p-4 w-12 text-center">
+                <!-- Custom Themed Header Checkbox -->
+                <button 
+                  v-if="shippablePaginatedData.length > 0"
+                  type="button"
+                  @click="toggleSelectAll"
+                  class="w-5 h-5 mx-auto rounded-lg border-2 transition-all flex items-center justify-center cursor-pointer shadow-xs focus:outline-none focus:ring-2 focus:ring-brand-orange/30"
+                  :class="isAllSelected ? 'bg-brand-orange border-brand-orange text-white' : 'bg-white border-brand-border/80 hover:border-brand-orange text-transparent'"
+                  :title="isAllSelected ? 'Batalkan pilihan semua' : 'Pilih semua pengiriman di halaman ini'"
+                >
+                  <svg class="w-3.5 h-3.5 stroke-[3]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </button>
+                <div 
+                  v-else 
+                  class="w-5 h-5 mx-auto rounded-lg bg-brand-cream/40 border border-brand-border/40 flex items-center justify-center text-brand-muted/40 select-none text-[10px]" 
+                  title="Tidak ada data pengiriman kitab di halaman ini"
+                >
+                  &mdash;
+                </div>
               </th>
               <th class="p-4 whitespace-nowrap">Invoice & Waktu</th>
               <th class="p-4">Peserta</th>
@@ -149,7 +177,7 @@
           </thead>
           <tbody v-if="isLoading" class="divide-y divide-brand-border/50">
             <tr v-for="n in 5" :key="n" class="animate-pulse">
-              <td class="p-4 text-center"><div class="h-4 w-4 bg-brand-cream/80 rounded mx-auto"></div></td>
+              <td class="p-4 text-center"><div class="h-5 w-5 bg-brand-cream/80 rounded-lg mx-auto"></div></td>
               <td class="p-4"><div class="h-4 bg-brand-cream/80 rounded w-28 mb-1.5"></div><div class="h-3 bg-brand-cream/40 rounded w-20"></div></td>
               <td class="p-4"><div class="h-4 bg-brand-cream/80 rounded w-36 mb-1.5"></div><div class="h-3 bg-brand-cream/40 rounded w-28"></div></td>
               <td class="p-4"><div class="h-4 bg-brand-cream/80 rounded w-40 mb-1.5"></div><div class="h-3 bg-brand-cream/40 rounded w-24"></div></td>
@@ -165,21 +193,33 @@
                 Tidak ada pendaftaran yang cocok dengan kriteria pencarian Anda.
               </td>
             </tr>
-            <tr v-for="item in paginatedData" :key="item.id" class="hover:bg-brand-cream/20 transition-colors" :class="{ 'bg-amber-50/40': selectedIds.includes(item.id) }">
+            <tr 
+              v-for="item in paginatedData" 
+              :key="item.id" 
+              class="hover:bg-brand-cream/20 transition-colors" 
+              :class="{ 'bg-amber-50/50': selectedIds.includes(item.id) }"
+            >
               <td class="p-4 text-center">
-                <input 
+                <!-- Custom Themed Row Checkbox -->
+                <button 
                   v-if="canPrintLabel(item)"
-                  type="checkbox" 
-                  :value="item.id" 
-                  v-model="selectedIds" 
-                  class="rounded border-gray-300 text-brand-orange focus:ring-brand-orange cursor-pointer"
-                  title="Pilih untuk cetak label"
-                />
-                <span 
+                  type="button"
+                  @click="toggleItemSelect(item.id)"
+                  class="w-5 h-5 mx-auto rounded-lg border-2 transition-all flex items-center justify-center cursor-pointer shadow-xs focus:outline-none focus:ring-2 focus:ring-brand-orange/30"
+                  :class="selectedIds.includes(item.id) ? 'bg-brand-orange border-brand-orange text-white shadow-brand-orange/20 shadow-xs' : 'bg-white border-brand-border/80 hover:border-brand-orange hover:bg-brand-cream/20 text-transparent'"
+                  :title="selectedIds.includes(item.id) ? 'Batalkan pilihan' : 'Pilih untuk cetak label'"
+                >
+                  <svg class="w-3.5 h-3.5 stroke-[3]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </button>
+                <div 
                   v-else 
-                  class="text-brand-muted/40 text-xs font-bold select-none cursor-default" 
+                  class="w-5 h-5 mx-auto rounded-lg bg-brand-cream/30 border border-brand-border/30 flex items-center justify-center text-brand-muted/40 font-bold select-none text-[10px]" 
                   title="Pendaftaran ini tidak memesan pengiriman kitab fisik"
-                >-</span>
+                >
+                  &mdash;
+                </div>
               </td>
               <td class="p-4 whitespace-nowrap">
                 <p class="font-bold text-brand-brown text-sm uppercase">#{{ item.kodeInvoice || item.id }}</p>
@@ -299,6 +339,14 @@ const canPrintLabel = (item: any) => {
     item.ongkir.zona !== 'ambil_sendiri' &&
     item.statusPengiriman !== '-'
   );
+};
+
+const toggleItemSelect = (id: string) => {
+  if (selectedIds.value.includes(id)) {
+    selectedIds.value = selectedIds.value.filter(i => i !== id);
+  } else {
+    selectedIds.value.push(id);
+  }
 };
 
 // Delete states
