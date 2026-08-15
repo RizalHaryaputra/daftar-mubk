@@ -70,7 +70,9 @@
             <!-- Tombol Cetak Label Pengiriman -->
             <button 
               @click="openPrintShippingLabels" 
-              class="flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-brand-orange text-white font-bold tracking-wider text-xs uppercase hover:bg-orange-600 transition-colors shadow-sm"
+              :disabled="selectedIds.length === 0"
+              class="flex items-center justify-center gap-2 px-5 py-2.5 rounded-full font-bold tracking-wider text-xs uppercase transition-all shadow-sm"
+              :class="selectedIds.length > 0 ? 'bg-brand-orange text-white hover:bg-orange-600 cursor-pointer' : 'bg-gray-200 text-gray-400 cursor-not-allowed border border-gray-300/50'"
             >
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -114,7 +116,7 @@
         <!-- Banner Seleksi Baris -->
         <div v-if="selectedIds.length > 0" class="flex items-center justify-between bg-amber-50 border border-amber-200 px-4 py-2.5 rounded-xl text-xs text-brand-brown">
           <span class="font-bold">
-            <span class="text-brand-orange font-extrabold">{{ selectedIds.length }}</span> data terpilih untuk dicetak atau dikelola
+            <span class="text-brand-orange font-extrabold">{{ selectedIds.length }}</span> pengiriman kitab terpilih untuk dicetak
           </span>
           <button @click="selectedIds = []" class="text-brand-muted hover:text-red-500 font-bold uppercase tracking-wider text-[11px]">
             Batal Pilih
@@ -130,8 +132,10 @@
                 <input 
                   type="checkbox" 
                   :checked="isAllSelected" 
+                  :disabled="shippablePaginatedData.length === 0"
                   @change="toggleSelectAll" 
-                  class="rounded border-gray-300 text-brand-orange focus:ring-brand-orange cursor-pointer"
+                  class="rounded border-gray-300 text-brand-orange focus:ring-brand-orange cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                  :title="shippablePaginatedData.length === 0 ? 'Tidak ada data pengiriman kitab di halaman ini' : 'Pilih semua pengiriman di halaman ini'"
                 />
               </th>
               <th class="p-4 whitespace-nowrap">Invoice & Waktu</th>
@@ -164,11 +168,18 @@
             <tr v-for="item in paginatedData" :key="item.id" class="hover:bg-brand-cream/20 transition-colors" :class="{ 'bg-amber-50/40': selectedIds.includes(item.id) }">
               <td class="p-4 text-center">
                 <input 
+                  v-if="canPrintLabel(item)"
                   type="checkbox" 
                   :value="item.id" 
                   v-model="selectedIds" 
                   class="rounded border-gray-300 text-brand-orange focus:ring-brand-orange cursor-pointer"
+                  title="Pilih untuk cetak label"
                 />
+                <span 
+                  v-else 
+                  class="text-brand-muted/40 text-xs font-bold select-none cursor-default" 
+                  title="Pendaftaran ini tidak memesan pengiriman kitab fisik"
+                >-</span>
               </td>
               <td class="p-4 whitespace-nowrap">
                 <p class="font-bold text-brand-brown text-sm uppercase">#{{ item.kodeInvoice || item.id }}</p>
@@ -278,6 +289,18 @@ const isExportDropdownOpen = ref(false);
 const isPrintLabelModalOpen = ref(false);
 const ordersToPrint = ref<any[]>([]);
 
+// Helper untuk mengecek apakah suatu data memiliki pengiriman kitab fisik (bukan ambil sendiri)
+const canPrintLabel = (item: any) => {
+  return Boolean(
+    item &&
+    item.kitabDibeli &&
+    item.kitabDibeli.length > 0 &&
+    item.ongkir?.zona &&
+    item.ongkir.zona !== 'ambil_sendiri' &&
+    item.statusPengiriman !== '-'
+  );
+};
+
 // Delete states
 const isDeleteModalOpen = ref(false);
 const itemToDelete = ref<string | null>(null);
@@ -383,17 +406,32 @@ const filteredData = computed(() => {
   return result;
 });
 
+const totalPages = computed(() => {
+  return Math.max(1, Math.ceil(filteredData.value.length / itemsPerPage));
+});
+
+const paginatedData = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  return filteredData.value.slice(start, end);
+});
+
+// Hanya data di halaman aktif yang memiliki pengiriman fisik
+const shippablePaginatedData = computed(() => {
+  return paginatedData.value.filter(item => canPrintLabel(item));
+});
+
 const isAllSelected = computed(() => {
-  if (paginatedData.value.length === 0) return false;
-  return paginatedData.value.every(item => selectedIds.value.includes(item.id));
+  if (shippablePaginatedData.value.length === 0) return false;
+  return shippablePaginatedData.value.every(item => selectedIds.value.includes(item.id));
 });
 
 const toggleSelectAll = () => {
   if (isAllSelected.value) {
-    const pageIds = new Set(paginatedData.value.map(i => i.id));
-    selectedIds.value = selectedIds.value.filter(id => !pageIds.has(id));
+    const pageShippableIds = new Set(shippablePaginatedData.value.map(i => i.id));
+    selectedIds.value = selectedIds.value.filter(id => !pageShippableIds.has(id));
   } else {
-    const newIds = new Set([...selectedIds.value, ...paginatedData.value.map(i => i.id)]);
+    const newIds = new Set([...selectedIds.value, ...shippablePaginatedData.value.map(i => i.id)]);
     selectedIds.value = Array.from(newIds);
   }
 };
@@ -499,17 +537,15 @@ const exportToCsv = () => {
 
 // ===== FITUR CETAK LABEL PENGIRIMAN =====
 const openPrintShippingLabels = () => {
-  let targetOrders: any[] = [];
-
-  if (selectedIds.value.length > 0) {
-    targetOrders = pendaftaranList.value.filter(p => selectedIds.value.includes(p.id));
-  } else {
-    // Ambil data dari filter yang ada pengiriman fisiknya
-    targetOrders = filteredData.value.filter(p => p.kitabDibeli?.length > 0 && p.ongkir?.zona !== 'ambil_sendiri');
+  if (selectedIds.value.length === 0) {
+    showToast('Silakan pilih minimal satu data pendaftaran yang memiliki pengiriman kitab.', 'error');
+    return;
   }
 
+  const targetOrders = pendaftaranList.value.filter(p => selectedIds.value.includes(p.id) && canPrintLabel(p));
+
   if (targetOrders.length === 0) {
-    showToast('Tidak ada data paket pengiriman kitab yang dipilih/ditemukan.', 'error');
+    showToast('Data yang dipilih tidak memiliki pengiriman kitab fisik.', 'error');
     return;
   }
 
@@ -520,15 +556,5 @@ const openPrintShippingLabels = () => {
 // Reset page when filter changes
 watch([searchQuery, filterStatus, filterPeriode, filterProgram, filterBulan], () => {
   currentPage.value = 1;
-});
-
-const totalPages = computed(() => {
-  return Math.max(1, Math.ceil(filteredData.value.length / itemsPerPage));
-});
-
-const paginatedData = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  return filteredData.value.slice(start, end);
 });
 </script>
